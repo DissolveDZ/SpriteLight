@@ -114,14 +114,14 @@ void DrawTextWorld(char *text, Font *font, float x, float y, float scale, Vector
 
 void DrawSubTextText(Text *text, Font *font, int count)
 {
-    DrawSubText(text, font, count, text->x, text->y, text->scale, text->color);
+    DrawSubText(text->text, font, count, text->x, text->y, text->scale, text->color);
 }
 
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color)
 {
-    if(!count)
+    if (!count || count > strlen(text))
         return;
-    char *temp = malloc(count + 1);
+    char *temp = malloc(count+1);
     memcpy(temp, text, count);
     temp[count] = '\0';
     DrawText(temp, font, x, y, scale, color);

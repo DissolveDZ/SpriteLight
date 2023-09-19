@@ -26,6 +26,19 @@ void ProcessCamera(Camera *camera)
     }
 }
 
+void UpdateCamera()
+{
+    // camera stuff
+    if (state->active_camera)
+    {
+        vec3 temp;
+        glm_mat4_identity(state->view);
+        vec3 camera_pos = {state->camera.position.x, state->camera.position.y, state->camera.position.z};
+        glm_vec3_add(camera_pos, (vec3){0, 0, -1}, temp);
+        glm_lookat(camera_pos, temp, (vec3){0, 1, 0}, state->view);
+    }
+}
+
 void EngineUpdate()
 {
     last_frame = current_frame;

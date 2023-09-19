@@ -414,6 +414,7 @@ void LightingPass();
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level);
 void EngineUpdate();
 void UpdateKeys();
+void UpdateCamera();
 void EngineQuit(void);
 void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
 void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO);

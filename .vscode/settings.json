@@ -18,6 +18,7 @@
         "engine.h": "c",
         "initializer_list": "c",
         "type_traits": "c",
-        "container.h": "c"
+        "container.h": "c",
+        "cstdlib": "c"
     }
 }

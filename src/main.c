@@ -39,7 +39,7 @@ int main(void)
         Vector3 text_dimensions = MeasureText("Measuring Text..()", antonio_bold, 1.5f);
         DrawRectangle((Rectangle){state->mouse_world.x + text_dimensions.x / 2, state->mouse_world.y + text_dimensions.y / 2 + text_dimensions.z, text_dimensions.x, text_dimensions.y}, (Vector4){0, 0, 0, 255});
         DrawTextWorld("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 1.5f, (Vector4){255, 0, 0, 125});
-        DrawSubText("100% health", pixel_square, round((sinf(state->time)*0.5f+0.5f)*strlen("100% health")), 25.f, 25.f, 0.125f, (Vector4){255, 0, 0, 255});
+        DrawSubText("100% health", 0, round((sinf(state->time)*0.5f+0.5f)*strlen("100% health")), 25.f, 25.f, 0.125f, (Vector4){255, 0, 0, 255});
         SDL_GL_SwapWindow(state->main_window);
     }
     EngineQuit();

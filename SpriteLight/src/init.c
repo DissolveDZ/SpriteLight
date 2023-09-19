@@ -25,6 +25,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
         BloomInit(bloom_mip_level, &state->bloom, width, height);
     stbi_set_flip_vertically_on_load(1);
 
+    state->time = 0;
     state->near_z = 0.1f;
     state->far_z = 1000.f;
     state->fullscreen = false;
@@ -46,11 +47,11 @@ bool IsFontLoaded(Font *font, char *path)
     if (loaded_fonts_len >= loaded_fonts_max - 1)
     {
         loaded_fonts_max *= 1.5f;
-        loaded_fonts = realloc(loaded_fonts, sizeof(Font));
+        loaded_fonts = realloc(loaded_fonts, loaded_fonts_max * sizeof(Font));
     }
     else if (!loaded_fonts_len)
     {
-        loaded_fonts = calloc(1, loaded_fonts_max);
+        loaded_fonts = calloc(1, loaded_fonts_max * sizeof(Font));
         return false;
     }
     for (int i = 0; i < loaded_fonts_len; i++)
@@ -68,7 +69,7 @@ bool IsFontLoaded(Font *font, char *path)
 void InitDefaultFont(unsigned int resolution)
 {
     Font *default_font = LoadFont("resources/fonts/arial.ttf", resolution);
-    memcpy(default_chars, default_font->loaded_chars, 128);
+    memcpy(default_chars, default_font->loaded_chars, 128 * sizeof(TextCharacter));
 }
 
 Font *LoadFont(char *path, unsigned int resolution)
@@ -79,23 +80,23 @@ Font *LoadFont(char *path, unsigned int resolution)
     if (!strlen(path))
     {
         printf("please enter a valid path");
-        return -1;
+        return NULL;
     }
     FT_Library ft;
     if (FT_Init_FreeType(&ft))
     {
         printf("Could not init FreeType Library");
-        return -1;
+        return NULL;
     }
     FT_Face face;
     if (FT_New_Face(ft, path, 0, &face))
     {
         printf("Failed to load font");
-        return -1;
+        return NULL;
     }
     else
     {
-        font = malloc(sizeof(Font));
+        font = calloc(1, sizeof(Font));
         font->path = path;
         FT_Set_Pixel_Sizes(face, 0, resolution);
 
