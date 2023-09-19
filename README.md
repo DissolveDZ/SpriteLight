@@ -5,7 +5,7 @@
 ### I will port all of my future games / and some existing games to this engine as a stress/compatibility test <br>
 ### Even though it might look 2D the main camera actually has a perspective projection while all screen-space objects will use an orthographic projection (a flat projection with no depth information) <br>
 On compile the headers will merge into one main header <br>
-Now supports font rendering using freetype, I'm currently working on SDF fonts <br> 
+enable SDF fonts by setting state->sdf_font to 1 <br>
 It currently has a lot of useful text functions like DrawSubText(), MeasureText() and more to come! <br>
 The game engine syntax itself involves functions to be called during the main loop like UpdateEngine() etc. to handle input and supply global struct pointer which contains all kinds of useful data like frame-time <br>
 and an inbuilt camera system which can handle multiple camera types like panning etc.
