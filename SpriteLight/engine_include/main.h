@@ -273,6 +273,7 @@ int GetRandomValue(int min, int max);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
+char *ReadTextFile(char *path);
 // multiply vector2 by a value
 Vector2 Vector2Scale(Vector2 vector, float scalar);
 // add two vector2s

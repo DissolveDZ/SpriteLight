@@ -36,11 +36,6 @@ void SetShaderVec4(int Shader_ID, const char *name, vec4 value);
 
 void SetShaderVec3v(int Shader_ID, const char *name, vec3 *vector, int amount);
 # 2 "SpriteLight/engine_include/SpriteLight.h" 2
-# 1 "SpriteLight/engine_include/general.h" 1
-       
-
-char *ReadTextFile(char *path);
-# 3 "SpriteLight/engine_include/SpriteLight.h" 2
 # 1 "SpriteLight/engine_include/main.h" 1
 
 
@@ -381,6 +376,7 @@ int GetRandomValue(int min, int max);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
+char *ReadTextFile(char *path);
 
 Vector2 Vector2Scale(Vector2 vector, float scalar);
 
@@ -420,7 +416,7 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
 void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO);
 void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
 void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
-# 4 "SpriteLight/engine_include/SpriteLight.h" 2
+# 3 "SpriteLight/engine_include/SpriteLight.h" 2
 
 
 # 1 "SpriteLight/engine_include/draw.h" 1
@@ -433,4 +429,4 @@ void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 col
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
-# 7 "SpriteLight/engine_include/SpriteLight.h" 2
+# 6 "SpriteLight/engine_include/SpriteLight.h" 2

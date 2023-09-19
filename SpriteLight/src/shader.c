@@ -9,7 +9,6 @@ char *ReadTextFile(char *path)
     path = malloc(fsize + 1);
     fread(path, 1, fsize, file);
     path[fsize] = 0;
-    printf("reading");
     return path;
 }
 

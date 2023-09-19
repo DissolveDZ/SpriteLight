@@ -152,9 +152,8 @@ Vector3 MeasureText(char *text, Font *font, float scale)
 {
     scale *= 0.001f;
     float offset_x = 0;
-    float offset_y = 0;
+    float offset_y_min = 0;
     float max_y = 0;
-    float max_bearing = 0;
     float xpos = 0;
     float w = 0;
     for (char i = 0; i != strlen(text); i++)
@@ -172,21 +171,18 @@ Vector3 MeasureText(char *text, Font *font, float scale)
             offset_x -= ch.bearing[0] * scale;
         xpos = offset_x + ch.bearing[0] * scale;
         ypos = -(ch.size[1] - ch.bearing[1]) * scale;
-        if (!offset_y)
-            offset_y = ypos;
-        if (ypos < offset_y)
-            offset_y = ypos;
+        if (!offset_y_min)
+            offset_y_min = ypos;
+        if (ypos < offset_y_min)
+            offset_y_min = ypos;
+        float temp = h+ypos;
         if (!max_y)
-            max_y = h;
-        if (h > max_y)
-            max_y = h;
-        if (!max_bearing)
-            max_bearing = ch.bearing[0] * scale;
-        if (ch.bearing[0] * scale > max_bearing)
-            max_bearing = ch.bearing[0] * scale;
+            max_y = temp;
+        if (temp > max_y)
+            max_y = temp;
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector3){xpos + w, max_y + max_bearing, offset_y};
+    return (Vector3){xpos + w, max_y-offset_y_min, offset_y_min};
 }
 
 void EngineQuit(void)
