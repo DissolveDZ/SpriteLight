@@ -112,6 +112,21 @@ void DrawTextWorld(char *text, Font *font, float x, float y, float scale, Vector
     DrawTextWorldText((Text){text, x, y, scale, color}, font);
 }
 
+void DrawSubTextText(Text *text, Font *font, int count)
+{
+    DrawSubText(text, font, count, text->x, text->y, text->scale, text->color);
+}
+
+void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color)
+{
+    if(!count)
+        return;
+    char *temp = malloc(count + 1);
+    memcpy(temp, text, count);
+    temp[count] = '\0';
+    DrawText(temp, font, x, y, scale, color);
+}
+
 void DrawTextWorldText(Text text, Font *font)
 {
     UseShader(text_shader_world);

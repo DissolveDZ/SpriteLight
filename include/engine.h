@@ -306,6 +306,7 @@ typedef struct State
     Player player;
     Camera camera;
     float frame_time;
+    float time;
     int active_camera;
     float gravity;
     bool quit;
@@ -429,4 +430,6 @@ void DrawTextWorld(char *text, Font *font, float x, float y, float scale, Vector
 void DrawTextWorldText(Text text, Font *font);
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 void DrawTextText(Text text, Font *font);
+void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
+void DrawSubTextText(Text *text, Font *font, int count);
 # 7 "SpriteLight/engine_include/SpriteLight.h" 2

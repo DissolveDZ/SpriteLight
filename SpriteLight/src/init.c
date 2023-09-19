@@ -68,8 +68,7 @@ bool IsFontLoaded(Font *font, char *path)
 void InitDefaultFont(unsigned int resolution)
 {
     Font *default_font = LoadFont("resources/fonts/arial.ttf", resolution);
-    for (int i = 0; i < 128; i++)
-        default_chars[i] = default_font->loaded_chars[i];
+    memcpy(default_chars, default_font->loaded_chars, 128);
 }
 
 Font *LoadFont(char *path, unsigned int resolution)

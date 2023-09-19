@@ -198,6 +198,7 @@ typedef struct State
     Player player;
     Camera camera;
     float frame_time;
+    float time;
     int active_camera;
     float gravity;
     bool quit;
