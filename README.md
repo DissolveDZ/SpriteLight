@@ -10,4 +10,6 @@ It currently has a lot of useful text functions like DrawSubText(), MeasureText(
 The game engine syntax itself involves functions to be called during the main loop like UpdateEngine() etc. to handle input and supply global struct pointer which contains all kinds of useful data like frame-time <br>
 and an inbuilt camera system which can handle multiple camera types like panning etc.
 
-![image](https://github.com/DissolveDZ/SpriteLight/assets/68782699/8f7a6df8-ccb1-49d1-8dd9-f9ea7bb0b4e3)
+![image](https://github.com/DissolveDZ/SpriteLight/assets/68782699/76a4f395-37e2-4f68-99ed-f044b5cbdf61)
+
+![image](https://github.com/DissolveDZ/SpriteLight/assets/68782699/04fadc83-d5a5-4f71-9428-ef958357c15c)
