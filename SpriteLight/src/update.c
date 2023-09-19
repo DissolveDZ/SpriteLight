@@ -43,6 +43,7 @@ void EngineUpdate()
 
 void UpdateKeys()
 {
+    state->wheel = 0;
     while (SDL_PollEvent(&state->window_event))
     {
         switch (state->window_event.type)

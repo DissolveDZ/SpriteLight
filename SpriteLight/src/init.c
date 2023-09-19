@@ -10,17 +10,21 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     state->main_context = SDL_GL_CreateContext(state->main_window);
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
     SDL_GL_SetSwapInterval(1);
+
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     basic_shader = LoadShader("resources/shaders/rec.vert", "resources/shaders/rec.frag");
     text_shader = LoadShader("resources/shaders/text.vert", "resources/shaders/text.frag");
     text_shader_world = LoadShader("resources/shaders/text_world.vert", "resources/shaders/text.frag");
+
     SDL_Surface *icon = LoadSDLImage(icon_path);
     SDL_SetWindowIcon(state->main_window, icon);
     if (bloom_mip_level)
         BloomInit(bloom_mip_level, &state->bloom, width, height);
     stbi_set_flip_vertically_on_load(1);
+
     state->near_z = 0.1f;
     state->far_z = 1000.f;
     state->fullscreen = false;
@@ -29,8 +33,8 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     state->quit = false;
     state->resize_ptr = &OnResize;
     state->resize_ptr(width, height);
-    InitDefaultFont(512);
 
+    InitDefaultFont(512);
     BufferSetup(&quad_vao, &quad_vbo, quad_vertices, sizeof(quad_vertices), true, false);
     BufferSetup(&text_vao, &text_vbo, quad_vertices, sizeof(quad_vertices), true, false);
     BufferSetup(&plane_vao, &plane_vbo, plane_vertices, sizeof(plane_vertices), true, false);
@@ -106,6 +110,10 @@ Font *LoadFont(char *path, unsigned int resolution)
                 printf("Failed to load Glyph");
                 continue;
             }
+            if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LIGHT))
+                continue;
+            if (state->sdf_font)
+                FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF);
             unsigned int texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);

@@ -192,6 +192,7 @@ typedef struct State
     Vector2I mouse_delta;
     int wheel;
     bool deferred;
+    bool sdf_font;
     void (*resize_ptr)(int, int);
     Bloom bloom;
     Player player;
@@ -295,7 +296,7 @@ void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int siz
 void OnResize(int new_width, int new_height);
 Font *LoadFont(char *path, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
-Vector3 MeasureText(char *text, Font *font, float scale);
+Vector2 MeasureText(char *text, Font *font, float scale);
 void CameraZoom(Camera *camera, float amount, float min, float max);
 void LightingPass();
 
@@ -303,6 +304,7 @@ void LightingPass();
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level);
 void EngineUpdate();
 void UpdateKeys();
+void EngineQuit(void);
 void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
 void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO);
 void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);

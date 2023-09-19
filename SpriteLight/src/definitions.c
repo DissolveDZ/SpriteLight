@@ -156,17 +156,15 @@ void UpdateCamera()
     }
 }
 
-Vector3 MeasureText(char *text, Font *font, float scale)
+Vector2 MeasureText(char *text, Font *font, float scale)
 {
     scale *= 0.001f;
     float offset_x = 0;
     float max_y = 0;
-    float offset_y = 0;
     float xpos = 0;
     float w = 0;
     for (char i = 0; i != strlen(text); i++)
     {
-        float ypos = 0;
         float h = 0;
         TextCharacter ch;
         if (font == NULL)
@@ -178,16 +176,18 @@ Vector3 MeasureText(char *text, Font *font, float scale)
         if (i == 0)
             offset_x -= ch.bearing[0] * scale;
         xpos = offset_x + ch.bearing[0] * scale;
-        ypos = -(ch.size[1] - ch.bearing[1]) * scale;
         if (!max_y)
             max_y = h;
-        if (!offset_y)
-            offset_y = ypos;
-        if (ypos < offset_y)
-            offset_y = ypos;
         if (h > max_y)
             max_y = h;
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector3){xpos + w, max_y, offset_y};
+    return (Vector2){xpos + w, max_y};
+}
+
+void EngineQuit(void)
+{
+    SDL_GL_DeleteContext(state->main_context);
+    SDL_DestroyWindow(state->main_window);
+    SDL_Quit();
 }

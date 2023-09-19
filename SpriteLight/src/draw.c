@@ -124,6 +124,21 @@ void DrawTextWorldText(Text text, Font *font)
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(text_vao);
     text.scale *= 0.001f;
+    float offset_y = 0;
+    for (char i = 0; i != strlen(text.text); i++)
+    {
+        TextCharacter ch;
+        if (font == NULL)
+            ch = default_chars[text.text[i]];
+        else
+            ch = font->loaded_chars[text.text[i]];
+        float ypos  = (ch.size[1] - ch.bearing[1]) * text.scale;
+        if (!offset_y)
+            offset_y = ypos;
+        if (ypos < offset_y)
+            offset_y = ypos;
+    }
+    text.y += offset_y;
     for (char i = 0; i != strlen(text.text); i++)
     {
         TextCharacter ch;
@@ -134,26 +149,19 @@ void DrawTextWorldText(Text text, Font *font)
         float w = ch.size[0] * text.scale;
         float h = ch.size[1] * text.scale;
         if (i == 0)
-            text.x -= ch.bearing[0]*text.scale;
+            text.x -= ch.bearing[0] * text.scale;
         float xpos = text.x + ch.bearing[0] * text.scale;
         float ypos = text.y - (ch.size[1] - ch.bearing[1]) * text.scale;
-        // printf("textlen: %f\n", scale);
-        //  update VBO for each character
         float vertices[4][5] = {
             {xpos, ypos + h, 0.f, 0.0f, 0.0f},
             {xpos, ypos, 0.f, 0.0f, 1.0f},
             {xpos + w, ypos + h, 0.f, 1.0f, 0.0f},
             {xpos + w, ypos, 0.f, 1.0f, 1.0f}};
-        // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.texture_id);
-        // update content of VBO memory
         glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
-
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        // render quad
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         text.x += (ch.advance >> 6) * text.scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
     }
     glBindVertexArray(0);
