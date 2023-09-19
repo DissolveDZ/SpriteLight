@@ -2,6 +2,7 @@
 ## 2D/3D game-engine/framework using SDL2 and OpenGL <br>
 ## Can be compiled statically and dynamically on Linux and Windows <br>
 ## A game engine which will make developing games in opengl easier and more organized/structured while still allowing for low-level access <br>
+### I will port all of my future games / and some existing games to this engine as a stress/compatibility test <br>
 ### Even though it might look 2D the main camera actually has a perspective projection while all screen-space objects will use an orthographic projection (a flat projection with no depth information) <br>
 On compile the headers will merge into one main header <br>
 Now supports font rendering using freetype, I'm currently working on SDF fonts <br> 
