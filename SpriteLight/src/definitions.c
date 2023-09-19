@@ -156,15 +156,23 @@ void UpdateCamera()
     }
 }
 
-Vector2 MeasureText(char *text, Font *font, float scale)
+Vector3 MeasureTextText(Text *text, Font *font)
+{
+    return MeasureText(text->text, font, text->scale);
+}
+
+Vector3 MeasureText(char *text, Font *font, float scale)
 {
     scale *= 0.001f;
     float offset_x = 0;
+    float offset_y = 0;
     float max_y = 0;
+    float max_bearing = 0;
     float xpos = 0;
     float w = 0;
     for (char i = 0; i != strlen(text); i++)
     {
+        float ypos = 0;
         float h = 0;
         TextCharacter ch;
         if (font == NULL)
@@ -176,13 +184,22 @@ Vector2 MeasureText(char *text, Font *font, float scale)
         if (i == 0)
             offset_x -= ch.bearing[0] * scale;
         xpos = offset_x + ch.bearing[0] * scale;
+        ypos = -(ch.size[1] - ch.bearing[1]) * scale;
+        if (!offset_y)
+            offset_y = ypos;
+        if (ypos < offset_y)
+            offset_y = ypos;
         if (!max_y)
             max_y = h;
         if (h > max_y)
             max_y = h;
+        if (!max_bearing)
+            max_bearing = ch.bearing[0] * scale;
+        if (ch.bearing[0] * scale > max_bearing)
+            max_bearing = ch.bearing[0] * scale;
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector2){xpos + w, max_y};
+    return (Vector3){xpos + w, max_y + max_bearing, offset_y};
 }
 
 void EngineQuit(void)

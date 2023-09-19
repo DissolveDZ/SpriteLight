@@ -124,6 +124,9 @@ void DrawTextWorldText(Text text, Font *font)
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(text_vao);
     text.scale *= 0.001f;
+    // commented for text-centering, might use later for UI objects like buttons etc.
+    // when changing text length the text would go up and down which is usually not wanted since text should be able to change dynamically best suited for static/centered text
+    /*
     float offset_y = 0;
     for (char i = 0; i != strlen(text.text); i++)
     {
@@ -139,6 +142,7 @@ void DrawTextWorldText(Text text, Font *font)
             offset_y = ypos;
     }
     text.y += offset_y;
+    */
     for (char i = 0; i != strlen(text.text); i++)
     {
         TextCharacter ch;

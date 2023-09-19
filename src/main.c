@@ -32,11 +32,13 @@ int main(void)
         DrawRectangle((Rectangle){-3, 0, 2, 1}, (Vector4){255, 75, 75, 255});
         DrawRectangle((Rectangle){3, 0, 2, 1}, (Vector4){75, 75, 75, 255});
         DrawRectangleTex(rec);
-        DrawTextWorldText(text, antonio_bold);
+        Vector3 text_size = MeasureTextText(&text, pixel_square);
+        DrawRectangle((Rectangle){text.x + text_size.x / 2, text.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){0, 0, 0, 255});
+        DrawTextWorldText(text, pixel_square);
         DrawTextWorld("this is a test", pixel_square, -7, 0, 2.5f, (Vector4){0, 0, 255, 255});
-        Vector2 text_dimensions = MeasureText("Measuring Text..()", 0, 2.5f);
-        //DrawRectangle((Rectangle){state->mouse_world.x + text_dimensions.x / 2, state->mouse_world.y + text_dimensions.y / 2, text_dimensions.x, text_dimensions.y}, (Vector4){0, 0, 0, 255});
-        DrawTextWorld("Measuring Text..()", 0, state->mouse_world.x, state->mouse_world.y, 2.5f, (Vector4){255, 0, 0, 125});
+        Vector3 text_dimensions = MeasureText("Measuring Text..()", antonio_bold, 1.5f);
+        DrawRectangle((Rectangle){state->mouse_world.x + text_dimensions.x / 2, state->mouse_world.y + text_dimensions.y / 2 + text_dimensions.z, text_dimensions.x, text_dimensions.y}, (Vector4){0, 0, 0, 255});
+        DrawTextWorld("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 1.5f, (Vector4){255, 0, 0, 125});
         DrawText("100% health", pixel_square, 25.f, 25.f, 0.125f, (Vector4){255, 0, 0, 255});
         SDL_GL_SwapWindow(state->main_window);
     }

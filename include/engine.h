@@ -404,7 +404,8 @@ void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int siz
 void OnResize(int new_width, int new_height);
 Font *LoadFont(char *path, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
-Vector2 MeasureText(char *text, Font *font, float scale);
+Vector3 MeasureText(char *text, Font *font, float scale);
+Vector3 MeasureTextText(Text *text, Font *font);
 void CameraZoom(Camera *camera, float amount, float min, float max);
 void LightingPass();
 
