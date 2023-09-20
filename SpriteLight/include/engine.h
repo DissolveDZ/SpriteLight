@@ -257,6 +257,11 @@ typedef struct Text
 
 static unsigned int text_characters_max = 100;
 
+typedef struct Audio
+{
+
+}Audio;
+
 typedef struct State
 {
     int screen_width;
@@ -266,6 +271,9 @@ typedef struct State
     SDL_Event window_event;
     SDL_Window *main_window;
     SDL_GLContext main_context;
+
+    Audio audio;
+
     uint8_t *key_state;
     uint32_t mouse_state;
     Vector2 mouse_world;
