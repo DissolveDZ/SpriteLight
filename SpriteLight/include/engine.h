@@ -1,6 +1,8 @@
 # 0 "SpriteLight/engine_include/SpriteLight.h"
 # 0 "<built-in>"
 # 0 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 0 "<command-line>" 2
 # 1 "SpriteLight/engine_include/SpriteLight.h"
 # 1 "SpriteLight/engine_include/shader.h" 1
        
