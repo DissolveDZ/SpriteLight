@@ -19,6 +19,9 @@
         "initializer_list": "c",
         "type_traits": "c",
         "container.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "msdfgen-ext.h": "c",
+        "stdint.h": "c",
+        "struct.h": "c"
     }
 }

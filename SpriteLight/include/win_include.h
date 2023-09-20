@@ -1,11 +1,4 @@
 #pragma once
-#ifdef _WIN32
-#include <win/SDL2/SDL.h>
-#include <win/cglm/call.h>
-#else
-#include <SDL2/SDL.h>
-#include <cglm/call.h>
-#endif
 #if defined(_WIN32)
 // To avoid conflicting windows.h symbols with raylib, some flags are defined
 // WARNING: Those flags avoid inclusion of some Win32 headers that could be required

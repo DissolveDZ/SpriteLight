@@ -120,32 +120,12 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 
-typedef struct Vector2
-{
-    float x;
-    float y;
-} Vector2;
-
-typedef struct Vector2I
-{
-    int x;
-    int y;
-} Vector2I;
-
-typedef struct Vector3
-{
-    float x;
-    float y;
-    float z;
-} Vector3;
-
-typedef struct Vector4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-} Vector4;
+typedef vec2s Vector2;
+typedef ivec2s Vector2I;
+typedef vec3s Vector3;
+typedef ivec3s Vector3I;
+typedef vec4s Vector4;
+typedef ivec4s Vector4I;
 
 typedef enum CameraType
 {
@@ -311,27 +291,27 @@ typedef struct State
     bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, basic_shader, circle_shader, text_shader_world, text_shader;
+static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader;
 
 static float quad_vertices[] = {
 
-    -1.0f,
-    1.0f,
+    -1.f,
+    1.f,
     0.0f,
     0.0f,
     1.0f,
-    -1.0f,
-    -1.0f,
+    -1.f,
+    -1.f,
     0.0f,
     0.0f,
     0.0f,
-    1.0f,
-    1.0f,
+    1.f,
+    1.f,
     0.0f,
     1.0f,
     1.0f,
-    1.0f,
-    -1.0f,
+    1.f,
+    -1.f,
     0.0f,
     1.0f,
     0.0f,
@@ -403,6 +383,8 @@ Font *LoadFont(char *path, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
 Vector3 MeasureText(char *text, Font *font, float scale);
 Vector3 MeasureTextText(Text *text, Font *font);
+Vector3 MeasureWorldText(char *text, Font *font, float scale);
+Vector3 MeasureWorldTextText(Text *text, Font *font);
 void CameraZoom(Camera *camera, float amount, float min, float max);
 void LightingPass();
 
@@ -421,10 +403,11 @@ void RenderBloom(unsigned int src_texture, float filter_radius, float threshold,
 
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
-void DrawRectangle(Rectangle rec, Vector4 color);
-void DrawRectangleTex(Rectangle rec);
-void DrawTextWorld(char *text, Font *font, float x, float y, float scale, Vector4 color);
-void DrawTextWorldText(Text text, Font *font);
+void DrawRect(Rectangle rec, Vector4 color);
+void DrawUIRect(Rectangle rec, Vector4 color);
+void DrawTexRect(Rectangle rec);
+void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
+void DrawWorldTextText(Text text, Font *font);
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);

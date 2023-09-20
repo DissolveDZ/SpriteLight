@@ -47,7 +47,7 @@ void OnResize(int new_width, int new_height)
     }
     state->screen_width = new_width;
     state->screen_height = new_height;
-    glm_ortho(0.0f, (float)new_width, 0.f, (float)new_height, state->near_z, state->far_z, state->ortho_projection);
+    glm_ortho(0.0f, (float)new_width, 0.f, (float)new_height, -1, 1, state->ortho_projection);
     glViewport(0, 0, new_width, new_height);
 }
 
@@ -143,6 +143,11 @@ void CameraZoom(Camera *camera, float amount, float min, float max)
     camera->position = next;
 }
 
+Vector3 MeasureWorldTextText(Text *text, Font *font)
+{
+    return MeasureWorldText(text->text, font, text->scale);
+}
+
 Vector3 MeasureTextText(Text *text, Font *font)
 {
     return MeasureText(text->text, font, text->scale);
@@ -150,7 +155,6 @@ Vector3 MeasureTextText(Text *text, Font *font)
 
 Vector3 MeasureText(char *text, Font *font, float scale)
 {
-    scale *= 0.001f;
     float offset_x = 0;
     float offset_y_min = 0;
     float max_y = 0;
@@ -175,14 +179,19 @@ Vector3 MeasureText(char *text, Font *font, float scale)
             offset_y_min = ypos;
         if (ypos < offset_y_min)
             offset_y_min = ypos;
-        float temp = h+ypos;
+        float temp = h + ypos;
         if (!max_y)
             max_y = temp;
         if (temp > max_y)
             max_y = temp;
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector3){xpos + w, max_y-offset_y_min, offset_y_min};
+    return (Vector3){xpos + w, max_y - offset_y_min, offset_y_min};
+}
+
+Vector3 MeasureWorldText(char *text, Font *font, float scale)
+{
+    return MeasureText(text, font, scale * 0.001f);
 }
 
 void EngineQuit(void)

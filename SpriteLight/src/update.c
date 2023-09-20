@@ -43,7 +43,7 @@ void EngineUpdate()
 {
     last_frame = current_frame;
     current_frame = SDL_GetPerformanceCounter();
-    state->frame_time = (double)(current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();\
+    state->frame_time = (double)(current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
     state->time += state->frame_time;
     state->key_state = SDL_GetKeyboardState(NULL);
     SDL_GetRelativeMouseState(&state->mouse_delta.x, &state->mouse_delta.y);

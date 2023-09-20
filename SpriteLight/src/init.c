@@ -16,6 +16,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     basic_shader = LoadShader("resources/shaders/rec.vert", "resources/shaders/rec.frag");
+    basic_screen_space_shader = LoadShader("resources/shaders/screen_space.vert", "resources/shaders/rec.frag");
     text_shader = LoadShader("resources/shaders/text.vert", "resources/shaders/text.frag");
     text_shader_world = LoadShader("resources/shaders/text_world.vert", "resources/shaders/text.frag");
 

@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <win_include.h>
+#include <SDL2/SDL.h>
+#include <cglm/call.h>
+#include <cglm/struct.h>
 #include "glad.c"
 #include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION

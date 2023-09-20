@@ -28,7 +28,7 @@ void main()
     }
     else
     {
-        cur_color.rgb = color.rgb;
+        cur_color = color;
     }
     FragColor = cur_color;
 }  

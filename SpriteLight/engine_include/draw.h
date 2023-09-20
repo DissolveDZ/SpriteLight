@@ -1,8 +1,9 @@
 void DrawQuad();
-void DrawRectangle(Rectangle rec, Vector4 color);
-void DrawRectangleTex(Rectangle rec);
-void DrawTextWorld(char *text, Font *font, float x, float y, float scale, Vector4 color);
-void DrawTextWorldText(Text text, Font *font);
+void DrawRect(Rectangle rec, Vector4 color);
+void DrawUIRect(Rectangle rec, Vector4 color);
+void DrawTexRect(Rectangle rec);
+void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
+void DrawWorldTextText(Text text, Font *font);
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
