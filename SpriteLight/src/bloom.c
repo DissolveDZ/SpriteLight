@@ -9,7 +9,7 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
     if (screen_width > (unsigned int)INT_MAX || screen_height > (unsigned int)INT_MAX)
     {
         printf("Window size conversion overflow - cannot build bloom FBO!");
-        return false;
+        return;
     }
     bloom->enabled = true;
     bloom->karis_average = true;
@@ -48,7 +48,7 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
     {
         printf("gbuffer FBO error, status: 0x\%x\n", status);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        return false;
+        return;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -63,7 +63,7 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
     SetShaderInt(downsample_shader.ID, "src_texture", 0);
 }
 
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO)
+void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO)
 {
     UseShader(upsample_shader);
     SetShaderFloat(upsample_shader.ID, "filter_radius", filter_radius);
@@ -90,7 +90,7 @@ void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO)
     glUseProgram(0);
 }
 
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height)
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height)
 {
     UseShader(downsample_shader);
     SetShaderVec2(downsample_shader.ID, "src_resolution", (vec2){(float)screen_width, (float)screen_height});
@@ -131,7 +131,7 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloo
 }
 
 // Render Bloom, will disable threshold when 0
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height)
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, bloom->FBO);
     DownSampleBloom(src_texture, threshold, knee, bloom, quadVAO, screen_width, screen_height);

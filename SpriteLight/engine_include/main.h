@@ -156,8 +156,14 @@ static unsigned int text_characters_max = 100;
 
 typedef struct Audio
 {
-    
-}Audio;
+    Mix_Music **music;
+    u32 music_len;
+    u32 music_max;
+    Mix_Chunk **sounds;
+    u32 sounds_len;
+    u32 sounds_max;
+    u32 volume;
+} Audio;
 
 typedef struct State
 {
@@ -171,8 +177,8 @@ typedef struct State
 
     Audio audio;
 
-    uint8_t *key_state;
-    uint32_t mouse_state;
+    u8 *key_state;
+    u32 mouse_state;
     Vector2 mouse_world;
     Vector2 camera_pan_start;
     Vector2 camera_pan_end;
@@ -300,8 +306,8 @@ void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);
 void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO);
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
+void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO);
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
 
 #endif // SPRITELIGHT_H

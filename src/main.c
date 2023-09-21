@@ -1,12 +1,14 @@
 #define SDL_MAIN_HANDLED
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <stdint.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <cglm/call.h>
 #include <cglm/struct.h>
-#include <win_include.h>
+#include "win_include.h"
 #include <glad/glad.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -15,6 +17,8 @@
 int main(void)
 {
     State *state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
+    u32 music = LoadAudioStream("resources/audio/music/35_Return_Trip.mp3");
+    PlayAudioStream(music);
     // optionally enable opengl debug output
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);

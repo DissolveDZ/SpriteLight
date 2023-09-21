@@ -4,8 +4,9 @@
 #include <math.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <win_include.h>
+#include "win_include.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <cglm/call.h>
 #include <cglm/struct.h>
 #include "glad.c"
@@ -19,6 +20,7 @@
 #include "shader.c"
 #include "texture.c"
 #include "lights.c"
+#include "audio.c"
 #include "buffers.c"
 #include "bloom.c"
 #include "init.c"

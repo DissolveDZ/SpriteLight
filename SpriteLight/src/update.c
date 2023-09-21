@@ -5,7 +5,7 @@ void ProcessCamera(Camera *camera)
     default:
         break;
     case PANNING_CAMERA:
-        if (state->mouse_state == SDL_BUTTON(SDL_BUTTON_RIGHT))
+        if (state->mouse_state & SDL_BUTTON_RMASK)
         {
             state->camera_pan_end = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
             camera->position.x += (state->camera_pan_start.x - state->camera_pan_end.x);
@@ -78,7 +78,6 @@ void UpdateKeys()
         case SDL_WINDOWEVENT:
             if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
             {
-                // resize(window_event.window.data1, window_event.window.data2);
                 if (state->window_event.window.data1 || state->window_event.window.data2)
                     state->resize_ptr(state->window_event.window.data1, state->window_event.window.data2);
             }

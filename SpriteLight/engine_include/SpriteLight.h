@@ -1,5 +1,6 @@
 #include "shader.h"
 #include "main.h"
+#include "audio.h"
 #include "texture.h"
 #include "lights.h"
 #include "draw.h"

@@ -43,7 +43,7 @@ void OnResize(int new_width, int new_height)
     if (new_width > (int)INT_MAX || new_height > (int)INT_MAX)
     {
         printf("Window size overflow");
-        return false;
+        return;
     }
     state->screen_width = new_width;
     state->screen_height = new_height;

@@ -261,8 +261,14 @@ static unsigned int text_characters_max = 100;
 
 typedef struct Audio
 {
-
-}Audio;
+    Mix_Music **music;
+    u32 music_len;
+    u32 music_max;
+    Mix_Chunk **sounds;
+    u32 sounds_len;
+    u32 sounds_max;
+    u32 volume;
+} Audio;
 
 typedef struct State
 {
@@ -276,8 +282,8 @@ typedef struct State
 
     Audio audio;
 
-    uint8_t *key_state;
-    uint32_t mouse_state;
+    u8 *key_state;
+    u32 mouse_state;
     Vector2 mouse_world;
     Vector2 camera_pan_start;
     Vector2 camera_pan_end;
@@ -405,10 +411,20 @@ void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);
 void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int *quadVAO);
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int *quadVAO, int screen_width, int screen_height);
+void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO);
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
 # 3 "SpriteLight/engine_include/SpriteLight.h" 2
+# 1 "SpriteLight/engine_include/audio.h" 1
+u32 LoadAudioStream(const char *file_name);
+u32 LoadSound(const char *file_name);
+u32 PlaySound(u32 sound);
+u32 PlayAudioStream(u32 music);
+void SetGlobalVolume(u32 volume);
+u32 InitAudio();
+u32 QuitAudio();
+void ToggleAudio();
+# 4 "SpriteLight/engine_include/SpriteLight.h" 2
 
 
 # 1 "SpriteLight/engine_include/draw.h" 1
@@ -422,4 +438,4 @@ void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 col
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
-# 6 "SpriteLight/engine_include/SpriteLight.h" 2
+# 7 "SpriteLight/engine_include/SpriteLight.h" 2
