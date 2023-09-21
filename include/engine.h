@@ -4,6 +4,10 @@
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 0 "<command-line>" 2
 # 1 "SpriteLight/engine_include/SpriteLight.h"
+# 1 "SpriteLight/engine_include/main.h" 1
+
+
+
 # 1 "SpriteLight/engine_include/shader.h" 1
        
 
@@ -37,12 +41,7 @@ void SetShaderVec3(int Shader_ID, const char *name, vec3 vector);
 void SetShaderVec4(int Shader_ID, const char *name, vec4 value);
 
 void SetShaderVec3v(int Shader_ID, const char *name, vec3 *vector, int amount);
-# 2 "SpriteLight/engine_include/SpriteLight.h" 2
-# 1 "SpriteLight/engine_include/main.h" 1
-
-
-
-
+# 5 "SpriteLight/engine_include/main.h" 2
 # 1 "SpriteLight/engine_include/texture.h" 1
        
 
@@ -414,7 +413,8 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
 void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO);
 void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
 void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
-# 3 "SpriteLight/engine_include/SpriteLight.h" 2
+# 2 "SpriteLight/engine_include/SpriteLight.h" 2
+
 # 1 "SpriteLight/engine_include/audio.h" 1
 u32 LoadAudioStream(const char *file_name);
 u32 LoadSound(const char *file_name);
