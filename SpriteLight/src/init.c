@@ -15,10 +15,10 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    basic_shader = LoadShader("resources/shaders/rec.vert", "resources/shaders/rec.frag");
-    basic_screen_space_shader = LoadShader("resources/shaders/screen_space.vert", "resources/shaders/rec.frag");
-    text_shader = LoadShader("resources/shaders/text.vert", "resources/shaders/text.frag");
-    text_shader_world = LoadShader("resources/shaders/text_world.vert", "resources/shaders/text.frag");
+    basic_shader = LoadShader("engine/rec.vert", "engine/rec.frag");
+    basic_screen_space_shader = LoadShader("ui/screen_space.vert", "engine/rec.frag");
+    text_shader = LoadShader("engine/text.vert", "engine/text.frag");
+    text_shader_world = LoadShader("engine/text_world.vert", "engine/text.frag");
 
     SDL_Surface *icon = LoadSDLImage(icon_path);
     SDL_SetWindowIcon(state->main_window, icon);

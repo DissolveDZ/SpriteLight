@@ -57,38 +57,34 @@ void EngineUpdate()
 
 void UpdateKeys()
 {
-    state->wheel = 0;
-    while (SDL_PollEvent(&state->window_event))
+    switch (state->window_event.type)
     {
-        switch (state->window_event.type)
+    case SDL_QUIT:
+        state->quit = true;
+        break;
+    case SDL_KEYDOWN:
+        switch (state->window_event.key.keysym.scancode)
+        case SDL_SCANCODE_F11:
+            state->fullscreen = !state->fullscreen;
+        if (state->fullscreen)
+            SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        else
+            SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_BORDERLESS);
+        break;
+        break;
+    case SDL_WINDOWEVENT:
+        if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
         {
-        case SDL_QUIT:
-            state->quit = true;
-            break;
-        case SDL_KEYDOWN:
-            switch (state->window_event.key.keysym.scancode)
-            case SDL_SCANCODE_F11:
-                state->fullscreen = !state->fullscreen;
-            if (state->fullscreen)
-                SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-            else
-                SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_BORDERLESS);
-            break;
-            break;
-        case SDL_WINDOWEVENT:
-            if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-            {
-                if (state->window_event.window.data1 || state->window_event.window.data2)
-                    state->resize_ptr(state->window_event.window.data1, state->window_event.window.data2);
-            }
-            break;
-        case SDL_MOUSEWHEEL:
-            state->wheel = state->window_event.wheel.y;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            if (state->camera.type == PANNING_CAMERA)
-                state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
-            break;
+            if (state->window_event.window.data1 || state->window_event.window.data2)
+                state->resize_ptr(state->window_event.window.data1, state->window_event.window.data2);
         }
+        break;
+    case SDL_MOUSEWHEEL:
+        state->wheel = state->window_event.wheel.y;
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (state->window_event.button.button == SDL_BUTTON_RIGHT && state->camera.type == PANNING_CAMERA)
+            state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+        break;
     }
 }

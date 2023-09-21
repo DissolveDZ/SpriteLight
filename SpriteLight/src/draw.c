@@ -140,6 +140,7 @@ void DrawSubText(char *text, Font *font, int count, float x, float y, float scal
     memcpy(temp, text, count);
     temp[count] = '\0';
     DrawText(temp, font, x, y, scale, color);
+    free(temp);
 }
 
 void DrawWorldTextText(Text text, Font *font)

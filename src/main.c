@@ -18,6 +18,7 @@ int main(void)
 {
     State *state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
     u32 music = LoadAudioStream("resources/audio/music/35_Return_Trip.mp3");
+    u32 sound = LoadSound("resources/audio/sounds/cash.mp3");
     PlayAudioStream(music);
     // optionally enable opengl debug output
     glEnable(GL_DEBUG_OUTPUT);
@@ -28,10 +29,21 @@ int main(void)
     Font *pixel_square = LoadFont("resources/fonts/Pixel_Square.ttf", 512);
     Font *antonio_bold = LoadFont("resources/fonts/Antonio-Bold.ttf", 512);
     Text text = (Text){"TESTING default font", 5.f, -5.f, 2.5f, {255, 0, 0, 255}};
-    
+
     while (!state->quit)
     {
-        UpdateKeys();
+        state->wheel = 0;
+        while (SDL_PollEvent(&state->window_event))
+        {
+            UpdateKeys();
+            switch (state->window_event.type)
+            {
+            case SDL_MOUSEBUTTONDOWN:
+                if (state->window_event.button.button == SDL_BUTTON_LEFT)
+                    PlaySound(sound);
+                break;
+            }
+        }
         EngineUpdate();
         UpdateCamera();
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
@@ -48,7 +60,7 @@ int main(void)
         DrawRect((Rectangle){state->mouse_world.x + text_size.x / 2, state->mouse_world.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){25, 25, 25, 50});
         DrawWorldText("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 1.5f, (Vector4){255, 0, 0, 255});
         text_size = MeasureText("100% health", pixel_square, 0.125f);
-        DrawUIRect((Rectangle){25+text_size.x/2, 25.f + text_size.y/2 + text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 255});
+        DrawUIRect((Rectangle){25 + text_size.x / 2, 25.f + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 255});
         DrawSubText("100% health", pixel_square, round((sinf(state->time) * 0.5f + 0.5f) * strlen("100% health")), 25.f, 25.f, 0.125f, (Vector4){255, 0, 0, 255});
         SDL_GL_SwapWindow(state->main_window);
     }

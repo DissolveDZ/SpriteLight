@@ -12,10 +12,10 @@ char *ReadTextFile(char *path)
     return path;
 }
 
-char* FormatShaderUniform(const char* uniform_name, int index)
+char *FormatShaderUniform(const char *uniform_name, int index)
 {
     int buffer_size = snprintf(NULL, 0, "%s[%d].%s", uniform_name, index, uniform_name) + 1;
-    char* buffer = malloc(buffer_size);
+    char *buffer = malloc(buffer_size);
     snprintf(buffer, buffer_size, "%s[%d].%s", uniform_name, index, uniform_name);
     return buffer;
 }
@@ -23,8 +23,21 @@ char* FormatShaderUniform(const char* uniform_name, int index)
 Shader LoadShader(char *vertex_path, char *fragment_path)
 {
     Shader shader = {0};
-    char* vertex_shader_source = ReadTextFile(vertex_path);
-    char* fragment_shader_source = ReadTextFile(fragment_path);
+    int vert = strlen(vertex_path);
+    int frag = strlen(fragment_path);
+    int len = vert;
+    if (vert < frag)
+        len = frag;
+    char *temp = malloc(19 + len + 1);
+    memcpy(temp, "resources/shaders/", 19);
+    strcat(temp, vertex_path);
+    temp[19 + vert] = '\0';
+    char *vertex_shader_source = ReadTextFile(temp);
+    temp[18] = 0;
+    strcat(temp, fragment_path);
+    temp[19 + frag] = '\0';
+    char *fragment_shader_source = ReadTextFile(temp);
+    free(temp);
 
     // compile shaders
     unsigned int vertex, fragment;
