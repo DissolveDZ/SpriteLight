@@ -258,12 +258,27 @@ typedef struct Text
 
 static unsigned int text_characters_max = 100;
 
+typedef struct Sound
+{
+    Mix_Chunk *chunk;
+} Sound;
+
+typedef struct Music
+{
+    Mix_Music *music;
+    u32 volume;
+} Music;
+
 typedef struct Audio
 {
-    Mix_Music **music;
+    Music **music;
     u32 music_len;
     u32 music_max;
-    Mix_Chunk **sounds;
+    Sound **sounds;
+    u32 parallel_sounds;
+    u32 max_parallel_sounds;
+    u32 max_parallel_musics;
+    u32 sounds_playing;
     u32 sounds_len;
     u32 sounds_max;
     u32 volume;
@@ -306,7 +321,7 @@ typedef struct State
     bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader;
+static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
 
 static float quad_vertices[] = {
 
@@ -419,8 +434,10 @@ void RenderBloom(unsigned int src_texture, float filter_radius, float threshold,
 u32 LoadAudioStream(const char *file_name);
 u32 LoadSound(const char *file_name);
 u32 PlaySound(u32 sound);
-u32 PlayAudioStream(u32 music);
+u32 PlayAudioStream(u32 stream);
 void SetGlobalVolume(u32 volume);
+void SetVolume(u32 sound, u8 volume);
+void SetAudioStreamVolume(u32 stream, u8 volume);
 u32 InitAudio();
 u32 QuitAudio();
 void ToggleAudio();
@@ -438,4 +455,5 @@ void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 col
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
+void DrawGradientV(Vector4 start, Vector4 end, float offset);
 # 7 "SpriteLight/engine_include/SpriteLight.h" 2
