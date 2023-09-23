@@ -1,4 +1,4 @@
-# SpriteLight
+# SpriteLight WIP
 ## 2D/3D game-engine/framework using SDL2 and OpenGL <br>
 ## Can be compiled statically and dynamically on Linux and Windows <br>
 ## A game engine which will make developing games in opengl easier and more organized/structured while still allowing for low-level access <br>
