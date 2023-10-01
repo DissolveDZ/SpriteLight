@@ -28,7 +28,7 @@ Shader LoadShader(char *vertex_path, char *fragment_path)
     int len = vert;
     if (vert < frag)
         len = frag;
-    char *temp = malloc(19 + len + 1);
+    char *temp = malloc(18 + len + 1);
     memcpy(temp, "resources/shaders/", 19);
     strcat(temp, vertex_path);
     temp[19 + vert] = '\0';

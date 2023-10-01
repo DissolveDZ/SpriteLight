@@ -4,14 +4,14 @@ header:
 	cp SpriteLight/include/engine.h include
 
 dynamic: header
-	gcc SpriteLight/src/main.c -shared -ISpriteLight/engine_include -ISpriteLight/include -L. -lfreetype -fPIC -lSDL2main -lSDL2 -lm -o libSpriteLight.dll -D_FILE_OFFSET_BITS=64 -ggdb
-	gcc src/main.c libSpriteLight.dll -o engine_test -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -Wall
-	
+	clang SpriteLight/src/main.c -shared -ISpriteLight/engine_include -ISpriteLight/include -L. -lfreetype -fPIC -lSDL2main -lSDL2 -lm -o libSpriteLight.so -D_FILE_OFFSET_BITS=64 -ggdb
+	clang src/main.c libSpriteLight.so -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -Wall -o engine_test
+
 static: header
-	gcc -c SpriteLight/src/main.c -o libSpriteLight.o -ISpriteLight/include -lSDL2main -DSLDL_MAIN_HANDLED -lm -D_FILE_OFFSET_BITS=64 -ggdb
+	clang -c SpriteLight/src/main.c -o libSpriteLight.o -ISpriteLight/include -lSDL2main -DSLDL_MAIN_HANDLED -lm -D_FILE_OFFSET_BITS=64 -ggdb
 	ar rcs libSpriteLight.a libSpriteLight.o
-	gcc -static-libgcc src/main.c libSpriteLight.o -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -Wall -o engine_test
+	clang src/main.c libSpriteLight.o -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -Wall -o engine_test
 	./engine_test
 
 run: dynamic
-	./engine_test
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/SpriteLight ./engine_test

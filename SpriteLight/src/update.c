@@ -17,7 +17,7 @@ void ProcessCamera(Camera *camera)
             camera->target.x = state->mouse_world.x;
             camera->target.y = state->mouse_world.y;
             Vector2 before = (Vector2){camera->target.x, camera->target.y};
-            CameraZoom(&state->camera, -2.5f * state->wheel, 1.f, 100.f);
+            CameraZoom(&state->camera, -1.f * state->wheel, 1.f, 100.f);
             Vector2 after = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
             camera->position.x += (before.x - after.x);
             camera->position.y += (before.y - after.y);
@@ -43,7 +43,8 @@ void EngineUpdate()
 {
     last_frame = current_frame;
     current_frame = SDL_GetPerformanceCounter();
-    state->frame_time = (double)(current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
+    if (last_frame > 0)
+        state->frame_time = (double)(current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
     state->time += state->frame_time;
     state->key_state = SDL_GetKeyboardState(NULL);
     SDL_GetRelativeMouseState(&state->mouse_delta.x, &state->mouse_delta.y);
@@ -76,7 +77,7 @@ void UpdateKeys()
         if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
         {
             if (state->window_event.window.data1 || state->window_event.window.data2)
-                state->resize_ptr(state->window_event.window.data1, state->window_event.window.data2);
+                OnResize(state->window_event.window.data1, state->window_event.window.data2);
         }
         break;
     case SDL_MOUSEWHEEL:

@@ -8,14 +8,13 @@ out vec4 FragColor;
 
 uniform vec3 view_pos;
 uniform vec4 color;
-uniform vec4 tint;
 uniform bool use_color;
 uniform bool flip;
 uniform sampler2D tex;
 
 void main()
 {    
-    bool use_tint = true;
+    // and the diffuse per-fragment color
     vec4 cur_color = vec4(1);
     if (!use_color)
     {
@@ -29,10 +28,7 @@ void main()
     }
     else
     {
-        use_tint = false;
         cur_color = color;
     }
-    if (use_tint)
-        cur_color *= tint;
     FragColor = cur_color;
 }  

@@ -21,6 +21,7 @@
 #include "texture.c"
 #include "lights.c"
 #include "audio.c"
+#include "input.c"
 #include "buffers.c"
 #include "bloom.c"
 #include "init.c"

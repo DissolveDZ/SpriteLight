@@ -5,6 +5,36 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
             type, severity, message);
 }
 
+char *TextFormat(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    int length = vsnprintf(NULL, 0, format, args); // Determine the length of the formatted string
+    if (length < 0)
+    {
+        // Handle error
+        va_end(args);
+        return NULL;
+    }
+
+    char *result = (char *)malloc(length + 1); // Allocate memory for the formatted string (+1 for null terminator)
+    if (result == NULL)
+    {
+        // Handle memory allocation failure
+        va_end(args);
+        return NULL;
+    }
+
+    va_end(args); // Reset the va_list
+
+    va_start(args, format);                      // Start again for the actual formatting
+    vsnprintf(result, length + 1, format, args); // Format the string and copy it to the result buffer
+    va_end(args);
+
+    return result;
+}
+
 int GetRandomValue(int min, int max)
 {
     if (min > max)
@@ -45,9 +75,11 @@ void OnResize(int new_width, int new_height)
         printf("Window size overflow");
         return;
     }
+    if (state->resize_callback)
+        state->resize_callback(new_width, new_height);
     state->screen_width = new_width;
     state->screen_height = new_height;
-    glm_ortho(0.0f, (float)new_width, 0.f, (float)new_height, -1, 1, state->ortho_projection);
+    glm_ortho(0.0f, (float)new_width, (float)new_height, 0.f, -1.f, 1.f, state->ortho_projection);
     glViewport(0, 0, new_width, new_height);
 }
 
@@ -156,10 +188,13 @@ Vector3 MeasureTextText(Text *text, Font *font)
 Vector3 MeasureText(char *text, Font *font, float scale)
 {
     float offset_x = 0;
+    float offset_y = 0;
     float offset_y_min = 0;
+    float offset_x_max = 0;
     float max_y = 0;
     float xpos = 0;
     float w = 0;
+    float added_h = 0;
     for (char i = 0; i != strlen(text); i++)
     {
         float ypos = 0;
@@ -174,19 +209,30 @@ Vector3 MeasureText(char *text, Font *font, float scale)
         if (i == 0)
             offset_x -= ch.bearing[0] * scale;
         xpos = offset_x + ch.bearing[0] * scale;
-        ypos = -(ch.size[1] - ch.bearing[1]) * scale;
+        ypos = offset_y - (ch.size[1] - ch.bearing[1]) * scale;
         if (!offset_y_min)
             offset_y_min = ypos;
         if (ypos < offset_y_min)
             offset_y_min = ypos;
+        if (!offset_x_max)
+            offset_x_max = xpos + w;
+        if (xpos + w > offset_x_max)
+            offset_x_max = xpos + w;
         float temp = h + ypos;
         if (!max_y)
             max_y = temp;
         if (temp > max_y)
             max_y = temp;
+        if (text[i] == '\n')
+        {
+            offset_x = 0;
+            offset_y += h;
+            added_h += max_y;
+            continue;
+        }
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector3){xpos + w, max_y - offset_y_min, offset_y_min};
+    return (Vector3){offset_x_max, (max_y - offset_y_min) + added_h, offset_y_min};
 }
 
 Vector3 MeasureWorldText(char *text, Font *font, float scale)

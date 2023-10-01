@@ -1,3 +1,4 @@
+#include "input.h"
 #include "main.h"
 #include "shader.h"
 #include "audio.h"

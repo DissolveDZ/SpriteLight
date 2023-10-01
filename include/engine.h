@@ -4,6 +4,22 @@
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 0 "<command-line>" 2
 # 1 "SpriteLight/engine_include/SpriteLight.h"
+# 1 "SpriteLight/engine_include/input.h" 1
+static u32 max_input_keys = 512;
+typedef struct Input
+{
+    char pressed[max_input_keys];
+}Input;
+# 16 "SpriteLight/engine_include/input.h"
+typedef struct KeyState
+{
+    bool pressed;
+    bool down;
+    bool up;
+}KeyState;
+
+KeyState GetKeyState(char key);
+# 2 "SpriteLight/engine_include/SpriteLight.h" 2
 # 1 "SpriteLight/engine_include/main.h" 1
 
 
@@ -296,6 +312,8 @@ typedef struct State
 
     Audio audio;
 
+    Input input;
+
     u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
@@ -306,7 +324,7 @@ typedef struct State
     int wheel;
     bool deferred;
     bool sdf_font;
-    void (*resize_ptr)(int, int);
+    void (*resize_callback)(int, int);
     Bloom bloom;
     Player player;
     Camera camera;
@@ -382,7 +400,7 @@ static unsigned int plane_vbo, plane_vao;
 static unsigned int text_vbo, text_vao;
 
 int GetRandomValue(int min, int max);
-
+char* TextFormat(const char* format, ...);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
@@ -424,11 +442,11 @@ void EngineUpdate();
 void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);
-void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO);
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
-# 2 "SpriteLight/engine_include/SpriteLight.h" 2
+void BloomInit(int mip_amount);
+void UpsampleBloom(float filter_radius);
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee);
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee);
+# 3 "SpriteLight/engine_include/SpriteLight.h" 2
 
 # 1 "SpriteLight/engine_include/audio.h" 1
 u32 LoadAudioStream(const char *file_name);
@@ -441,14 +459,16 @@ void SetAudioStreamVolume(u32 stream, u8 volume);
 u32 InitAudio();
 u32 QuitAudio();
 void ToggleAudio();
-# 4 "SpriteLight/engine_include/SpriteLight.h" 2
+# 5 "SpriteLight/engine_include/SpriteLight.h" 2
 
 
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
 void DrawRect(Rectangle rec, Vector4 color);
 void DrawUIRect(Rectangle rec, Vector4 color);
+void DrawUITexRect(Rectangle rec);
 void DrawTexRect(Rectangle rec);
+void DrawTexRectTint(Rectangle rec, Vector4 tint);
 void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 void DrawWorldTextText(Text text, Font *font);
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
@@ -456,4 +476,4 @@ void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
 void DrawGradientV(Vector4 start, Vector4 end, float offset);
-# 7 "SpriteLight/engine_include/SpriteLight.h" 2
+# 8 "SpriteLight/engine_include/SpriteLight.h" 2

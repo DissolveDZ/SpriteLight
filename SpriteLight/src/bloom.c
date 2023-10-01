@@ -1,16 +1,17 @@
-void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height)
+void BloomInit(int mip_amount)
 {
-    glGenFramebuffers(1, &bloom->FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, bloom->FBO);
+    glGenFramebuffers(1, &state->bloom.FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, state->bloom.FBO);
     if (mip_amount > MAX_BLOOM_MIP)
         mip_amount = MAX_BLOOM_MIP;
-    vec2 mip_size = {(float)screen_width, (float)screen_height};
-    ivec2 mip_int_size = {(int)screen_width, (int)screen_height};
-    if (screen_width > (unsigned int)INT_MAX || screen_height > (unsigned int)INT_MAX)
+    vec2 mip_size = {(float)state->screen_width, (float)state->screen_height};
+    ivec2 mip_int_size = {(int)state->screen_width, (int)state->screen_height};
+    if (state->screen_width > (unsigned int)INT_MAX || state->screen_height > (unsigned int)INT_MAX)
     {
         printf("Window size conversion overflow - cannot build bloom FBO!");
         return;
     }
+    Bloom *bloom = &state->bloom;
     bloom->enabled = true;
     bloom->karis_average = true;
     bloom->mip_chain_len += mip_amount;
@@ -53,8 +54,8 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    upsample_shader = LoadShader("resources/shaders/vertex.vert", "resources/shaders/upsample.frag");
-    downsample_shader = LoadShader("resources/shaders/vertex.vert", "resources/shaders/downsample.frag");
+    upsample_shader = LoadShader("vertex.vert", "upsample.frag");
+    downsample_shader = LoadShader("vertex.vert", "downsample.frag");
 
     UseShader(upsample_shader);
     SetShaderInt(upsample_shader.ID, "src_texture", 0);
@@ -63,7 +64,7 @@ void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height
     SetShaderInt(downsample_shader.ID, "src_texture", 0);
 }
 
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO)
+void UpsampleBloom(float filter_radius)
 {
     UseShader(upsample_shader);
     SetShaderFloat(upsample_shader.ID, "filter_radius", filter_radius);
@@ -71,10 +72,10 @@ void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO)
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
-    for (int i = (int)bloom->mip_chain_len - 1; i > 0; i--)
+    for (int i = (int)state->bloom.mip_chain_len - 1; i > 0; i--)
     {
-        const BloomMip *mip = &bloom->mip_chain[i];
-        const BloomMip *next_mip = &bloom->mip_chain[i - 1];
+        const BloomMip *mip = &state->bloom.mip_chain[i];
+        const BloomMip *next_mip = &state->bloom.mip_chain[i - 1];
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mip->texture.ID);
 
@@ -82,7 +83,7 @@ void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, next_mip->texture.ID, 0);
 
         // Render screen-filled quad of resolution of current mip
-        glBindVertexArray(quadVAO);
+        glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
     }
@@ -90,11 +91,11 @@ void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO)
     glUseProgram(0);
 }
 
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height)
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee)
 {
     UseShader(downsample_shader);
-    SetShaderVec2(downsample_shader.ID, "src_resolution", (vec2){(float)screen_width, (float)screen_height});
-    if (bloom->karis_average)
+    SetShaderVec2(downsample_shader.ID, "src_resolution", (vec2){(float)state->screen_width, (float)state->screen_height});
+    if (state->bloom.karis_average)
     {
         SetShaderInt(downsample_shader.ID, "mip_level", 0);
     }
@@ -104,15 +105,15 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloo
     glBindTexture(GL_TEXTURE_2D, src_texture);
 
     // Progressively downsample through the mip chain
-    for (int i = 0; i < bloom->mip_chain_len; i++)
+    for (int i = 0; i < state->bloom.mip_chain_len; i++)
     {
-        BloomMip *mip = &bloom->mip_chain[i];
+        BloomMip *mip = &state->bloom.mip_chain[i];
         glViewport(0, 0, mip->size[0], mip->size[1]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_2D, mip->texture.ID, 0);
 
         // Render screen-filled quad of resolution of current mip
-        glBindVertexArray(quadVAO);
+        glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
 
@@ -131,11 +132,11 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloo
 }
 
 // Render Bloom, will disable threshold when 0
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height)
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, bloom->FBO);
-    DownSampleBloom(src_texture, threshold, knee, bloom, quadVAO, screen_width, screen_height);
-    UpsampleBloom(filter_radius, bloom, quadVAO);
+    glBindFramebuffer(GL_FRAMEBUFFER, state->bloom.FBO);
+    DownSampleBloom(src_texture, threshold, knee);
+    UpsampleBloom(filter_radius);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, screen_width, screen_height);
+    glViewport(0, 0, state->screen_width, state->screen_height);
 }

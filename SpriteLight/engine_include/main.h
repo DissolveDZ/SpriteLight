@@ -154,12 +154,27 @@ typedef struct Text
 
 static unsigned int text_characters_max = 100;
 
+typedef struct Sound
+{
+    Mix_Chunk *chunk;
+} Sound;
+
+typedef struct Music
+{
+    Mix_Music *music;
+    u32 volume;
+} Music;
+
 typedef struct Audio
 {
-    Mix_Music **music;
+    Music **music;
     u32 music_len;
     u32 music_max;
-    Mix_Chunk **sounds;
+    Sound **sounds;
+    u32 parallel_sounds;
+    u32 max_parallel_sounds;
+    u32 max_parallel_musics;
+    u32 sounds_playing;
     u32 sounds_len;
     u32 sounds_max;
     u32 volume;
@@ -177,6 +192,8 @@ typedef struct State
 
     Audio audio;
 
+    Input input;
+    
     u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
@@ -187,7 +204,7 @@ typedef struct State
     int wheel;
     bool deferred;
     bool sdf_font;
-    void (*resize_ptr)(int, int);
+    void (*resize_callback)(int, int);
     Bloom bloom;
     Player player;
     Camera camera;
@@ -202,7 +219,7 @@ typedef struct State
     bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader;
+static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
 
 static float quad_vertices[] = {
     // positions        // texture Coords
@@ -263,7 +280,7 @@ static unsigned int plane_vbo, plane_vao;
 static unsigned int text_vbo, text_vao;
 
 int GetRandomValue(int min, int max);
-
+char* TextFormat(const char* format, ...);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
@@ -305,9 +322,9 @@ void EngineUpdate();
 void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);
-void BloomInit(int mip_amount, Bloom *bloom, int screen_width, int screen_height);
-void UpsampleBloom(float filter_radius, Bloom *bloom, unsigned int quadVAO);
-void DownSampleBloom(unsigned int src_texture, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
-void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee, Bloom *bloom, unsigned int quadVAO, int screen_width, int screen_height);
+void BloomInit(int mip_amount);
+void UpsampleBloom(float filter_radius);
+void DownSampleBloom(unsigned int src_texture, float threshold, float knee);
+void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee);
 
 #endif // SPRITELIGHT_H
