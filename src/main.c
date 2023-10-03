@@ -15,18 +15,23 @@
 #include FT_FREETYPE_H
 #include "container.h"
 
+void TestAction()
+{
+    printf("fart\n");
+}
+
 int main(void)
 {
     State *state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 6);
-        printf("len = %i\n", state->bloom.mip_chain[0].texture.ID);
+    printf("len = %i\n", state->bloom.mip_chain[0].texture.ID);
     u32 music = LoadAudioStream("resources/audio/music/35_Return_Trip.mp3");
     u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
     u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
     SetAudioStreamVolume(music, 10);
     SetVolume(sound1, 1000);
     SetVolume(sound2, 1000);
-    PlayAudioStream(music);
-    // optionally enable opengl debug output
+    // PlayAudioStream(music);
+    //  optionally enable opengl debug output
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
     Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
@@ -35,24 +40,31 @@ int main(void)
     Font *pixel_square = LoadFont("resources/fonts/Pixel_Square.ttf", 512);
     Font *antonio_bold = LoadFont("resources/fonts/Antonio-Bold.ttf", 512);
     Text text = (Text){"TESTING default font", 5.f, -5.f, 2.5f, {255, 0, 0, 255}};
+    SetKeyAction(KEY_A, TestAction, KEY_PRESS);
 
     while (!state->quit)
     {
-        state->wheel = 0;
-        while (SDL_PollEvent(&state->window_event))
-        {
-            UpdateKeys();
-            switch (state->window_event.type)
-            {
-            case SDL_MOUSEBUTTONDOWN:
-                if (state->window_event.button.button == SDL_BUTTON_LEFT)
-                    PlaySound(sound1);
-                else if (state->window_event.button.button == SDL_BUTTON_RIGHT)
-                    PlaySound(sound2);
-                break;
-            }
-        }
         EngineUpdate();
+        if (GetKeyState(KEY_D)->down)
+        {
+            camera->position.x += 15.f * state->frame_time;
+        }
+        if (GetKeyState(KEY_A)->down)
+        {
+            camera->position.x -= 15.f * state->frame_time;
+        }
+        if (GetKeyState(KEY_W)->down)
+        {
+            camera->position.y += 15.f * state->frame_time;
+        }
+        if (GetKeyState(KEY_S)->down)
+        {
+            camera->position.y -= 15.f * state->frame_time;
+        }
+        if (GetKeyState(KEY_D)->up)
+            printf("released\n");
+        if (GetKeyState(KEY_D)->down)
+            printf("down\n");
         UpdateCamera();
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -71,7 +83,7 @@ int main(void)
         text_size = MeasureText("100% he\nalth", pixel_square, 0.125f);
         DrawUIRect((Rectangle){25 + text_size.x / 2, 125.f - text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 50});
         DrawSubText("100% he\na-l\nth", pixel_square, round((sinf(state->time) * 0.5f + 0.5f) * strlen("100% he\na-l\nth")), 25.f, 125.f, 0.125f, (Vector4){255, 0, 0, 255});
-        //DrawUIRect((Rectangle){0, 0, state->screen_width, state->screen_height}, (Vector4){255, 255, 255, 255});
+        // DrawUIRect((Rectangle){0, 0, state->screen_width, state->screen_height}, (Vector4){255, 255, 255, 255});
         SDL_GL_SwapWindow(state->main_window);
     }
     EngineQuit();

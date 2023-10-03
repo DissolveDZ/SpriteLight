@@ -208,7 +208,7 @@ typedef struct State
     Bloom bloom;
     Player player;
     Camera camera;
-    float frame_time;
+    double frame_time;
     float time;
     int active_camera;
     float gravity;
@@ -272,8 +272,8 @@ static float plane_vertices[] = {
 static State *state;
 
 static int MAX_BLOOM_MIP = 10;
-static int last_frame;
-static int current_frame;
+static u64 last_frame;
+static u64 current_frame;
 
 static unsigned int quad_vbo, quad_vao;
 static unsigned int plane_vbo, plane_vao;

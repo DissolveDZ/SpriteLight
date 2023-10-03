@@ -41,10 +41,11 @@ void UpdateCamera()
 
 void EngineUpdate()
 {
+    state->wheel = 0;
+    memset(state->input.key, 0, max_input_keys * sizeof(KeyState));
     last_frame = current_frame;
     current_frame = SDL_GetPerformanceCounter();
-    if (last_frame > 0)
-        state->frame_time = (double)(current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
+    state->frame_time = (current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
     state->time += state->frame_time;
     state->key_state = SDL_GetKeyboardState(NULL);
     SDL_GetRelativeMouseState(&state->mouse_delta.x, &state->mouse_delta.y);
@@ -54,38 +55,4 @@ void EngineUpdate()
     state->mouse_state = SDL_GetMouseState(&state->mouse_pos.x, &state->mouse_pos.y);
     state->mouse_world = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
     ProcessCamera(&state->camera);
-}
-
-void UpdateKeys()
-{
-    switch (state->window_event.type)
-    {
-    case SDL_QUIT:
-        state->quit = true;
-        break;
-    case SDL_KEYDOWN:
-        switch (state->window_event.key.keysym.scancode)
-        case SDL_SCANCODE_F11:
-            state->fullscreen = !state->fullscreen;
-        if (state->fullscreen)
-            SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-        else
-            SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_BORDERLESS);
-        break;
-        break;
-    case SDL_WINDOWEVENT:
-        if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-        {
-            if (state->window_event.window.data1 || state->window_event.window.data2)
-                OnResize(state->window_event.window.data1, state->window_event.window.data2);
-        }
-        break;
-    case SDL_MOUSEWHEEL:
-        state->wheel = state->window_event.wheel.y;
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        if (state->window_event.button.button == SDL_BUTTON_RIGHT && state->camera.type == PANNING_CAMERA)
-            state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
-        break;
-    }
 }

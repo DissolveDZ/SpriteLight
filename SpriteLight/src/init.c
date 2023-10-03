@@ -34,6 +34,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     state->screen_height = height;
     state->quit = false;
     state->resize_callback = 0;
+    current_frame = SDL_GetPerformanceCounter();
     OnResize(width, height);
 
     InitDefaultFont(512);
