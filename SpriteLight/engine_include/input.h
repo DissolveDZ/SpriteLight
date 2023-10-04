@@ -10,20 +10,26 @@ typedef enum KeyCode
     NUM_KEYS
 }KeyCode;
 
-typedef enum KeyState
+typedef enum MouseCode
+{
+    MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, NUM_MOUSE_CODES
+}MouseCode;
+
+typedef enum InputState
 {   
-    KEY_RELEASE,
-    KEY_PRESS,
-    KEY_DOWN
-}KeyState;
+    INPUT_UP,
+    INPUT_PRESS,
+    INPUT_HELD
+}InputState;
 
-typedef void (*KeyActionCallback)(void);
+typedef void (*InputActionCallback)(void);
 
-typedef struct KeyAction {
+typedef struct InputAction {
     KeyCode key;
-    KeyActionCallback callback;
-    struct KeyAction *next;
-} KeyAction;
+    InputActionCallback callback;
+    InputState trigger;
+    struct InputAction *next;
+} InputAction;
 
 typedef struct KeyMap
 {
@@ -31,7 +37,7 @@ typedef struct KeyMap
     SDL_Scancode scancode;
 }KeyMap;
 
-static KeyMap KeyMapping[NUM_KEYS] = {
+static KeyMap KeyMapping[NUM_KEYS+NUM_MOUSE_CODES] = {
     {KEY_NONE, SDL_SCANCODE_UNKNOWN},
     {KEY_A, SDL_SCANCODE_A},
     {KEY_B, SDL_SCANCODE_B},
@@ -94,14 +100,20 @@ static KeyMap KeyMapping[NUM_KEYS] = {
     {KEY_F10, SDL_SCANCODE_F10},
     {KEY_F11, SDL_SCANCODE_F11},
     {KEY_F12, SDL_SCANCODE_F12},
+    
+    {MOUSE_LEFT, SDL_BUTTON_LEFT},
+    {MOUSE_RIGHT, SDL_BUTTON_RIGHT},
+    {MOUSE_MIDDLE, SDL_BUTTON_MIDDLE},
 };
 
 typedef struct Input
 {
-    KeyState key[max_input_keys];
-    KeyAction *actions[NUM_KEYS];
+    InputState key[max_input_keys];
+    InputAction *actions[NUM_KEYS+NUM_MOUSE_CODES];
 }Input;
 
-void SetKeyAction(KeyCode key, KeyActionCallback callback);
-KeyState *GetKeyState(KeyCode key);
+void SetInputAction(KeyCode key, InputActionCallback callback, InputState key_state);
+InputState *GetKeyState(KeyCode key);
+bool GetKeyPress(KeyCode key);
+bool GetKeyDown(KeyCode key);
 unsigned int *GetAnyKey();

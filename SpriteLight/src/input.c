@@ -15,75 +15,73 @@ bool GetKeyPress(KeyCode key)
 {
     if (!key || key > NUM_KEYS)
         return false;
-    return state->input.key[key] == KEY_PRESS ? 1 : 0;
+    return state->input.key[KeyMapping[key].scancode] == INPUT_PRESS ? 1 : 0;
 }
 
-void SetKeyAction(KeyCode key, KeyActionCallback callback)
+bool GetKeyDown(KeyCode key)
+{
+    if (!key || key > NUM_KEYS)
+        return false;
+    return state->key_state[KeyMapping[key].scancode];
+}
+
+void SetInputAction(KeyCode key, InputActionCallback callback, InputState key_state)
 {
     if (!key || key > NUM_KEYS)
         return;
-    KeyAction *new_action = state->input.actions[key];
+    InputAction *new_action = state->input.actions[key];
     if (new_action)
+    {
         new_action->callback = callback;
+        new_action->trigger = key_state;
+    }
     else
     {
-        new_action = malloc(sizeof(KeyAction));
+        new_action = malloc(sizeof(InputAction));
         new_action->key = key;
         new_action->callback = callback;
+        new_action->trigger = key_state;
         new_action->next = NULL;
     }
     state->input.actions[key] = new_action;
 }
 
-void ProcessActionEvent()
-{
-    for (int i = 0; i < NUM_KEYS; i++)
-    {
-        KeyAction *action = state->input.actions[i];
-        if (action)
-        {
-            KeyCode key = action->key;
-            SDL_Scancode scancode = KeyMapping[key].scancode;
-            if (state->key_state[scancode])
-                action->callback();
-        }
-    }
-}
-
 void ProcessKeys()
 {
-    SDL_Scancode cur_code;
+    SDL_Scancode cur_code = 0;
+    state->key_state = SDL_GetKeyboardState(NULL);
+
     while (SDL_PollEvent(&state->window_event))
     {
-        ProcessKeys();
         switch (state->window_event.type)
         {
         case SDL_QUIT:
             state->quit = true;
             break;
         case SDL_KEYDOWN:
-            cur_code = state->window_event.key.keysym.scancode;
-            if (cur_code && state->window_event.key.repeat == 0)
+            if (!state->window_event.key.repeat)
             {
-                state->input.key[cur_code].pressed = true;
-                ProcessActionEvent();
+                cur_code = state->window_event.key.keysym.scancode;
+                state->input.key[cur_code] = INPUT_PRESS;
             }
             switch (state->window_event.key.keysym.scancode)
+            {
             case SDL_SCANCODE_F11:
                 state->fullscreen = !state->fullscreen;
-            if (state->fullscreen)
-                SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-            else
-                SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_BORDERLESS);
-            break;
+                if (state->fullscreen)
+                    SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                else
+                    SDL_SetWindowFullscreen(state->main_window, 0); // Set to 0 for windowed mode
+                break;
+            }
             break;
         case SDL_KEYUP:
-            cur_code = state->window_event.key.keysym.scancode;
-            if (cur_code && state->window_event.key.repeat == 0)
+            if (!state->window_event.key.repeat)
             {
-                state->input.key[cur_code].up = true;
-                ProcessActionEvent();
+                cur_code = state->window_event.key.keysym.scancode;
+                state->input.key[cur_code] = INPUT_UP;
             }
+            break;
         case SDL_WINDOWEVENT:
             if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
             {
@@ -97,7 +95,33 @@ void ProcessKeys()
         case SDL_MOUSEBUTTONDOWN:
             if (state->window_event.button.button == SDL_BUTTON_RIGHT && state->camera.type == PANNING_CAMERA)
                 state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+            cur_code = state->window_event.button.button;
+            if (cur_code >= 1 && cur_code <= NUM_MOUSE_CODES)
+            {
+                state->input.key[NUM_KEYS + cur_code] = INPUT_PRESS;
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            cur_code = state->window_event.button.button;
+            if (cur_code >= 1 && cur_code <= NUM_MOUSE_CODES)
+            {
+                state->input.key[NUM_KEYS + cur_code] = INPUT_UP;
+            }
             break;
         }
+    }
+    for (int i = 0; i < NUM_KEYS + NUM_MOUSE_CODES; i++)
+    {
+        SDL_Scancode scancode = KeyMapping[i].scancode;
+        InputAction *action = state->input.actions[i];
+        if (action)
+        {
+            InputState trigger = state->input.key[scancode];
+
+            // Check if the trigger matches the action's trigger
+            if ((trigger == action->trigger) || (trigger == INPUT_PRESS && action->trigger == INPUT_HELD))
+                action->callback();
+        }
+        state->input.key[scancode] = state->key_state[scancode] ? INPUT_HELD : INPUT_UP;
     }
 }

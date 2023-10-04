@@ -17,13 +17,22 @@
 
 void TestAction()
 {
-    printf("fart\n");
+    printf("press\n");
+}
+
+void TestAction1()
+{
+    printf("down\n");
+}
+
+void TestAction2()
+{
+    printf("mouse press\n");
 }
 
 int main(void)
 {
     State *state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 6);
-    printf("len = %i\n", state->bloom.mip_chain[0].texture.ID);
     u32 music = LoadAudioStream("resources/audio/music/35_Return_Trip.mp3");
     u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
     u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
@@ -40,31 +49,29 @@ int main(void)
     Font *pixel_square = LoadFont("resources/fonts/Pixel_Square.ttf", 512);
     Font *antonio_bold = LoadFont("resources/fonts/Antonio-Bold.ttf", 512);
     Text text = (Text){"TESTING default font", 5.f, -5.f, 2.5f, {255, 0, 0, 255}};
-    SetKeyAction(KEY_A, TestAction, KEY_PRESS);
+    SetInputAction(KEY_A, TestAction, INPUT_PRESS);
+    SetInputAction(KEY_T, TestAction1, INPUT_HELD);
+    SetInputAction(MOUSE_LEFT, TestAction2, INPUT_PRESS);
 
     while (!state->quit)
     {
         EngineUpdate();
-        if (GetKeyState(KEY_D)->down)
+        if (GetKeyDown(KEY_D))
         {
             camera->position.x += 15.f * state->frame_time;
         }
-        if (GetKeyState(KEY_A)->down)
+        if (GetKeyDown(KEY_A))
         {
             camera->position.x -= 15.f * state->frame_time;
         }
-        if (GetKeyState(KEY_W)->down)
+        if (GetKeyDown(KEY_W))
         {
             camera->position.y += 15.f * state->frame_time;
         }
-        if (GetKeyState(KEY_S)->down)
+        if (GetKeyDown(KEY_S))
         {
             camera->position.y -= 15.f * state->frame_time;
         }
-        if (GetKeyState(KEY_D)->up)
-            printf("released\n");
-        if (GetKeyState(KEY_D)->down)
-            printf("down\n");
         UpdateCamera();
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
