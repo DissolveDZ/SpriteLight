@@ -52,7 +52,6 @@ void EngineUpdate()
     glm_mat4_identity(state->projection);
     if (state->screen_height && state->screen_width)
         glm_perspective(glm_rad((float)state->screen_height / state->camera.fov), (float)state->screen_width / (float)state->screen_height, state->near_z, state->far_z, state->projection);
-    state->mouse_state = SDL_GetMouseState(&state->mouse_pos.x, &state->mouse_pos.y);
     state->mouse_world = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
     ProcessCamera(&state->camera);
 }

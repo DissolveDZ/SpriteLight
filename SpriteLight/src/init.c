@@ -37,6 +37,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     current_frame = SDL_GetPerformanceCounter();
     OnResize(width, height);
 
+    InitializeMappings();
     InitDefaultFont(512);
     BufferSetup(&quad_vao, &quad_vbo, quad_vertices, sizeof(quad_vertices), true, false);
     BufferSetup(&text_vao, &text_vbo, quad_vertices, sizeof(quad_vertices), true, false);

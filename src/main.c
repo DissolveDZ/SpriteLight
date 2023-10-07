@@ -27,7 +27,14 @@ void TestAction1()
 
 void TestAction2()
 {
-    printf("mouse press\n");
+    if (GetInputPress(MOUSE_LEFT))
+    {
+        printf("Mouse Left Pressed\n");
+    }
+    if (GetInputPress(MOUSE_RIGHT))
+    {
+        printf("Mouse Right Held\n");
+    }
 }
 
 int main(void)
@@ -50,8 +57,10 @@ int main(void)
     Font *antonio_bold = LoadFont("resources/fonts/Antonio-Bold.ttf", 512);
     Text text = (Text){"TESTING default font", 5.f, -5.f, 2.5f, {255, 0, 0, 255}};
     SetInputAction(KEY_A, TestAction, INPUT_PRESS);
-    SetInputAction(KEY_T, TestAction1, INPUT_HELD);
+    SetInputAction(KEY_T, TestAction1, INPUT_DOWN);
     SetInputAction(MOUSE_LEFT, TestAction2, INPUT_PRESS);
+    //SetInputAction(MOUSE_LEFT, TestAction2, INPUT_PRESS);
+    SetInputAction(MOUSE_RIGHT, TestAction2, INPUT_PRESS);
 
     while (!state->quit)
     {
