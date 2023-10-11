@@ -10,7 +10,7 @@ dynamic: header
 static: header
 	clang -c SpriteLight/src/main.c -o libSpriteLight.o -ISpriteLight/include -lSDL2main -DSLDL_MAIN_HANDLED -lm -D_FILE_OFFSET_BITS=64 -ggdb
 	ar rcs libSpriteLight.a libSpriteLight.o
-	clang src/main.c libSpriteLight.o -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -Wall -o engine_test
+	clang src/main.c libSpriteLight.o -Iinclude -L. -lfreetype -lSDL2 -lSDL2_mixer -lm -ggdb -o engine_test #-fsanitize=undefined -fsanitize=address -pg
 	./engine_test
 
 run: dynamic

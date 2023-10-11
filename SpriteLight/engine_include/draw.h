@@ -1,4 +1,5 @@
 void DrawQuad();
+void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
 void DrawRect(Rectangle rec, Vector4 color);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);
@@ -11,3 +12,4 @@ void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
 void DrawGradientV(Vector4 start, Vector4 end, float offset);
+void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color);

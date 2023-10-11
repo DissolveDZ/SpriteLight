@@ -3,7 +3,7 @@ u32 LoadSound(const char *file_name);
 u32 PlaySound(u32 sound);
 u32 PlayAudioStream(u32 stream);
 void SetGlobalVolume(u32 volume);
-void SetVolume(u32 sound, u8 volume);
+void SetVolume(u32 sound, u32 volume);
 void SetAudioStreamVolume(u32 stream, u8 volume);
 u32 InitAudio();
 u32 QuitAudio();

@@ -11,7 +11,7 @@ typedef struct Shader
     unsigned int ID;
 } Shader;
 
-Shader LoadShader(char *vertex_path, char *fragment_path);
+Shader LoadShader(const char *vertex_name, const char *fragment_name);
 
 void UseShader(Shader shader);
 

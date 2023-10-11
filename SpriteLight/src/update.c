@@ -42,12 +42,7 @@ void UpdateCamera()
 void EngineUpdate()
 {
     state->wheel = 0;
-    // memset(state->input.key, 0, max_input_keys * sizeof(KeyState));
     ProcessKeys();
-    last_frame = current_frame;
-    current_frame = SDL_GetPerformanceCounter();
-    state->frame_time = (current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
-    state->time += state->frame_time;
     SDL_GetRelativeMouseState(&state->mouse_delta.x, &state->mouse_delta.y);
     glm_mat4_identity(state->projection);
     if (state->screen_height && state->screen_width)

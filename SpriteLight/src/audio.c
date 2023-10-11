@@ -36,7 +36,7 @@ void SetGlobalVolume(u32 volume)
     state->audio.volume = (MIX_MAX_VOLUME * volume) / 100;
 }
 
-void SetVolume(u32 sound, u8 volume)
+void SetVolume(u32 sound, u32 volume)
 {
     for(int i = 0; i < state->audio.parallel_sounds; i++)
         state->audio.sounds[sound][i].chunk->volume = (MIX_MAX_VOLUME * volume) / 100;

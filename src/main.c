@@ -15,19 +15,49 @@
 #include FT_FREETYPE_H
 #include "container.h"
 
-void TestAction()
+void MoveLeft(void *data)
 {
-    printf("press\n");
+    CallArgs *args = (CallArgs *)data;
+    Camera *camera = (Camera *)args->pointers[0];
+    float speed = *(float *)args->pointers[1];
+    if (camera)
+        camera->position.x -= speed * state->frame_time;
+}
+void MoveRight(void *data)
+{
+    CallArgs *args = (CallArgs *)data;
+    Camera *camera = (Camera *)args->pointers[0];
+    float speed = *(float *)args->pointers[1];
+    if (camera)
+        camera->position.x += speed * state->frame_time;
 }
 
-void TestAction1()
+void MoveUp(void *data)
 {
-    printf("down\n");
+    CallArgs *args = (CallArgs *)data;
+    Camera *camera = (Camera *)args->pointers[0];
+    float speed = *(float *)args->pointers[1];
+    if (camera)
+        camera->position.y += speed * state->frame_time;
+}
+
+void MoveDown(void *data)
+{
+    CallArgs *args = (CallArgs *)data;
+    Camera *camera = (Camera *)args->pointers[0];
+    float speed = *(float *)args->pointers[1];
+    if (camera)
+        camera->position.y -= speed * state->frame_time;
+}
+
+void Talk()
+{
+    printf("ain't no way\n");
 }
 
 void TestAction2()
 {
-    if (GetInputPress(MOUSE_LEFT))
+    if (GetInputDown(MOUSE_LEFT))
     {
         printf("Mouse Left Pressed\n");
     }
@@ -39,48 +69,37 @@ void TestAction2()
 
 int main(void)
 {
-    State *state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 6);
-    u32 music = LoadAudioStream("resources/audio/music/35_Return_Trip.mp3");
+    state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 6);
+    u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
     u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
     u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
     SetAudioStreamVolume(music, 10);
     SetVolume(sound1, 1000);
     SetVolume(sound2, 1000);
     // PlayAudioStream(music);
-    //  optionally enable opengl debug output
+    //   optionally enable opengl debug output
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
     Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
     Rectangle rec = (Rectangle){0, 2, 1, 1};
-    rec.texture = LoadTexture2D("resources/textures/cube.png", 0, false);
-    Font *pixel_square = LoadFont("resources/fonts/Pixel_Square.ttf", 512);
-    Font *antonio_bold = LoadFont("resources/fonts/Antonio-Bold.ttf", 512);
-    Text text = (Text){"TESTING default font", 5.f, -5.f, 2.5f, {255, 0, 0, 255}};
-    SetInputAction(KEY_A, TestAction, INPUT_PRESS);
-    SetInputAction(KEY_T, TestAction1, INPUT_DOWN);
-    SetInputAction(MOUSE_LEFT, TestAction2, INPUT_PRESS);
-    //SetInputAction(MOUSE_LEFT, TestAction2, INPUT_PRESS);
-    SetInputAction(MOUSE_RIGHT, TestAction2, INPUT_PRESS);
-
+    LoadTexture("cube.png");
+    rec.texture = LoadTexture("cube.png");
+    Font *pixel_square = LoadFont("Pixel_Square.ttf", 256);
+    Font *antonio_bold = LoadFont("Antonio-Bold.ttf", 256);
+    Text text = (Text){"TESTING default font", 5.f, -5.f, 5.f, {255, 0, 0, 255}};
+    float camera_speed = 10.f;
+    // pass in a pointer to your arguments
+    SetInputAction(KEY_A, MoveLeft, INPUT_DOWN, "Left", ArgsToCallArgs(2, camera, &camera_speed));
+    SetInputAction(KEY_D, MoveRight, INPUT_DOWN, "Right", ArgsToCallArgs(2, camera, &camera_speed));
+    SetInputAction(KEY_W, MoveUp, INPUT_DOWN, "Up", ArgsToCallArgs(2, camera, &camera_speed));
+    SetInputAction(KEY_S, MoveDown, INPUT_DOWN, "Down", ArgsToCallArgs(2, camera, &camera_speed));
+    SetInputAction(KEY_T, Talk, INPUT_PRESS, "Talk", 0);
+    SetInputAction(MOUSE_LEFT, TestAction2, INPUT_DOWN, "LeftClick", 0);
+    SetInputAction(MOUSE_RIGHT, TestAction2, INPUT_PRESS, "Interact", 0);
+    Texture cube = LoadTexture("cube.png");
     while (!state->quit)
     {
         EngineUpdate();
-        if (GetKeyDown(KEY_D))
-        {
-            camera->position.x += 15.f * state->frame_time;
-        }
-        if (GetKeyDown(KEY_A))
-        {
-            camera->position.x -= 15.f * state->frame_time;
-        }
-        if (GetKeyDown(KEY_W))
-        {
-            camera->position.y += 15.f * state->frame_time;
-        }
-        if (GetKeyDown(KEY_S))
-        {
-            camera->position.y -= 15.f * state->frame_time;
-        }
         UpdateCamera();
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -92,15 +111,18 @@ int main(void)
         Vector3 text_size = MeasureWorldTextText(&text, 0);
         DrawRect((Rectangle){text.x + text_size.x / 2, text.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){25, 25, 25, 50});
         DrawWorldTextText(text, 0);
-        DrawWorldText("this is a test", pixel_square, -7, 0, 2.5f, (Vector4){0, 0, 255, 255});
-        text_size = MeasureWorldText("Measuring Text..()", antonio_bold, 1.5f);
+        DrawWorldText("this is a test", pixel_square, -7, 0, 5.f, (Vector4){0, 0, 255, 255});
+        text_size = MeasureWorldText("Measuring Text..()", antonio_bold, 3.f);
         DrawRect((Rectangle){state->mouse_world.x + text_size.x / 2, state->mouse_world.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){25, 25, 25, 50});
-        DrawWorldText("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 1.5f, (Vector4){255, 0, 0, 255});
-        text_size = MeasureText("100% he\nalth", pixel_square, 0.125f);
-        DrawUIRect((Rectangle){25 + text_size.x / 2, 125.f - text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 50});
-        DrawSubText("100% he\na-l\nth", pixel_square, round((sinf(state->time) * 0.5f + 0.5f) * strlen("100% he\na-l\nth")), 25.f, 125.f, 0.125f, (Vector4){255, 0, 0, 255});
+        DrawWorldText("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 3.f, (Vector4){255, 0, 0, 255});
+        text_size = MeasureText("100% he\nal\nth", pixel_square, 0.25f);
+        DrawUIRect((Rectangle){25 + text_size.x / 2, 125.f + text_size.y / 2 - text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 50});
+        DrawSubText("100% he\na-l\nth", pixel_square, round((sinf(state->time) * 0.5f + 0.5f) * strlen("100% he\na-l\nth")), 25.f, 125.f, 0.25f, (Vector4){255, 0, 0, 255});
+        DrawLine2DWorld((Vector2){0, 0}, state->mouse_world, (Vector4){255, 0, 0, 255});
+        DrawCube((Vector3){1, 1.5, 0.5f}, (Vector3){1, 1, 1}, (Vector3){20, 0, 20}, cube);
+        DrawCube((Vector3){5, 2, 0.5f}, (Vector3){5, 1, 1}, (Vector3){40, 40.f, 20.f}, cube);
         // DrawUIRect((Rectangle){0, 0, state->screen_width, state->screen_height}, (Vector4){255, 255, 255, 255});
-        SDL_GL_SwapWindow(state->main_window);
+        EnginePresent();
     }
     EngineQuit();
     return 0;

@@ -5,7 +5,7 @@
 # 0 "<command-line>" 2
 # 1 "SpriteLight/engine_include/SpriteLight.h"
 # 1 "SpriteLight/engine_include/input.h" 1
-const static unsigned int max_input_keys = 512;
+
 
 typedef enum KeyCode {
     KEY_NONE,
@@ -22,16 +22,75 @@ typedef enum KeyCode {
     NUM_MOUSE_KEYS = 3
 } KeyCode;
 
+static const SDL_Scancode KeyCodeToScancode[NUM_KEYS] = {
+    [KEY_A] = SDL_SCANCODE_A, [KEY_B] = SDL_SCANCODE_B, [KEY_C] = SDL_SCANCODE_C,
+    [KEY_D] = SDL_SCANCODE_D, [KEY_E] = SDL_SCANCODE_E, [KEY_F] = SDL_SCANCODE_F,
+    [KEY_G] = SDL_SCANCODE_G, [KEY_H] = SDL_SCANCODE_H, [KEY_I] = SDL_SCANCODE_I,
+    [KEY_J] = SDL_SCANCODE_J, [KEY_K] = SDL_SCANCODE_K, [KEY_L] = SDL_SCANCODE_L,
+    [KEY_M] = SDL_SCANCODE_M, [KEY_N] = SDL_SCANCODE_N, [KEY_O] = SDL_SCANCODE_O,
+    [KEY_P] = SDL_SCANCODE_P, [KEY_Q] = SDL_SCANCODE_Q, [KEY_R] = SDL_SCANCODE_R,
+    [KEY_S] = SDL_SCANCODE_S, [KEY_T] = SDL_SCANCODE_T, [KEY_U] = SDL_SCANCODE_U,
+    [KEY_V] = SDL_SCANCODE_V, [KEY_W] = SDL_SCANCODE_W, [KEY_X] = SDL_SCANCODE_X,
+    [KEY_Y] = SDL_SCANCODE_Y, [KEY_Z] = SDL_SCANCODE_Z, [KEY_0] = SDL_SCANCODE_0,
+    [KEY_1] = SDL_SCANCODE_1, [KEY_2] = SDL_SCANCODE_2, [KEY_3] = SDL_SCANCODE_3,
+    [KEY_4] = SDL_SCANCODE_4, [KEY_5] = SDL_SCANCODE_5, [KEY_6] = SDL_SCANCODE_6,
+    [KEY_7] = SDL_SCANCODE_7, [KEY_8] = SDL_SCANCODE_8, [KEY_9] = SDL_SCANCODE_9,
+    [KEY_SPACE] = SDL_SCANCODE_SPACE, [KEY_ENTER] = SDL_SCANCODE_RETURN,
+    [KEY_ESCAPE] = SDL_SCANCODE_ESCAPE, [KEY_BACKSPACE] = SDL_SCANCODE_BACKSPACE,
+    [KEY_TAB] = SDL_SCANCODE_TAB, [KEY_LEFT_SHIFT] = SDL_SCANCODE_LSHIFT,
+    [KEY_RIGHT_SHIFT] = SDL_SCANCODE_RSHIFT, [KEY_LEFT_CTRL] = SDL_SCANCODE_LCTRL,
+    [KEY_RIGHT_CTRL] = SDL_SCANCODE_RCTRL, [KEY_LEFT_ALT] = SDL_SCANCODE_LALT,
+    [KEY_RIGHT_ALT] = SDL_SCANCODE_RALT, [KEY_LEFT_GUI] = SDL_SCANCODE_LGUI,
+    [KEY_RIGHT_GUI] = SDL_SCANCODE_RGUI, [KEY_F1] = SDL_SCANCODE_F1,
+    [KEY_F2] = SDL_SCANCODE_F2, [KEY_F3] = SDL_SCANCODE_F3, [KEY_F4] = SDL_SCANCODE_F4,
+    [KEY_F5] = SDL_SCANCODE_F5, [KEY_F6] = SDL_SCANCODE_F6, [KEY_F7] = SDL_SCANCODE_F7,
+    [KEY_F8] = SDL_SCANCODE_F8, [KEY_F9] = SDL_SCANCODE_F9, [KEY_F10] = SDL_SCANCODE_F10,
+    [KEY_F11] = SDL_SCANCODE_F11, [KEY_F12] = SDL_SCANCODE_F12
+};
+
+static const KeyCode ScancodeToKeyCode[SDL_NUM_SCANCODES] = {
+    [SDL_SCANCODE_A] = KEY_A, [SDL_SCANCODE_B] = KEY_B, [SDL_SCANCODE_C] = KEY_C,
+    [SDL_SCANCODE_D] = KEY_D, [SDL_SCANCODE_E] = KEY_E, [SDL_SCANCODE_F] = KEY_F,
+    [SDL_SCANCODE_G] = KEY_G, [SDL_SCANCODE_H] = KEY_H, [SDL_SCANCODE_I] = KEY_I,
+    [SDL_SCANCODE_J] = KEY_J, [SDL_SCANCODE_K] = KEY_K, [SDL_SCANCODE_L] = KEY_L,
+    [SDL_SCANCODE_M] = KEY_M, [SDL_SCANCODE_N] = KEY_N, [SDL_SCANCODE_O] = KEY_O,
+    [SDL_SCANCODE_P] = KEY_P, [SDL_SCANCODE_Q] = KEY_Q, [SDL_SCANCODE_R] = KEY_R,
+    [SDL_SCANCODE_S] = KEY_S, [SDL_SCANCODE_T] = KEY_T, [SDL_SCANCODE_U] = KEY_U,
+    [SDL_SCANCODE_V] = KEY_V, [SDL_SCANCODE_W] = KEY_W, [SDL_SCANCODE_X] = KEY_X,
+    [SDL_SCANCODE_Y] = KEY_Y, [SDL_SCANCODE_Z] = KEY_Z, [SDL_SCANCODE_0] = KEY_0,
+    [SDL_SCANCODE_1] = KEY_1, [SDL_SCANCODE_2] = KEY_2, [SDL_SCANCODE_3] = KEY_3,
+    [SDL_SCANCODE_4] = KEY_4, [SDL_SCANCODE_5] = KEY_5, [SDL_SCANCODE_6] = KEY_6,
+    [SDL_SCANCODE_7] = KEY_7, [SDL_SCANCODE_8] = KEY_8, [SDL_SCANCODE_9] = KEY_9,
+    [SDL_SCANCODE_SPACE] = KEY_SPACE, [SDL_SCANCODE_RETURN] = KEY_ENTER,
+    [SDL_SCANCODE_ESCAPE] = KEY_ESCAPE, [SDL_SCANCODE_BACKSPACE] = KEY_BACKSPACE,
+    [SDL_SCANCODE_TAB] = KEY_TAB, [SDL_SCANCODE_LSHIFT] = KEY_LEFT_SHIFT,
+    [SDL_SCANCODE_RSHIFT] = KEY_RIGHT_SHIFT, [SDL_SCANCODE_LCTRL] = KEY_LEFT_CTRL,
+    [SDL_SCANCODE_RCTRL] = KEY_RIGHT_CTRL, [SDL_SCANCODE_LALT] = KEY_LEFT_ALT,
+    [SDL_SCANCODE_RALT] = KEY_RIGHT_ALT, [SDL_SCANCODE_LGUI] = KEY_LEFT_GUI,
+    [SDL_SCANCODE_RGUI] = KEY_RIGHT_GUI, [SDL_SCANCODE_F1] = KEY_F1,
+    [SDL_SCANCODE_F2] = KEY_F2, [SDL_SCANCODE_F3] = KEY_F3, [SDL_SCANCODE_F4] = KEY_F4,
+    [SDL_SCANCODE_F5] = KEY_F5, [SDL_SCANCODE_F6] = KEY_F6, [SDL_SCANCODE_F7] = KEY_F7,
+    [SDL_SCANCODE_F8] = KEY_F8, [SDL_SCANCODE_F9] = KEY_F9, [SDL_SCANCODE_F10] = KEY_F10,
+    [SDL_SCANCODE_F11] = KEY_F11, [SDL_SCANCODE_F12] = KEY_F12
+};
+
 typedef enum InputState {
     INPUT_UP, INPUT_PRESS, INPUT_DOWN
 } InputState;
 
-typedef void (*InputActionCallback)(void);
+typedef struct CallData
+{
+    void* data; int *count; int *byte_offsets;
+}CallData;
+
+typedef void (*InputActionCallback)(void *data);
 
 typedef struct InputAction {
     KeyCode key;
     InputActionCallback callback;
     InputState trigger;
+    char *name;
+    void *data;
     struct InputAction *next;
 } InputAction;
 
@@ -40,25 +99,21 @@ typedef struct {
     KeyCode keycode;
 } KeyMap;
 
-static KeyMap KeyHash[SDL_NUM_SCANCODES];
-
-void InitializeMappings();
-
-
-KeyCode ScancodeToKeyCode(SDL_Scancode scancode);
-
-
-SDL_Scancode KeyCodeToScancode(KeyCode keycode);
-
 typedef struct Input {
-    InputState key[max_input_keys];
+    InputState key[512];
     InputAction *actions[NUM_INPUTS];
 } Input;
 
-void SetInputAction(KeyCode key, InputActionCallback callback, InputState key_state);
+typedef struct {
+    size_t num_pointers;
+    void **pointers;
+} CallArgs;
+
+CallArgs *ArgsToCallArgs(size_t count, ...);
+void SetInputAction(KeyCode key, InputActionCallback callback, InputState key_state, char* name, CallArgs *data);
 InputState *GetKeyState(KeyCode key);
 bool GetInputPress(KeyCode key);
-bool GetKeyDown(KeyCode key);
+bool GetInputDown(KeyCode key);
 unsigned int *GetAnyKey();
 # 2 "SpriteLight/engine_include/SpriteLight.h" 2
 # 1 "SpriteLight/engine_include/main.h" 1
@@ -79,7 +134,7 @@ typedef struct Shader
     unsigned int ID;
 } Shader;
 
-Shader LoadShader(char *vertex_path, char *fragment_path);
+Shader LoadShader(const char *vertex_name, const char *fragment_name);
 
 void UseShader(Shader shader);
 
@@ -111,7 +166,7 @@ typedef struct Texture
     int height;
 } Texture;
 
-Texture LoadTexture2D(const char *path, float anisotropy, bool gamma);
+Texture LoadTexture(const char *path);
 SDL_Surface *LoadSDLImage(char *path);
 # 6 "SpriteLight/engine_include/main.h" 2
 # 1 "SpriteLight/engine_include/lights.h" 1
@@ -300,9 +355,6 @@ typedef struct Font
     char *path;
     TextCharacter loaded_chars[128];
 } Font;
-static Font **loaded_fonts;
-static unsigned int loaded_fonts_len;
-static unsigned int loaded_fonts_max = 5;
 
 typedef struct Text
 {
@@ -341,12 +393,35 @@ typedef struct Audio
     u32 volume;
 } Audio;
 
+typedef struct {
+    char file_path[256];
+    int index;
+    void* data;
+} Resource;
+
+typedef struct HashNode {
+    Resource resource;
+    struct HashNode *next;
+} HashNode;
+
+typedef struct {
+    HashNode **table;
+    size_t size;
+    size_t capacity;
+} HashTable;
+
+typedef struct {
+    HashTable *hash_table;
+    int next_index;
+} Salad;
+
 typedef struct State
 {
     int screen_width;
     int screen_height;
     float near_z;
     float far_z;
+    int target_fps;
     SDL_Event window_event;
     SDL_Window *main_window;
     SDL_GLContext main_context;
@@ -354,6 +429,8 @@ typedef struct State
     Audio audio;
 
     Input input;
+
+    Salad *salad;
 
     u8 *key_state;
     u32 mouse_state;
@@ -382,54 +459,59 @@ typedef struct State
 
 static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
 
-static float quad_vertices[] = {
+static float line_vertices[] = { 0, 0, 0, 0, 0, 0 };
 
-    -1.f,
-    1.f,
-    0.0f,
-    0.0f,
-    1.0f,
-    -1.f,
-    -1.f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.f,
-    1.f,
-    0.0f,
-    1.0f,
-    1.0f,
-    1.f,
-    -1.f,
-    0.0f,
-    1.0f,
-    0.0f,
+static float quad_vertices[] = {
+    -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 };
 
 static float plane_vertices[] = {
-
-    -0.5f,
-    0.5f,
-    0.0f,
-    0.0f,
-    1.0f,
-    -0.5f,
-    -0.5f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.5f,
-    0.5f,
-    0.0f,
-    1.0f,
-    1.0f,
-    0.5f,
-    -0.5f,
-    0.0f,
-    1.0f,
-    0.0f,
+    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+     0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+     0.5f, -0.5f, 0.0f, 1.0f, 0.0f
 };
 
+static float cube_vertices[] = {
+
+   -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+   -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+
+
+    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+
+
+    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+   -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+   -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+
+
+   -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+   -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+   -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+   -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+
+
+   -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+   -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+
+
+   -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+   -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+};
 static State *state;
 
 static int MAX_BLOOM_MIP = 10;
@@ -439,6 +521,8 @@ static u64 current_frame;
 static unsigned int quad_vbo, quad_vao;
 static unsigned int plane_vbo, plane_vao;
 static unsigned int text_vbo, text_vao;
+static unsigned int line_vbo, line_vao;
+static unsigned int cube_vbo, cube_vao;
 
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
@@ -468,7 +552,7 @@ void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int
 void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_process_color, unsigned int *depth, int screen_width, int screen_height);
 void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int size, bool textured, bool normals);
 void OnResize(int new_width, int new_height);
-Font *LoadFont(char *path, unsigned int resolution);
+Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
 Vector3 MeasureText(char *text, Font *font, float scale);
 Vector3 MeasureTextText(Text *text, Font *font);
@@ -480,6 +564,7 @@ void LightingPass();
 
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level);
 void EngineUpdate();
+void EnginePresent(void);
 void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);
@@ -489,22 +574,37 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee);
 void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee);
 # 3 "SpriteLight/engine_include/SpriteLight.h" 2
 
+
+# 1 "SpriteLight/engine_include/resource_mgr.h" 1
+
+
+
+void InitHashTable(size_t initial_capacity);
+void FreeResources();
+Resource *LoadResource(const char* file_name);
+Resource *GetResource(int index_or_file_path);
+void RemoveResource(int index_or_file_path);
+Texture LoadTexture(const char *texture_name);
+Shader Load_Shader(const char *vertex_name, const char *fragment_name);
+unsigned int Hash(const char *str);
+void HandleError(const char *message, ...);
+# 6 "SpriteLight/engine_include/SpriteLight.h" 2
 # 1 "SpriteLight/engine_include/audio.h" 1
 u32 LoadAudioStream(const char *file_name);
 u32 LoadSound(const char *file_name);
 u32 PlaySound(u32 sound);
 u32 PlayAudioStream(u32 stream);
 void SetGlobalVolume(u32 volume);
-void SetVolume(u32 sound, u8 volume);
+void SetVolume(u32 sound, u32 volume);
 void SetAudioStreamVolume(u32 stream, u8 volume);
 u32 InitAudio();
 u32 QuitAudio();
 void ToggleAudio();
-# 5 "SpriteLight/engine_include/SpriteLight.h" 2
-
+# 7 "SpriteLight/engine_include/SpriteLight.h" 2
 
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
+void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
 void DrawRect(Rectangle rec, Vector4 color);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);
@@ -517,4 +617,5 @@ void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
 void DrawGradientV(Vector4 start, Vector4 end, float offset);
-# 8 "SpriteLight/engine_include/SpriteLight.h" 2
+void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color);
+# 9 "SpriteLight/engine_include/SpriteLight.h" 2

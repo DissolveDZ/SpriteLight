@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <stdarg.h>
 #include "win_include.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -16,6 +17,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "engine.h"
+#include "resource_mgr.c"
 #include "definitions.c"
 #include "shader.c"
 #include "texture.c"

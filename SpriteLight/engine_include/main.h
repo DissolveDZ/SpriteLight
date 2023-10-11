@@ -139,9 +139,6 @@ typedef struct Font
     char *path;
     TextCharacter loaded_chars[128];
 } Font;
-static Font **loaded_fonts;
-static unsigned int loaded_fonts_len;
-static unsigned int loaded_fonts_max = 5;
 
 typedef struct Text
 {
@@ -180,12 +177,35 @@ typedef struct Audio
     u32 volume;
 } Audio;
 
+typedef struct {
+    char file_path[256];
+    int index;
+    void* data;
+} Resource;
+
+typedef struct HashNode {
+    Resource resource;
+    struct HashNode *next;
+} HashNode;
+
+typedef struct {
+    HashNode **table;
+    size_t size;
+    size_t capacity;
+} HashTable;
+
+typedef struct {
+    HashTable *hash_table;
+    int next_index;
+} Salad;
+
 typedef struct State
 {
     int screen_width;
     int screen_height;
     float near_z;
     float far_z;
+    int target_fps;
     SDL_Event window_event;
     SDL_Window *main_window;
     SDL_GLContext main_context;
@@ -193,7 +213,9 @@ typedef struct State
     Audio audio;
 
     Input input;
-    
+
+    Salad *salad;
+
     u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
@@ -221,54 +243,59 @@ typedef struct State
 
 static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
 
+static float line_vertices[] = { 0, 0, 0, 0, 0, 0 };
+
 static float quad_vertices[] = {
-    // positions        // texture Coords
-    -1.f,
-    1.f,
-    0.0f,
-    0.0f,
-    1.0f,
-    -1.f,
-    -1.f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.f,
-    1.f,
-    0.0f,
-    1.0f,
-    1.0f,
-    1.f,
-    -1.f,
-    0.0f,
-    1.0f,
-    0.0f,
+    -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+    -1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+     1.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  0.0f,  1.0f,  0.0f
 };
 
 static float plane_vertices[] = {
-    // positions        // texture Coords
-    -0.5f,
-    0.5f,
-    0.0f,
-    0.0f,
-    1.0f,
-    -0.5f,
-    -0.5f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.5f,
-    0.5f,
-    0.0f,
-    1.0f,
-    1.0f,
-    0.5f,
-    -0.5f,
-    0.0f,
-    1.0f,
-    0.0f,
+    -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+    -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.0f,  1.0f,  1.0f,
+     0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
+static float cube_vertices[] = {
+    // Front face
+   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f, // Vertex 0
+    1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // Vertex 1
+   -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f, // Vertex 2
+    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f, // Vertex 3
+
+    // Right face
+    1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // Vertex 1
+    1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, // Vertex 5
+    1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f, // Vertex 3
+    1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // Vertex 7
+
+    // Back face
+    1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, // Vertex 5
+   -1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f, // Vertex 4
+    1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f, // Vertex 7
+   -1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, // Vertex 6
+
+   // Left face
+   -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Vertex 4
+   -1.0f, -1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Vertex 0
+   -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // Vertex 6
+   -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // Vertex 2
+
+    // Bottom face
+   -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // Vertex 4
+    1.0f, -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // Vertex 5
+   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // Vertex 0
+    1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // Vertex 1
+
+    // Top face
+   -1.0f,  1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Vertex 2
+    1.0f,  1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Vertex 3
+   -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Vertex 6
+    1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Vertex 7
+};
 static State *state;
 
 static int MAX_BLOOM_MIP = 10;
@@ -278,6 +305,8 @@ static u64 current_frame;
 static unsigned int quad_vbo, quad_vao;
 static unsigned int plane_vbo, plane_vao;
 static unsigned int text_vbo, text_vao;
+static unsigned int line_vbo, line_vao;
+static unsigned int cube_vbo, cube_vao;
 
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
@@ -307,7 +336,7 @@ void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int
 void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_process_color, unsigned int *depth, int screen_width, int screen_height);
 void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int size, bool textured, bool normals);
 void OnResize(int new_width, int new_height);
-Font *LoadFont(char *path, unsigned int resolution);
+Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
 Vector3 MeasureText(char *text, Font *font, float scale);
 Vector3 MeasureTextText(Text *text, Font *font);
@@ -319,6 +348,7 @@ void LightingPass();
 // initiate engine, higher mip level = more bloom samples and 0 is no bloom at all
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level);
 void EngineUpdate();
+void EnginePresent(void);
 void UpdateKeys();
 void UpdateCamera();
 void EngineQuit(void);

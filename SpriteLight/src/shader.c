@@ -1,68 +1,60 @@
-char *ReadTextFile(char *path)
+Shader LoadShader(const char *vertex_name, const char *fragment_name)
 {
-    void *file;
-    long fsize;
-    file = fopen(path, "rb");
-    fseek(file, 0, SEEK_END);
-    fsize = ftell(file);
-    rewind(file);
-    path = malloc(fsize + 1);
-    fread(path, 1, fsize, file);
-    path[fsize] = 0;
-    return path;
-}
+    const char *base_path = "resources/shaders/";
+    int len = strlen(vertex_name) + strlen(fragment_name) + 2;
+    char *combined_path = (char *)malloc(len);
+    if (!combined_path)
+        HandleError("Failed to allocate memory for combined_path");
+    snprintf(combined_path, len, "%s+%s", vertex_name, fragment_name);
+    combined_path[len - 1] = '\0';  // Ensure null termination
+    Resource *resource = LoadResource(combined_path);
+    if (resource && resource->data)
+        return *(Shader *)resource->data;
 
-char *FormatShaderUniform(const char *uniform_name, int index)
-{
-    int buffer_size = snprintf(NULL, 0, "%s[%d].%s", uniform_name, index, uniform_name) + 1;
-    char *buffer = malloc(buffer_size);
-    snprintf(buffer, buffer_size, "%s[%d].%s", uniform_name, index, uniform_name);
-    return buffer;
-}
+    len += strlen(base_path);
 
-Shader LoadShader(char *vertex_path, char *fragment_path)
-{
-    Shader shader = {0};
-    int vert = strlen(vertex_path);
-    int frag = strlen(fragment_path);
-    int len = vert;
-    if (vert < frag)
-        len = frag;
-    char *temp = malloc(18 + len + 1);
-    memcpy(temp, "resources/shaders/", 19);
-    strcat(temp, vertex_path);
-    temp[19 + vert] = '\0';
-    char *vertex_shader_source = ReadTextFile(temp);
-    temp[18] = 0;
-    strcat(temp, fragment_path);
-    temp[19 + frag] = '\0';
-    char *fragment_shader_source = ReadTextFile(temp);
-    free(temp);
+    char *vertex_shader_path = (char *)malloc(len);
+    char *fragment_shader_path = (char *)malloc(len);
 
-    // compile shaders
+    if (!vertex_shader_path || !fragment_shader_path)
+        HandleError("Failed to allocate memory for shader paths");
+
+    snprintf(vertex_shader_path, len, "%s%s", base_path, vertex_name);
+    snprintf(fragment_shader_path, len, "%s%s", base_path, fragment_name);
+
+    char *vertex_shader_source = ReadTextFile(vertex_shader_path);
+    char *fragment_shader_source = ReadTextFile(fragment_shader_path);
+
     unsigned int vertex, fragment;
     int success;
-    char infoLog[512];
+    char info_log[512];
 
-    // vertex Shader
+    Shader shader;
+
+    // Vertex Shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vertex_shader_source, NULL);
     glCompileShader(vertex);
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %s", infoLog);
-    };
+        glGetShaderInfoLog(vertex, 512, NULL, info_log);
+        HandleError("vertex shader compilation failed\n %s", info_log);
+        exit(1);
+    }
+
+    // Fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fragment_shader_source, NULL);
     glCompileShader(fragment);
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s", infoLog);
-    };
+        glGetShaderInfoLog(fragment, 512, NULL, info_log);
+        HandleError("fragment shader compilation failed\n %s", info_log);
+        exit(1);
+    }
+
     shader.ID = glCreateProgram();
     glAttachShader(shader.ID, vertex);
     glAttachShader(shader.ID, fragment);
@@ -70,11 +62,19 @@ Shader LoadShader(char *vertex_path, char *fragment_path)
     glGetProgramiv(shader.ID, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shader.ID, 512, NULL, infoLog);
-        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n %s", infoLog);
+        glGetProgramInfoLog(shader.ID, 512, NULL, info_log);
+        HandleError("shader linking failed\n %s", info_log);
+        exit(1);
     }
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+
+    free(vertex_shader_source);
+    free(fragment_shader_source);
+
+    if (resource)
+        resource->data = &shader;
+
     return shader;
 }
 void UseShader(Shader shader)

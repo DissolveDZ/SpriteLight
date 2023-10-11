@@ -1,3 +1,25 @@
+char *ReadTextFile(char *path)
+{
+    void *file;
+    long fsize;
+    file = fopen(path, "rb");
+    fseek(file, 0, SEEK_END);
+    fsize = ftell(file);
+    rewind(file);
+    path = malloc(fsize + 1);
+    fread(path, 1, fsize, file);
+    path[fsize] = 0;
+    return path;
+}
+
+char *FormatShaderUniform(const char *uniform_name, int index)
+{
+    int buffer_size = snprintf(NULL, 0, "%s[%d].%s", uniform_name, index, uniform_name) + 1;
+    char *buffer = malloc(buffer_size);
+    snprintf(buffer, buffer_size, "%s[%d].%s", uniform_name, index, uniform_name);
+    return buffer;
+}
+
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
 {
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
@@ -184,55 +206,71 @@ Vector3 MeasureTextText(Text *text, Font *font)
 {
     return MeasureText(text->text, font, text->scale);
 }
-
 Vector3 MeasureText(char *text, Font *font, float scale)
 {
-    float offset_x = 0;
-    float offset_y = 0;
-    float offset_y_min = 0;
-    float offset_x_max = 0;
-    float max_y = 0;
-    float xpos = 0;
-    float w = 0;
-    float added_h = 0;
-    for (char i = 0; i != strlen(text); i++)
+    if (text == NULL || text[0] == '\0')
     {
-        float ypos = 0;
-        float h = 0;
+        return (Vector3){0.0f, 0.0f, 0.0f}; // Empty text, return zeros.
+    }
+
+    bool first_row = true;
+    float offset_x = 0.0f;
+    float offset_y = 0.0f;
+    float offset_y_min = 0.0f;
+    float offset_x_max = 0.0f;
+    float max_y = 0.0f;
+    float highest_height = 0.0f;
+    float first_offset = 0.0f;
+
+    for (int i = 0; text[i] != '\0'; i++)
+    {
+        char current_char = text[i];
         TextCharacter ch;
-        if (font == NULL)
-            ch = default_chars[text[i]];
+
+        if (!font)
+            ch = default_chars[current_char];
         else
-            ch = font->loaded_chars[text[i]];
-        w = ch.size[0] * scale;
-        h = ch.size[1] * scale;
-        if (i == 0)
-            offset_x -= ch.bearing[0] * scale;
-        xpos = offset_x + ch.bearing[0] * scale;
-        ypos = offset_y - (ch.size[1] - ch.bearing[1]) * scale;
-        if (!offset_y_min)
-            offset_y_min = ypos;
-        if (ypos < offset_y_min)
-            offset_y_min = ypos;
-        if (!offset_x_max)
-            offset_x_max = xpos + w;
-        if (xpos + w > offset_x_max)
-            offset_x_max = xpos + w;
-        float temp = h + ypos;
-        if (!max_y)
-            max_y = temp;
-        if (temp > max_y)
-            max_y = temp;
+            ch = font->loaded_chars[current_char];
+
+        float w = ch.size[0] * scale;
+        float h = ch.size[1] * scale;
+
+        if (h > highest_height)
+            highest_height = h;
+
         if (text[i] == '\n')
         {
             offset_x = 0;
-            offset_y += h;
-            added_h += max_y;
-            continue;
+            offset_y += highest_height;
+            if (first_row)
+                first_offset = highest_height;
+            highest_height = 0;
+            first_row = false;
+            // continue; for no spacing
         }
+
+        if (i == 0)
+        {
+            offset_x -= ch.bearing[0] * scale;
+        }
+
+        float xpos = offset_x + ch.bearing[0] * scale;
+        float ypos = offset_y - (ch.size[1] - ch.bearing[1]) * scale;
+
+        if (ypos < offset_y_min)
+            offset_y_min = ypos;
+
+        if (xpos + w > offset_x_max)
+            offset_x_max = xpos + w;
+
+        float temp = h + ypos;
+
+        if (temp > max_y)
+            max_y = temp;
+
         offset_x += (ch.advance >> 6) * scale;
     }
-    return (Vector3){offset_x_max, (max_y - offset_y_min) + added_h, offset_y_min};
+    return (Vector3){offset_x_max, (max_y - offset_y_min), offset_y_min + first_offset};
 }
 
 Vector3 MeasureWorldText(char *text, Font *font, float scale)
@@ -240,8 +278,31 @@ Vector3 MeasureWorldText(char *text, Font *font, float scale)
     return MeasureText(text, font, scale * 0.001f);
 }
 
+void EnginePresent(void)
+{
+    SDL_GL_SwapWindow(state->main_window);
+    last_frame = current_frame;
+    current_frame = SDL_GetPerformanceCounter();
+    state->frame_time = (current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
+    state->time += state->frame_time;
+    double target_frame_time = 1000.0 / state->target_fps; // Target frame time for 60 FPS in milliseconds
+    double frame_delay = target_frame_time - state->frame_time;
+    if (frame_delay > 0) {
+        SDL_Delay(frame_delay);
+    }
+    /*
+    frame_delay = 1.0 / state->target_fps - state->frame_time;
+    if (frame_delay > 0)
+    {
+        Uint32 delay_time = (Uint32)(frame_delay*1000);
+        SDL_Delay(delay_time);
+    }
+    */
+}
+
 void EngineQuit(void)
 {
+    FreeResources();
     SDL_GL_DeleteContext(state->main_context);
     SDL_DestroyWindow(state->main_window);
     SDL_Quit();

@@ -1,6 +1,6 @@
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level)
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -10,12 +10,21 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     InitAudio();
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
     SDL_GL_SetSwapInterval(1);
+    SDL_DisplayMode cur_mode;
+     if (SDL_GetCurrentDisplayMode(0, &cur_mode) != 0) {
+        HandleError("Failed to get display mode! SDL_Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        return NULL;
+    }
+    state->target_fps = cur_mode.refresh_rate;
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // make shader loading save already loaded shaders into an array to avoid loading multiple
+    InitHashTable(16);
+    InitDefaultFont(256);
+
     basic_shader = LoadShader("engine/rec.vert", "engine/rec.frag");
     basic_screen_space_shader = LoadShader("ui/screen_space.vert", "engine/rec.frag");
     text_shader = LoadShader("engine/text.vert", "engine/text.frag");
@@ -34,120 +43,125 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     state->screen_height = height;
     state->quit = false;
     state->resize_callback = 0;
-    current_frame = SDL_GetPerformanceCounter();
     OnResize(width, height);
 
-    InitializeMappings();
-    InitDefaultFont(512);
     BufferSetup(&quad_vao, &quad_vbo, quad_vertices, sizeof(quad_vertices), true, false);
     BufferSetup(&text_vao, &text_vbo, quad_vertices, sizeof(quad_vertices), true, false);
     BufferSetup(&plane_vao, &plane_vbo, plane_vertices, sizeof(plane_vertices), true, false);
+    BufferSetup(&line_vao, &line_vbo, line_vertices, sizeof(line_vertices), false, false);
+    BufferSetup(&cube_vao, &cube_vbo, cube_vertices, sizeof(cube_vertices), true, true);
     if (bloom_mip_level)
         BloomInit(bloom_mip_level);
     return state;
 }
 
-bool IsFontLoaded(Font *font, char *path)
-{
-    if (loaded_fonts_len >= loaded_fonts_max - 1)
-    {
-        loaded_fonts_max *= 1.5f;
-        loaded_fonts = realloc(loaded_fonts, loaded_fonts_max * sizeof(Font));
-    }
-    else if (!loaded_fonts_len)
-    {
-        loaded_fonts = calloc(1, loaded_fonts_max * sizeof(Font));
-        return false;
-    }
-    for (int i = 0; i < loaded_fonts_len; i++)
-    {
-        if (strcmp(loaded_fonts[i]->path, path) == 0)
-        {
-            printf("already loaded\n");
-            font = loaded_fonts[i];
-            return true;
-        }
-    }
-    return false;
-}
-
 void InitDefaultFont(unsigned int resolution)
 {
-    Font *default_font = LoadFont("resources/fonts/arial.ttf", resolution);
+    Font *default_font = LoadFont("arial.ttf", resolution);
     memcpy(default_chars, default_font->loaded_chars, 128 * sizeof(TextCharacter));
 }
 
-Font *LoadFont(char *path, unsigned int resolution)
+Font *LoadFont(const char *font_name, unsigned int resolution)
 {
+    const char *base_path = "resources/fonts/";
+    size_t font_path_length = strlen(base_path) + strlen(font_name) + 1;
+    char *font_path = (char *)malloc(font_path_length);
+    
+    if (!font_path)
+    {
+        HandleError("Failed to allocate memory for font");
+        return NULL;
+    }
+    
+    snprintf(font_path, font_path_length, "%s%s", base_path, font_name);
+    
+    Resource *resource = LoadResource(font_path);
     Font *font;
-    if (IsFontLoaded(font, path))
-        return font;
-    if (!strlen(path))
+    
+    if (resource)
     {
-        printf("please enter a valid path");
-        return NULL;
-    }
-    FT_Library ft;
-    if (FT_Init_FreeType(&ft))
-    {
-        printf("Could not init FreeType Library");
-        return NULL;
-    }
-    FT_Face face;
-    if (FT_New_Face(ft, path, 0, &face))
-    {
-        printf("Failed to load font");
-        return NULL;
-    }
-    else
-    {
-        font = calloc(1, sizeof(Font));
-        font->path = path;
-        FT_Set_Pixel_Sizes(face, 0, resolution);
-
-        // disable byte-alignment restriction
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        for (unsigned char c = 0; c < 128; c++)
+        if (resource->data)
         {
-            // Load character glyph
-            if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-            {
-                printf("Failed to load Glyph");
-                continue;
-            }
-            if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LIGHT))
-                continue;
-            if (state->sdf_font)
-                FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF);
-            unsigned int texture;
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RED,
-                face->glyph->bitmap.width,
-                face->glyph->bitmap.rows,
-                0,
-                GL_RED,
-                GL_UNSIGNED_BYTE,
-                face->glyph->bitmap.buffer);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            TextCharacter character =
-                {texture,
-                 {face->glyph->bitmap.width, face->glyph->bitmap.rows},
-                 {face->glyph->bitmap_left, face->glyph->bitmap_top},
-                 {face->glyph->advance.x}};
-            font->loaded_chars[c] = character;
+            font = (Font *)resource->data;
+            return font;
         }
-        loaded_fonts[loaded_fonts_len] = font;
-        loaded_fonts_len++;
-        return font;
-        glBindTexture(GL_TEXTURE_2D, 0);
+        else
+        {
+            FT_Library ft;
+            
+            if (FT_Init_FreeType(&ft))
+            {
+                printf("Could not initialize FreeType Library");
+                free(font_path);
+                return NULL;
+            }
+            
+            FT_Face face;
+            
+            if (FT_New_Face(ft, font_path, 0, &face))
+            {
+                printf("Failed to load font");
+                free(font_path);
+                FT_Done_FreeType(ft);
+                return NULL;
+            }
+            else
+            {
+                font = calloc(1, sizeof(Font));
+                font->path = font_path;
+                FT_Set_Pixel_Sizes(face, 0, resolution);
+                
+                // Disable byte-alignment restriction
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                
+                for (unsigned char c = 0; c < 128; c++)
+                {
+                    // Load character glyph
+                    if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+                    {
+                        printf("Failed to load Glyph");
+                        continue;
+                    }
+                    
+                    if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LIGHT))
+                        continue;
+                    
+                    if (state->sdf_font)
+                        FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF);
+                    
+                    unsigned int texture;
+                    glGenTextures(1, &texture);
+                    glBindTexture(GL_TEXTURE_2D, texture);
+                    glTexImage2D(
+                        GL_TEXTURE_2D,
+                        0,
+                        GL_RED,
+                        face->glyph->bitmap.width,
+                        face->glyph->bitmap.rows,
+                        0,
+                        GL_RED,
+                        GL_UNSIGNED_BYTE,
+                        face->glyph->bitmap.buffer);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    
+                    TextCharacter character =
+                        {texture,
+                         {face->glyph->bitmap.width, face->glyph->bitmap.rows},
+                         {face->glyph->bitmap_left, face->glyph->bitmap_top},
+                         {face->glyph->advance.x}};
+                    font->loaded_chars[c] = character;
+                }
+                
+                resource->data = font;
+                glBindTexture(GL_TEXTURE_2D, 0);
+                FT_Done_Face(face);
+                FT_Done_FreeType(ft);
+                return font;
+            }
+        }
     }
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft);
+    return NULL;
 }

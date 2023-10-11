@@ -106,11 +106,26 @@ void DrawUITexRect(Rectangle rec)
     glBindVertexArray(0);
 }
 
+void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color)
+{
+    UseShader(basic_shader);
+    SetShaderMat4(basic_shader.ID, "projection", state->projection);
+    SetShaderMat4(basic_shader.ID, "view", state->view);
+    SetShaderBool(basic_shader.ID, "use_color", true);
+    SetShaderVec4(basic_shader.ID, "color", (vec4){color.r / 255, color.g / 255, color.b / 255, color.a / 255});
+    SetShaderMat4(basic_shader.ID, "model", (mat4)GLM_MAT4_IDENTITY_INIT);
+    glBindVertexArray(line_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertices), (float[]){start.x, start.y, 0, end.x, end.y, 0});
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_LINE_STRIP, 0, 2);
+    glBindVertexArray(0);
+}
+
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color)
 {
     DrawTextText((Text){text, x, y, scale, color}, font);
 }
-
 void DrawTextText(Text text, Font *font)
 {
     UseShader(text_shader);
@@ -119,25 +134,38 @@ void DrawTextText(Text text, Font *font)
     SetShaderVec4(text_shader.ID, "text_color", (vec4){text.color.r / 255, text.color.g / 255, text.color.b / 255, text.color.a / 255});
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(text_vao);
-    Vector2 text_offset = (Vector2){text.x, text.y};
+    glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
 
-    for (char i = 0; i != strlen(text.text); i++)
+    Vector2 text_offset = (Vector2){text.x, text.y};
+    size_t text_length = strlen(text.text);
+
+    float highest_in_row = 0.f;
+    for (size_t i = 0; i < text_length; i++)
     {
         TextCharacter ch;
         if (font == NULL)
             ch = default_chars[text.text[i]];
         else
             ch = font->loaded_chars[text.text[i]];
-        float xpos = text_offset.x + ch.bearing[0] * text.scale;
-        float ypos = -(text_offset.y + (ch.size[1] - ch.bearing[1]) * text.scale);
+
         float w = ch.size[0] * text.scale;
         float h = ch.size[1] * text.scale;
+
+        if (h > highest_in_row)
+            highest_in_row = h;
+
         if (text.text[i] == '\n')
         {
             text_offset.x = text.x;
-            text_offset.y += h;
+            text_offset.y += highest_in_row;
+            // currently doesn't account for the fact that \n shouldn't be added
+            // but it creates nice spacing so i'll leave it in
             continue;
         }
+
+        float xpos = text_offset.x + ch.bearing[0] * text.scale;
+        float ypos = -(text_offset.y + (ch.size[1] - ch.bearing[1]) * text.scale);
+
         float vertices[4][5] = {
             {-xpos, ypos + h, 0.f, 0.0f, 0.0f},
             {-xpos, ypos, 0.f, 0.0f, 1.0f},
@@ -145,16 +173,61 @@ void DrawTextText(Text text, Font *font)
             {-(xpos + w), ypos, 0.f, 1.0f, 1.0f}};
 
         glBindTexture(GL_TEXTURE_2D, ch.texture_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        text_offset.x += (ch.advance >> 6) * text.scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+
+        text_offset.x += (ch.advance >> 6) * text.scale;
     }
+
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture)
+{
+    glEnable(GL_DEPTH_TEST);
+    UseShader(basic_shader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture.ID);
+    SetShaderMat4(basic_shader.ID, "projection", state->projection);
+    SetShaderMat4(basic_shader.ID, "view", state->view);
+    SetShaderBool(basic_shader.ID, "use_color", false);
+    SetShaderBool(basic_shader.ID, "use_normals", true);
+    SetShaderVec3(basic_shader.ID, "view_pos", (vec3){state->camera.position.x, state->camera.position.y, state->camera.position.z});
+    SetShaderFloat(basic_shader.ID, "exposure", 1);
+    SetShaderBool(basic_shader.ID, "hdr", true);
+
+    glm_mat4_identity(state->model);
+    mat4 temp;
+    glm_mat4_identity(temp);
+    versor quater;
+    glm_quat_identity(quater);
+    mat4 idendidy;
+    glm_mat4_identity(idendidy);
+    mat4 transformx;
+    glm_mat4_identity(transformx);
+    glm_rotate(transformx, glm_rad(rotation.x), (vec3){1.f, 0.f, 0.f});
+    mat4 transformy;
+    glm_mat4_identity(transformy);
+    glm_rotate(transformy, glm_rad(rotation.y), (vec3){0.f, 1.f, 0.f});
+    mat4 transformz;
+    glm_mat4_identity(transformz);
+    glm_rotate(transformz, glm_rad(rotation.z), (vec3){0.f, 0.f, 1.f});
+    mat4 rotationmat;
+    glm_mat4_identity(rotationmat);
+    glm_mul(transformy, transformx, temp);
+    glm_mul(temp, transformz, rotationmat);
+
+    glm_translate(state->model, position.raw);
+    glm_mat4_mul(state->model, rotationmat, state->model);
+    glm_scale(state->model, scale.raw);
+    // glm_rotate(model, glm_rad((float)SDL_GetTicks64() / 50), rotation);
+    SetShaderMat4(basic_shader.ID, "model", state->model);
+    glBindVertexArray(cube_vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
+    glBindVertexArray(0);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void DrawGradientV(Vector4 start, Vector4 end, float offset)
