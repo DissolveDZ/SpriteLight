@@ -1,13 +1,14 @@
-#version 330 core
+#version 450 core
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 
-in vec2 TexCoord;
+in vec2 TexCoords;
+in float TexIndex;
 
-uniform sampler2D tex;
-uniform vec4 color;
+// textures as ubo in future
+uniform sampler2D textures[32];
 
 void main()
 {
-    FragColor = color;
+    FragColor = texture(textures[int(round(TexIndex))], TexCoords);
 }

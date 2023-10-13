@@ -17,7 +17,7 @@ void ProcessCamera(Camera *camera)
             camera->target.x = state->mouse_world.x;
             camera->target.y = state->mouse_world.y;
             Vector2 before = (Vector2){camera->target.x, camera->target.y};
-            CameraZoom(&state->camera, -1.f * state->wheel, 1.f, 100.f);
+            CameraZoom(&state->camera, -2 * state->wheel, 1.f, 1000.f);
             Vector2 after = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
             camera->position.x += (before.x - after.x);
             camera->position.y += (before.y - after.y);

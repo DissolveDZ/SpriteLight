@@ -110,6 +110,7 @@ Resource *LoadResource(const char *file_path)
     }
     new_node->resource = (Resource){0};
     strcpy(new_node->resource.file_path, file_path);
+    new_node->resource.program_index = -1;
     new_node->resource.index = index;
     new_node->resource.data = NULL;
         size_t insert_index = Hash(file_path) % salad->hash_table->capacity;

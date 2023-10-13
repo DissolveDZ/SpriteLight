@@ -25,7 +25,7 @@ bool GetInputDown(KeyCode key)
     if (key < NUM_KEYS)
         return state->key_state[KeyCodeToScancode[key]];
     else
-        return state->mouse_state & SDL_BUTTON(key-NUM_KEYS);
+        return state->mouse_state & SDL_BUTTON(key - NUM_KEYS);
 }
 
 CallArgs *ArgsToCallArgs(size_t count, ...)
@@ -33,13 +33,13 @@ CallArgs *ArgsToCallArgs(size_t count, ...)
     va_list list;
     va_start(list, count);
 
-    CallArgs* args = malloc(sizeof(CallArgs));
-    args->pointers = (void**)malloc(count * sizeof(void*));
+    CallArgs *args = malloc(sizeof(CallArgs));
+    args->pointers = (void **)malloc(count * sizeof(void *));
     args->num_pointers = count;
 
-    for(int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
-        args->pointers[i] = va_arg(list, void*);
+        args->pointers[i] = va_arg(list, void *);
     }
     va_end(list);
     return args;
@@ -123,7 +123,7 @@ void ProcessKeys()
     {
         InputAction *action = state->input.actions[i];
 
-        if (action)
+        if (action && action->data && action->callback)
         {
             InputState trigger = state->input.key[i];
             if ((trigger == action->trigger) || (trigger == INPUT_PRESS && action->trigger == INPUT_DOWN))
@@ -138,7 +138,7 @@ void ProcessKeys()
         int mouse_index = i - NUM_KEYS;
         InputAction *action = state->input.actions[i];
 
-        if (action)
+        if (action && action->data && action->callback)
         {
             InputState trigger = state->input.key[i];
             if ((trigger == action->trigger) || (trigger == INPUT_PRESS && action->trigger == INPUT_DOWN))

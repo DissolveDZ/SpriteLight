@@ -256,6 +256,14 @@ typedef struct Camera
     float zoom;
 } Camera;
 
+typedef struct
+{
+    Vector3 position;
+    Vector2 tex_coords;
+    float tex_id;
+}Vertex;
+
+
 typedef struct Material
 {
 
@@ -397,6 +405,7 @@ typedef struct {
     char file_path[256];
     int index;
     void* data;
+    u32 program_index;
 } Resource;
 
 typedef struct HashNode {
@@ -415,6 +424,30 @@ typedef struct {
     int next_index;
 } Salad;
 
+typedef struct {
+    GLuint vao;
+    GLuint vbo;
+    GLuint ibo;
+
+    GLuint white;
+    u32 white_tex_index;
+
+    Vertex *buffer_object;
+    Vertex *buffer_object_ptr;
+
+    u32 *textures;
+    u32 tex_index;
+    u32 *indices;
+
+    u32 vertex_count;
+    u32 index_count;
+
+    u32 max_quads;
+    u32 max_vertices;
+    u32 max_indices;
+    u32 max_textures;
+} RenderBatch;
+
 typedef struct State
 {
     int screen_width;
@@ -432,6 +465,8 @@ typedef struct State
 
     Salad *salad;
 
+    RenderBatch renderer;
+
     u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
@@ -447,7 +482,7 @@ typedef struct State
     Player player;
     Camera camera;
     double frame_time;
-    float time;
+    double time;
     int active_camera;
     float gravity;
     bool quit;
@@ -458,8 +493,7 @@ typedef struct State
 } State;
 
 static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
-
-static float line_vertices[] = { 0, 0, 0, 0, 0, 0 };
+static float line_vertices[6];
 
 static float quad_vertices[] = {
     -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
@@ -518,11 +552,7 @@ static int MAX_BLOOM_MIP = 10;
 static u64 last_frame;
 static u64 current_frame;
 
-static unsigned int quad_vbo, quad_vao;
-static unsigned int plane_vbo, plane_vao;
-static unsigned int text_vbo, text_vao;
 static unsigned int line_vbo, line_vao;
-static unsigned int cube_vbo, cube_vao;
 
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
@@ -537,9 +567,12 @@ Vector2 Vector2Add(Vector2 first, Vector2 second);
 Vector2 Vector2Zero(void);
 Vector3 Vector3Scale(Vector3 vector, float scalar);
 Vector3 Vector3Add(Vector3 first, Vector3 second);
+Vector2 Vector2Subtract(Vector2 first, Vector2 second);
 Vector3 Vector3Subtract(Vector3 first, Vector3 second);
 Vector3 Vector3Zero(void);
+Vector3 Vector2ToVector3(Vector2 vec, float z);
 float Vector3Distance(Vector3 v1, Vector3 v2);
+Vector3 Vector3Normalize(Vector3 vector);
 
 bool Vector2Comp(Vector2 first, Vector2 second);
 
@@ -550,7 +583,10 @@ Vector2 GetScreenToWorld2D(Vector2 position, mat4 projection);
 Camera *CreateCamera2D(float fov, Vector3 position, CameraType type);
 void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int *g_normal, unsigned int *g_albedo, unsigned int *depth, int screen_width, int screen_height);
 void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_process_color, unsigned int *depth, int screen_width, int screen_height);
-void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int size, bool textured, bool normals);
+void BatchSetup();
+void BeginBatch();
+void EndBatch();
+void FlushBatch();
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
@@ -559,6 +595,7 @@ Vector3 MeasureTextText(Text *text, Font *font);
 Vector3 MeasureWorldText(char *text, Font *font, float scale);
 Vector3 MeasureWorldTextText(Text *text, Font *font);
 void CameraZoom(Camera *camera, float amount, float min, float max);
+void ZoomCamera(Camera *Camera);
 void LightingPass();
 
 
@@ -605,7 +642,8 @@ void ToggleAudio();
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
 void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
-void DrawRect(Rectangle rec, Vector4 color);
+void DrawRect(Rectangle rec, Texture tex, float rotation);
+Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, float rotation, float tex);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);
 void DrawTexRect(Rectangle rec);

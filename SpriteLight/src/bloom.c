@@ -83,7 +83,7 @@ void UpsampleBloom(float filter_radius)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, next_mip->texture.ID, 0);
 
         // Render screen-filled quad of resolution of current mip
-        glBindVertexArray(quad_vao);
+        // glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
     }
@@ -113,7 +113,7 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee)
                                GL_TEXTURE_2D, mip->texture.ID, 0);
 
         // Render screen-filled quad of resolution of current mip
-        glBindVertexArray(quad_vao);
+        // glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
 

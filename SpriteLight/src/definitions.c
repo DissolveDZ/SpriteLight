@@ -123,10 +123,20 @@ Vector2 GetScreenToWorld2D(Vector2 position, mat4 projection)
     mat4 inv_view;
     glm_mat4_inv(projection, inv_view);
     Vector3 transform;
-    // glm_scale(invmat, transform);
     transform = Vector3Transform((vec3){clipcoord.x, clipcoord.y, 1}, inv_view);
-    // transform = (vec4){position.x, position.y, 1, 1} * inv_view;
     return (Vector2){transform.x * state->camera.position.z + state->camera.position.x, transform.y * state->camera.position.z + state->camera.position.y};
+}
+
+// Function to subtract two Vector2 vectors
+Vector2 Vector2Subtract(Vector2 first, Vector2 second)
+ {
+    return (Vector2){first.x - second.x, first.y - second.y};
+}
+
+// Function to convert a Vector2 to Vector3
+Vector3 Vector2ToVector3(Vector2 vec, float z) 
+{
+    return (Vector3){vec.x, vec.y, z};
 }
 
 Vector2 Vector2Scale(Vector2 vector, float scalar)
@@ -164,6 +174,15 @@ Vector3 Vector3Zero()
     return (Vector3){0};
 }
 
+Vector3 Vector3Normalize(Vector3 vector)
+{
+    float length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+    if (length != 0.0f)
+        return (Vector3){vector.x / length, vector.y / length, vector.z / length};
+    else
+        return (Vector3){0.0f, 0.0f, 0.0f};
+}
+
 // return the distance between two vector3s
 float Vector3Distance(Vector3 first, Vector3 second)
 {
@@ -180,6 +199,9 @@ bool Vector2Comp(Vector2 first, Vector2 second)
 
 void CameraZoom(Camera *camera, float amount, float min, float max)
 {
+    // Calculate the direction from the camera position to the target
+    Vector3 view_dir = Vector3Subtract(camera->target, camera->position);
+    view_dir = Vector3Normalize(view_dir);
     float distance = Vector3Distance(camera->position, camera->target);
 
     distance += amount;
@@ -189,12 +211,10 @@ void CameraZoom(Camera *camera, float amount, float min, float max)
     else if (distance > max)
         distance = max;
 
-    Vector3 forward = (Vector3){0, 0, -1};
-    camera->zoom = distance;
-    Vector3 next = Vector3Add(camera->target, Vector3Scale(forward, -distance));
+    Vector3 newCameraPosition = Vector3Add(camera->target, Vector3Scale(view_dir, -distance));
 
-    camera->zoom = next.z;
-    camera->position = next;
+    camera->zoom = distance;
+    camera->position = newCameraPosition;
 }
 
 Vector3 MeasureWorldTextText(Text *text, Font *font)
@@ -287,7 +307,8 @@ void EnginePresent(void)
     state->time += state->frame_time;
     double target_frame_time = 1000.0 / state->target_fps; // Target frame time for 60 FPS in milliseconds
     double frame_delay = target_frame_time - state->frame_time;
-    if (frame_delay > 0) {
+    if (frame_delay > 0)
+    {
         SDL_Delay(frame_delay);
     }
     /*
