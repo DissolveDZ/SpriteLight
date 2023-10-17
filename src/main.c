@@ -79,7 +79,7 @@ int main(void)
     SetVolume(sound1, 1000);
     SetVolume(sound2, 1000);
     // PlayAudioStream(music);
-    // glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
     Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
     Rectangle rec = (Rectangle){0, 2, 1, 1};
@@ -100,18 +100,24 @@ int main(void)
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         BeginBatch();
-        DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200);
+        DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200, 3);
         for (int y = 0; y < 50; y++)
         {
             for (int x = 0; x < 50; x++)
             {
                 GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-                Texture tex;
-                tex.ID = tex_id;
-                DrawRect((Rectangle){x, y, 1, 1}, tex, 0.f);
+                DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f, 3);
             }
         }
-        EndBatch();
+        for (int y = 0; y < 50; y++)
+        {
+            for (int x = 0; x < 50; x++)
+            {
+                GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
+                DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f, 6);
+            }
+        }
+        // EndBatch(&state->renderer.batches[1]);
         FlushBatch();
         EnginePresent();
     }

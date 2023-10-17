@@ -1,6 +1,6 @@
 void DrawQuad();
 void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
-void DrawRect(Rectangle rec, Texture tex, float rotation);
+void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader);
 Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, float rotation, float tex);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);

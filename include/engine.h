@@ -429,19 +429,29 @@ typedef struct {
     GLuint vbo;
     GLuint ibo;
 
+    Vertex *buffer_object;
+    Vertex *buffer_object_ptr;
+
+    Shader shader;
+    int index;
+    GLsizeiptr size;
+    u32 vertex_count;
+    u32 index_count;
+} Batch;
+
+typedef struct {
     GLuint white;
     u32 white_tex_index;
 
-    Vertex *buffer_object;
-    Vertex *buffer_object_ptr;
+    Batch *batches;
+    GLsizeiptr offset;
+    u32 batch_count;
 
     u32 *textures;
     u32 tex_index;
     u32 *indices;
 
-    u32 vertex_count;
-    u32 index_count;
-
+    u32 max_batches;
     u32 max_quads;
     u32 max_vertices;
     u32 max_indices;
@@ -585,7 +595,7 @@ void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int
 void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_process_color, unsigned int *depth, int screen_width, int screen_height);
 void BatchSetup();
 void BeginBatch();
-void EndBatch();
+void EndBatch(Batch *batch);
 void FlushBatch();
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
@@ -642,7 +652,7 @@ void ToggleAudio();
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
 void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
-void DrawRect(Rectangle rec, Texture tex, float rotation);
+void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader);
 Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, float rotation, float tex);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);

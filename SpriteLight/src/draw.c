@@ -14,17 +14,17 @@ Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, 
     float half_width = width * 0.5f;
     float half_height = height * 0.5f;
 
-    vec3s vertices[4] = {
-        {-half_width, -half_height, 0.0f},
-        {half_width, -half_height, 0.0f},
-        {half_width, half_height, 0.0f},
-        {-half_width, half_height, 0.0f}};
-
     mat4 transform = GLM_MAT4_IDENTITY_INIT;
     glm_translate(transform, (vec3){x, y, 0.0f});
     if (rotation != 0.f)
         glm_rotate(transform, glm_rad(rotation), (vec3){0.0f, 0.0f, 1.0f});
     glm_scale(transform, (vec3){width, height, 1.0f});
+
+    vec3s vertices[4] = {
+        {-half_width, -half_height, 0.0f},
+        {half_width, -half_height, 0.0f},
+        {half_width, half_height, 0.0f},
+        {-half_width, half_height, 0.0f}};
 
     for (int i = 0; i < 4; i++)
     {
@@ -37,15 +37,43 @@ Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, 
         target->tex_id = tex;
         target++;
     }
-    state->renderer.vertex_count += 4;
     return target;
 }
 
-void DrawRect(Rectangle rec, Texture tex, float rotation)
+// called by other function using the shader, drawing with a custom shader would be it's own function
+void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader)
 {
-    if (state->renderer.vertex_count >= state->renderer.max_vertices || state->renderer.tex_index > 31)
+    Batch *batch = &state->renderer.batches[state->renderer.batch_count - 1];
+    bool has = false;
+    int index = state->renderer.batch_count - 1;
+    // replace with hashmap later
+    for (int i = 0; i < state->renderer.batch_count; i++)
     {
-        EndBatch();
+        if (state->renderer.batches[i].shader.ID &&  state->renderer.batches[i].shader.ID == shader)
+        {
+            batch = &state->renderer.batches[i];
+            index = i;
+            has = true;
+            break;
+        }
+    }
+    if (!has)
+    {
+        batch = &state->renderer.batches[state->renderer.batch_count];
+        index = state->renderer.batch_count;
+        state->renderer.batch_count++;
+        if (state->renderer.batch_count >= state->renderer.max_batches - 1)
+        {
+            state->renderer.max_batches *= 1.5f;
+            state->renderer.batches = realloc(state->renderer.batches, state->renderer.batch_count * sizeof(Batch));
+        }
+        batch->shader.ID = shader;
+        printf("new should print 2 times\n");
+    }
+
+    if (state->renderer.batches[index].vertex_count >= state->renderer.max_vertices || state->renderer.tex_index > 31 || !has)
+    {
+        EndBatch(batch);
         FlushBatch();
         BeginBatch();
     }
@@ -58,14 +86,15 @@ void DrawRect(Rectangle rec, Texture tex, float rotation)
             break;
         }
     }
-    
+
     if (texture_index == 0.0f)
     {
         texture_index = (float)state->renderer.tex_index;
         state->renderer.textures[state->renderer.tex_index] = tex.ID;
         state->renderer.tex_index++;
     }
-    state->renderer.buffer_object_ptr = CreateQuad(state->renderer.buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, texture_index);
+    state->renderer.batches[index].buffer_object_ptr = CreateQuad(state->renderer.batches[index].buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, texture_index);
+    state->renderer.batches[index].vertex_count += 4;
 }
 
 void DrawTexRectTint(Rectangle rec, Vector4 tint)

@@ -30,6 +30,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     // InitDefaultFont(256);
 
     basic_shader = LoadShader("engine/quad.vert", "engine/quad.frag");
+    gradient_shader = LoadShader("engine/quad.vert", "engine/test.frag");
     // gradient_shader = LoadShader("engine/quad.vert", "ui/gradient.frag");
 
     SDL_Surface *icon = LoadSDLImage(icon_path);

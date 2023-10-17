@@ -54,12 +54,13 @@ void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_proces
 
 void BatchSetup()
 {
-    state->renderer.max_quads = 1000;
+    state->renderer.max_quads = 10000;
     state->renderer.max_vertices = state->renderer.max_quads * 4;
     state->renderer.max_indices = state->renderer.max_quads * 6;
     state->renderer.max_textures = 32;
+    state->renderer.max_batches = 10;
     // glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &state->renderer.max_textures);
-
+    // use UBO
     glUseProgram(basic_shader.ID);
     int textures[32];
     for (int i = 0; i < 32; i++)
@@ -68,25 +69,10 @@ void BatchSetup()
     glUniform1iv(glGetUniformLocation(basic_shader.ID, "textures"), 32, textures);
     glUseProgram(0);
 
-    glCreateVertexArrays(1, &state->renderer.vao);
-    glBindVertexArray(state->renderer.vao);
-
-    glCreateBuffers(1, &state->renderer.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, state->renderer.vbo);
-    glBufferData(GL_ARRAY_BUFFER, state->renderer.max_vertices * sizeof(Vertex), NULL, GL_DYNAMIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, position));
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_coords));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_id));
-    glEnableVertexAttribArray(2);
-
     state->renderer.textures = malloc(state->renderer.max_textures * sizeof(u32));
-    state->renderer.buffer_object = malloc(state->renderer.max_vertices * sizeof(Vertex));
-    state->renderer.buffer_object_ptr = NULL;
+    state->renderer.batches = malloc(state->renderer.max_batches * sizeof(Batch));
+    state->renderer.batch_count = 0;
+    state->renderer.max_batches = 10;
     state->renderer.indices = malloc(state->renderer.max_indices * sizeof(u32));
 
     u32 offset = 0;
@@ -103,9 +89,31 @@ void BatchSetup()
         offset += 4;
     }
 
-    glCreateBuffers(1, &state->renderer.ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->renderer.ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(state->renderer.indices) * state->renderer.max_indices, state->renderer.indices, GL_STATIC_DRAW);
+    for (int i = 0; i < state->renderer.max_batches; i++)
+    {
+        state->renderer.batches[i].buffer_object = malloc(state->renderer.max_vertices * sizeof(Vertex));
+        state->renderer.batches[i].buffer_object_ptr = NULL;
+
+        glCreateVertexArrays(1, &state->renderer.batches[i].vao);
+        glBindVertexArray(state->renderer.batches[i].vao);
+
+        glCreateBuffers(1, &state->renderer.batches[i].vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, state->renderer.batches[i].vbo);
+        glBufferData(GL_ARRAY_BUFFER, state->renderer.max_vertices * sizeof(Vertex), NULL, GL_DYNAMIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, position));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_coords));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_id));
+        glEnableVertexAttribArray(2);
+
+        glCreateBuffers(1, &state->renderer.batches[i].ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->renderer.batches[i].ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(state->renderer.indices) * state->renderer.max_indices, state->renderer.indices, GL_STATIC_DRAW);
+    }
 
     glCreateTextures(GL_TEXTURE_2D, 1, &state->renderer.white);
     glBindTexture(GL_TEXTURE_2D, state->renderer.white);
@@ -123,31 +131,41 @@ void BatchSetup()
 
 void BeginBatch()
 {
-    state->renderer.buffer_object_ptr = state->renderer.buffer_object;
+    for (int i = 0; i < state->renderer.batch_count; i++)
+        state->renderer.batches[i].buffer_object_ptr = state->renderer.batches[i].buffer_object;
 }
 
-void EndBatch()
+void EndBatch(Batch *batch)
 {
-    GLsizeiptr size = (u8 *)state->renderer.buffer_object_ptr - (u8 *)state->renderer.buffer_object;
-    glBindBuffer(GL_ARRAY_BUFFER, state->renderer.vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, state->renderer.buffer_object);
+    // glBindVertexArray(batch->vao);
+    printf("offset %u\n", state->renderer.offset);
+    batch->size = (u8 *)batch->buffer_object_ptr - (u8 *)batch->buffer_object;
+    state->renderer.offset = batch->vertex_count * sizeof(Vertex);
+    glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, batch->size, batch->buffer_object);
 }
 
 void FlushBatch()
 {
-    UseShader(basic_shader);
+    for (int i = 0; i < state->renderer.batch_count; i++)
+    {
+        state->renderer.batches[i].index_count = (state->renderer.batches[i].vertex_count / 4) * 6;
+        printf("index count for %i is %i\n", i, state->renderer.batches[i].index_count);
+        printf("cur shader %u\n", state->renderer.batches[i].shader.ID);
+        glUseProgram(state->renderer.batches[i].shader.ID);
 
-    SetShaderMat4(basic_shader.ID, "projection", state->projection);
-    SetShaderMat4(basic_shader.ID, "view", state->view);
-    
-    for (u32 i = 0; i < state->renderer.tex_index; i++)
-        glBindTextureUnit(i, state->renderer.textures[i]);
-    state->renderer.index_count = (state->renderer.vertex_count/4) * 6;
+        for (u32 i = 0; i < state->renderer.tex_index; i++)
+            glBindTextureUnit(i, state->renderer.textures[i]);
 
-    glBindVertexArray(state->renderer.vao);
-    glDrawElements(GL_TRIANGLES, state->renderer.index_count, GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
-        
-    state->renderer.vertex_count = 0;
+        SetShaderMat4(state->renderer.batches[i].shader.ID, "projection", state->projection);
+        SetShaderMat4(state->renderer.batches[i].shader.ID, "view", state->view);
+        EndBatch(&state->renderer.batches[i]);
+        //  printf("offset %f\n", state->)
+        glBindVertexArray(state->renderer.batches[i].vao);
+        glDrawElements(GL_TRIANGLES, state->renderer.batches[i].index_count, GL_UNSIGNED_INT, NULL);
+        glBindVertexArray(0);
+        state->renderer.batches[i].vertex_count = 0;
+    }
+    state->renderer.offset = 0;
     state->renderer.tex_index = 1;
 }
