@@ -434,7 +434,6 @@ typedef struct {
 
     Shader shader;
     int index;
-    GLsizeiptr size;
     u32 vertex_count;
     u32 index_count;
 } Batch;
@@ -444,8 +443,8 @@ typedef struct {
     u32 white_tex_index;
 
     Batch *batches;
-    GLsizeiptr offset;
     u32 batch_count;
+ u32 cur_shader;
 
     u32 *textures;
     u32 tex_index;
@@ -456,7 +455,7 @@ typedef struct {
     u32 max_vertices;
     u32 max_indices;
     u32 max_textures;
-} RenderBatch;
+} Renderer;
 
 typedef struct State
 {
@@ -475,7 +474,7 @@ typedef struct State
 
     Salad *salad;
 
-    RenderBatch renderer;
+    Renderer renderer;
 
     u8 *key_state;
     u32 mouse_state;
@@ -597,6 +596,7 @@ void BatchSetup();
 void BeginBatch();
 void EndBatch(Batch *batch);
 void FlushBatch();
+void EndFlushBatch(Batch *batch);
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);

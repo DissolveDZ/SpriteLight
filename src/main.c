@@ -9,6 +9,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <cglm/call.h>
 #include <cglm/struct.h>
+#include <flecs.h>
 #include "win_include.h"
 #include <glad/glad.h>
 #include <ft2build.h>
@@ -67,7 +68,7 @@ void TestAction2()
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
     Texture tex1 = LoadTexture("cube.png");
@@ -93,14 +94,14 @@ int main(void)
     SetInputAction(KEY_D, MoveRight, INPUT_DOWN, "Right", ArgsToCallArgs(2, camera, &camera_speed));
     SetInputAction(KEY_W, MoveUp, INPUT_DOWN, "Up", ArgsToCallArgs(2, camera, &camera_speed));
     SetInputAction(KEY_S, MoveDown, INPUT_DOWN, "Down", ArgsToCallArgs(2, camera, &camera_speed));
+	
     while (!state->quit)
     {
         EngineUpdate();
         UpdateCamera();
         glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        BeginBatch();
-        DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200, 3);
+		BeginBatch();
         for (int y = 0; y < 50; y++)
         {
             for (int x = 0; x < 50; x++)
@@ -109,6 +110,9 @@ int main(void)
                 DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f, 3);
             }
         }
+		EndBatch(&state->renderer.batches[0]);
+		FlushBatch(&state->renderer.batches[0]);
+		BeginBatch();
         for (int y = 0; y < 50; y++)
         {
             for (int x = 0; x < 50; x++)
@@ -117,8 +121,12 @@ int main(void)
                 DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f, 6);
             }
         }
-        // EndBatch(&state->renderer.batches[1]);
-        FlushBatch();
+		EndBatch(&state->renderer.batches[1]);
+		FlushBatch(&state->renderer.batches[1]);
+		BeginBatch();
+		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200, 3);
+		EndBatch(&state->renderer.batches[0]);
+		FlushBatch(&state->renderer.batches[0]);
         EnginePresent();
     }
     EngineQuit();

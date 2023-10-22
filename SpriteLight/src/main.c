@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include "win_include.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -12,6 +13,7 @@
 #include <cglm/struct.h>
 #include "glad.c"
 #include <glad/glad.h>
+#include <flecs.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <ft2build.h>
