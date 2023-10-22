@@ -228,7 +228,8 @@ typedef struct {
 
     Batch *batches;
     u32 batch_count;
-	u32 cur_shader;
+	u32 current_shader;
+	u32 current_batch;
 
     u32 *textures;
     u32 tex_index;

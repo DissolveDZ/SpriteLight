@@ -18,117 +18,108 @@
 
 void MoveLeft(void *data)
 {
-    CallArgs *args = (CallArgs *)data;
-    Camera *camera = (Camera *)args->pointers[0];
-    float speed = *(float *)args->pointers[1];
-    if (camera)
-        camera->position.x -= speed * state->frame_time;
+	CallArgs *args = (CallArgs *)data;
+	Camera *camera = (Camera *)args->pointers[0];
+	float speed = *(float *)args->pointers[1];
+	if (camera)
+		camera->position.x -= speed * state->frame_time;
 }
 void MoveRight(void *data)
 {
-    CallArgs *args = (CallArgs *)data;
-    Camera *camera = (Camera *)args->pointers[0];
-    float speed = *(float *)args->pointers[1];
-    if (camera)
-        camera->position.x += speed * state->frame_time;
+	CallArgs *args = (CallArgs *)data;
+	Camera *camera = (Camera *)args->pointers[0];
+	float speed = *(float *)args->pointers[1];
+	if (camera)
+		camera->position.x += speed * state->frame_time;
 }
 
 void MoveUp(void *data)
 {
-    CallArgs *args = (CallArgs *)data;
-    Camera *camera = (Camera *)args->pointers[0];
-    float speed = *(float *)args->pointers[1];
-    if (camera)
-        camera->position.y += speed * state->frame_time;
+	CallArgs *args = (CallArgs *)data;
+	Camera *camera = (Camera *)args->pointers[0];
+	float speed = *(float *)args->pointers[1];
+	if (camera)
+		camera->position.y += speed * state->frame_time;
 }
 
 void MoveDown(void *data)
 {
-    CallArgs *args = (CallArgs *)data;
-    Camera *camera = (Camera *)args->pointers[0];
-    float speed = *(float *)args->pointers[1];
-    if (camera)
-        camera->position.y -= speed * state->frame_time;
+	CallArgs *args = (CallArgs *)data;
+	Camera *camera = (Camera *)args->pointers[0];
+	float speed = *(float *)args->pointers[1];
+	if (camera)
+		camera->position.y -= speed * state->frame_time;
 }
 
 void Talk()
 {
-    printf("ain't no way\n");
+	printf("ain't no way\n");
 }
 
 void TestAction2()
 {
-    if (GetInputDown(MOUSE_LEFT))
-    {
-        printf("Mouse Left Pressed\n");
-    }
-    if (GetInputPress(MOUSE_RIGHT))
-    {
-        printf("Mouse Right Held\n");
-    }
+	if (GetInputDown(MOUSE_LEFT))
+	{
+		printf("Mouse Left Pressed\n");
+	}
+	if (GetInputPress(MOUSE_RIGHT))
+	{
+		printf("Mouse Right Held\n");
+	}
 }
 
 int main(int argc, char *argv[])
 {
-    state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
-    Texture tex1 = LoadTexture("cube.png");
-    Texture tex2 = LoadTexture("vedl.png");
-    u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
-    u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
-    u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
-    SetAudioStreamVolume(music, 10);
-    SetVolume(sound1, 1000);
-    SetVolume(sound2, 1000);
-    // PlayAudioStream(music);
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
-    Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
-    Rectangle rec = (Rectangle){0, 2, 1, 1};
-    //rec.texture = LoadTexture("cube.png");
-    Font *pixel_square = LoadFont("Pixel_Square.ttf", 256);
-    Font *antonio_bold = LoadFont("Antonio-Bold.ttf", 256);
-    Text text = (Text){"TESTING default font", 5.f, -5.f, 5.f, {255, 0, 0, 255}};
-    float camera_speed = 5.f;
-    // pass in a pointer to your arguments
-    SetInputAction(KEY_A, MoveLeft, INPUT_DOWN, "Left", ArgsToCallArgs(2, camera, &camera_speed));
-    SetInputAction(KEY_D, MoveRight, INPUT_DOWN, "Right", ArgsToCallArgs(2, camera, &camera_speed));
-    SetInputAction(KEY_W, MoveUp, INPUT_DOWN, "Up", ArgsToCallArgs(2, camera, &camera_speed));
-    SetInputAction(KEY_S, MoveDown, INPUT_DOWN, "Down", ArgsToCallArgs(2, camera, &camera_speed));
-	
-    while (!state->quit)
-    {
-        EngineUpdate();
-        UpdateCamera();
-        glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		BeginBatch();
-        for (int y = 0; y < 50; y++)
-        {
-            for (int x = 0; x < 50; x++)
-            {
-                GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-                DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f, 3);
-            }
-        }
-		EndBatch(&state->renderer.batches[0]);
-		FlushBatch(&state->renderer.batches[0]);
-		BeginBatch();
-        for (int y = 0; y < 50; y++)
-        {
-            for (int x = 0; x < 50; x++)
-            {
-                GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-                DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f, 6);
-            }
-        }
-		EndBatch(&state->renderer.batches[1]);
-		FlushBatch(&state->renderer.batches[1]);
-		BeginBatch();
+	state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
+	Texture tex1 = LoadTexture("cube.png");
+	Texture tex2 = LoadTexture("vedl.png");
+	u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
+	u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
+	u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
+	SetAudioStreamVolume(music, 10);
+	SetVolume(sound1, 1000);
+	SetVolume(sound2, 1000);
+	// PlayAudioStream(music);
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
+	Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
+	Rectangle rec = (Rectangle){0, 2, 1, 1};
+	// rec.texture = LoadTexture("cube.png");
+	Font *pixel_square = LoadFont("Pixel_Square.ttf", 256);
+	Font *antonio_bold = LoadFont("Antonio-Bold.ttf", 256);
+	Text text = (Text){"TESTING default font", 5.f, -5.f, 5.f, {255, 0, 0, 255}};
+	float camera_speed = 5.f;
+	// pass in a pointer to your arguments
+	SetInputAction(KEY_A, MoveLeft, INPUT_DOWN, "Left", ArgsToCallArgs(2, camera, &camera_speed));
+	SetInputAction(KEY_D, MoveRight, INPUT_DOWN, "Right", ArgsToCallArgs(2, camera, &camera_speed));
+	SetInputAction(KEY_W, MoveUp, INPUT_DOWN, "Up", ArgsToCallArgs(2, camera, &camera_speed));
+	SetInputAction(KEY_S, MoveDown, INPUT_DOWN, "Down", ArgsToCallArgs(2, camera, &camera_speed));
+
+	while (!state->quit)
+	{
+		EngineUpdate();
+		UpdateCamera();
+		glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		for (int y = 0; y < 50; y++)
+		{
+			for (int x = 0; x < 50; x++)
+			{
+				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
+				DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f, 3);
+			}
+		}
+		for (int y = 0; y < 50; y++)
+		{
+			for (int x = 0; x < 50; x++)
+			{
+				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
+				DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f, 6);
+			}
+		}
 		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200, 3);
-		EndBatch(&state->renderer.batches[0]);
-		FlushBatch(&state->renderer.batches[0]);
-        EnginePresent();
-    }
-    EngineQuit();
-    return 0;
+		EnginePresent();
+	}
+	EngineQuit();
+	return 0;
 }

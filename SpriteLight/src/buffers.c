@@ -74,6 +74,8 @@ void BatchSetup()
 	state->renderer.batch_count = 0;
 	state->renderer.max_batches = 10;
 	state->renderer.indices = malloc(state->renderer.max_indices * sizeof(u32));
+	state->renderer.current_batch = 0;
+	state->renderer.current_shader = -1;
 
 	u32 offset = 0;
 	for (size_t i = 0; i < state->renderer.max_indices; i += 6)
@@ -137,6 +139,8 @@ void BeginBatch()
 
 void EndBatch(Batch *batch)
 {
+	if (batch->vertex_count <= 0)
+		return;
 	GLsizeiptr size = (u8 *)batch->buffer_object_ptr - (u8 *)batch->buffer_object;
 	glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size, batch->buffer_object);
@@ -144,6 +148,8 @@ void EndBatch(Batch *batch)
 
 void FlushBatch(Batch *batch)
 {
+	if (batch->vertex_count <= 0)
+		return;
 	batch->index_count = (batch->vertex_count / 4) * 6;
 	glUseProgram(batch->shader.ID);
 
@@ -152,7 +158,7 @@ void FlushBatch(Batch *batch)
 
 	SetShaderMat4(batch->shader.ID, "projection", state->projection);
 	SetShaderMat4(batch->shader.ID, "view", state->view);
-	
+
 	glBindVertexArray(batch->vao);
 	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
 	glBindVertexArray(0);
@@ -162,11 +168,15 @@ void FlushBatch(Batch *batch)
 
 void EndFlushBatch(Batch *batch)
 {
+	if (batch->vertex_count <= 0)
+		return;
 	EndBatch(batch);
 	batch->index_count = (batch->vertex_count / 4) * 6;
 	glUseProgram(batch->shader.ID);
 	for (u32 i = 0; i < state->renderer.tex_index; i++)
 		glBindTextureUnit(i, state->renderer.textures[i]);
+	SetShaderMat4(batch->shader.ID, "projection", state->projection);
+	SetShaderMat4(batch->shader.ID, "view", state->view);
 	glBindVertexArray(batch->vao);
 	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
 	glBindVertexArray(0);

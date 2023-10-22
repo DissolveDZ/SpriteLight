@@ -300,6 +300,7 @@ Vector3 MeasureWorldText(char *text, Font *font, float scale)
 
 void EnginePresent(void)
 {
+	EndFlushBatch(&state->renderer.batches[state->renderer.current_batch]);
     SDL_GL_SwapWindow(state->main_window);
     last_frame = current_frame;
     current_frame = SDL_GetPerformanceCounter();

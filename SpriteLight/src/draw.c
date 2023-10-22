@@ -43,58 +43,70 @@ Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, 
 // called by other function using the shader, drawing with a custom shader would be it's own function
 void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader)
 {
-    Batch *batch = NULL;
+	if (state->renderer.current_shader != shader)
+	{
+		if (state->renderer.current_shader != -1)
+		{
+			EndFlushBatch(&state->renderer.batches[state->renderer.current_batch]);
+			BeginBatch();
+		}
+		state->renderer.current_shader = shader;
+	}
 
-    // Check if there is a batch with the same shader.
-    for (int i = 0; i < state->renderer.batch_count; i++)
-    {
-        if (state->renderer.batches[i].shader.ID == shader)
-        {
-            batch = &state->renderer.batches[i];
-            break;
-        }
-    }
+	// Check if there is a batch with the same shader.
+	Batch *batch = NULL;
+	for (int i = 0; i < state->renderer.batch_count; i++)
+	{
+		if (state->renderer.batches[i].shader.ID == shader)
+		{
+			batch = &state->renderer.batches[i];
+			state->renderer.current_batch = i;
+			break;
+		}
+	}
 
-    if (batch == NULL)
-    {
-        if (state->renderer.batch_count >= state->renderer.max_batches - 1)
-        {
-            state->renderer.max_batches *= 1.5f;
-            state->renderer.batches = realloc(state->renderer.batches, state->renderer.max_batches * sizeof(Batch));
-        }
+	if (batch == NULL)
+	{
+		state->renderer.batch_count++;
+		if (state->renderer.batch_count >= state->renderer.max_batches - 1)
+		{
+			state->renderer.max_batches *= 1.5f;
+			state->renderer.batches = realloc(state->renderer.batches, state->renderer.max_batches * sizeof(Batch));
+		}
 
-        batch = &state->renderer.batches[state->renderer.batch_count];
-        batch->shader.ID = shader;
-        state->renderer.batch_count++;
-    }
+		batch = &state->renderer.batches[state->renderer.batch_count - 1];
+		batch->shader.ID = shader;
+		state->renderer.current_batch = state->renderer.batch_count - 1;
+	}
 
-    // Check if the batch is full, and if so, end it.
-    if (batch->vertex_count > state->renderer.max_vertices || state->renderer.tex_index > 31)
-    {
-        EndFlushBatch(batch);
-    }
+	// Check if the batch is full, and if so, flush it.
+	if (batch->vertex_count > state->renderer.max_vertices || state->renderer.tex_index > 31)
+	{
+		EndFlushBatch(&state->renderer.batches[state->renderer.current_batch]);
+		BeginBatch();
+	}
 
-    // Handle texture indexing.
-    float texture_index = 0.0f;
-    for (u32 i = 1; i < state->renderer.tex_index; i++)
-    {
-        if (state->renderer.textures[i] == tex.ID)
-        {
-            texture_index = (float)i;
-            break;
-        }
-    }
+	// Handle texture indexing.
+	float texture_index = 0.0f;
+	for (u32 i = 1; i < state->renderer.tex_index; i++)
+	{
+		if (state->renderer.textures[i] == tex.ID)
+		{
+			texture_index = (float)i;
+			break;
+		}
+	}
 
-    if (texture_index == 0.0f)
-    {
-        texture_index = (float)state->renderer.tex_index;
-        state->renderer.textures[state->renderer.tex_index] = tex.ID;
-        state->renderer.tex_index++;
-    }
+	if (texture_index == 0.0f)
+	{
+		texture_index = (float)state->renderer.tex_index;
+		state->renderer.textures[state->renderer.tex_index] = tex.ID;
+		state->renderer.tex_index++;
+	}
 
-    // Create and add the quad to the batch.
-    batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, texture_index);
-    batch->vertex_count += 4;
+	// Create and add the quad to the batch.
+	batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, texture_index);
+	batch->vertex_count += 4;
 }
 
 void DrawTexRectTint(Rectangle rec, Vector4 tint)
