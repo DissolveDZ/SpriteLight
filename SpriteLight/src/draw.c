@@ -40,18 +40,10 @@ Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, 
 	return target;
 }
 
-// called by other function using the shader, drawing with a custom shader would be it's own function
-void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader)
+Batch *CheckBatch(u32 shader, Texture *tex)
 {
-	if (state->renderer.current_shader != shader)
-	{
-		if (state->renderer.current_shader != -1)
-		{
-			EndFlushBatch(&state->renderer.batches[state->renderer.current_batch]);
-			BeginBatch();
-		}
-		state->renderer.current_shader = shader;
-	}
+	if (shader == -1)
+		return NULL;
 
 	// Check if there is a batch with the same shader.
 	Batch *batch = NULL;
@@ -82,15 +74,15 @@ void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader)
 	// Check if the batch is full, and if so, flush it.
 	if (batch->vertex_count > state->renderer.max_vertices || state->renderer.tex_index > 31)
 	{
-		EndFlushBatch(&state->renderer.batches[state->renderer.current_batch]);
-		BeginBatch();
+		ShaderBatch(&state->renderer.batches[state->renderer.current_batch]);
 	}
-
+	if (!tex)
+		return &state->renderer.batches[state->renderer.current_batch];
 	// Handle texture indexing.
 	float texture_index = 0.0f;
 	for (u32 i = 1; i < state->renderer.tex_index; i++)
 	{
-		if (state->renderer.textures[i] == tex.ID)
+		if (state->renderer.textures[i] == tex->ID)
 		{
 			texture_index = (float)i;
 			break;
@@ -100,12 +92,25 @@ void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader)
 	if (texture_index == 0.0f)
 	{
 		texture_index = (float)state->renderer.tex_index;
-		state->renderer.textures[state->renderer.tex_index] = tex.ID;
+		state->renderer.textures[state->renderer.tex_index] = tex->ID;
 		state->renderer.tex_index++;
 	}
+	tex->ID = texture_index;
+	return &state->renderer.batches[state->renderer.current_batch];
+}
 
-	// Create and add the quad to the batch.
-	batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, texture_index);
+void DrawRect(Rectangle rec, Texture tex, float rotation)
+{
+	if (state->renderer.current_shader != basic_shader.ID)
+	{
+		glUseProgram(basic_shader.ID);
+		SetShaderMat4(basic_shader.ID, "projection", state->projection);
+		SetShaderMat4(basic_shader.ID, "view", state->view);
+		ShaderBatch(&state->renderer.batches[state->renderer.current_batch]);
+		state->renderer.current_shader = basic_shader.ID;
+	}
+	Batch *batch = CheckBatch(basic_shader.ID, &tex);
+	batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, tex.ID);
 	batch->vertex_count += 4;
 }
 

@@ -597,7 +597,7 @@ void BatchSetup();
 void BeginBatch();
 void EndBatch(Batch *batch);
 void FlushBatch();
-void EndFlushBatch(Batch *batch);
+void ShaderBatch(Batch *batch);
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);
@@ -652,8 +652,9 @@ void ToggleAudio();
 
 # 1 "SpriteLight/engine_include/draw.h" 1
 void DrawQuad();
+Batch *CheckBatch(u32 shader, Texture *tex);
 void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
-void DrawRect(Rectangle rec, Texture tex, float rotation, unsigned int shader);
+void DrawRect(Rectangle rec, Texture tex, float rotation);
 Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, float rotation, float tex);
 void DrawUIRect(Rectangle rec, Vector4 color);
 void DrawUITexRect(Rectangle rec);

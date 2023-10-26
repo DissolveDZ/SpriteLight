@@ -61,11 +61,12 @@ void BatchSetup()
 	state->renderer.max_batches = 10;
 	// glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &state->renderer.max_textures);
 	// use UBO
-	glUseProgram(basic_shader.ID);
+
 	int textures[32];
 	for (int i = 0; i < 32; i++)
 		textures[i] = i;
 
+	glUseProgram(basic_shader.ID);
 	glUniform1iv(glGetUniformLocation(basic_shader.ID, "textures"), 32, textures);
 	glUseProgram(0);
 
@@ -142,8 +143,11 @@ void EndBatch(Batch *batch)
 	if (batch->vertex_count <= 0)
 		return;
 	GLsizeiptr size = (u8 *)batch->buffer_object_ptr - (u8 *)batch->buffer_object;
-	glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, size, batch->buffer_object);
+	if (size)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, batch->buffer_object);
+	}
 }
 
 void FlushBatch(Batch *batch)
@@ -151,13 +155,9 @@ void FlushBatch(Batch *batch)
 	if (batch->vertex_count <= 0)
 		return;
 	batch->index_count = (batch->vertex_count / 4) * 6;
-	glUseProgram(batch->shader.ID);
 
 	for (u32 i = 0; i < state->renderer.tex_index; i++)
 		glBindTextureUnit(i, state->renderer.textures[i]);
-
-	SetShaderMat4(batch->shader.ID, "projection", state->projection);
-	SetShaderMat4(batch->shader.ID, "view", state->view);
 
 	glBindVertexArray(batch->vao);
 	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
@@ -166,21 +166,11 @@ void FlushBatch(Batch *batch)
 	state->renderer.tex_index = 1;
 }
 
-void EndFlushBatch(Batch *batch)
+void ShaderBatch(Batch *batch)
 {
 	if (batch->vertex_count <= 0)
 		return;
 	EndBatch(batch);
-	batch->index_count = (batch->vertex_count / 4) * 6;
-	glUseProgram(batch->shader.ID);
-	for (u32 i = 0; i < state->renderer.tex_index; i++)
-		glBindTextureUnit(i, state->renderer.textures[i]);
-	SetShaderMat4(batch->shader.ID, "projection", state->projection);
-	SetShaderMat4(batch->shader.ID, "view", state->view);
-	glBindVertexArray(batch->vao);
-	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
-	glBindVertexArray(0);
-	batch->vertex_count = 0;
-	state->renderer.tex_index = 1;
+	FlushBatch(batch);
 	BeginBatch();
 }

@@ -381,7 +381,7 @@ void BatchSetup();
 void BeginBatch();
 void EndBatch(Batch *batch);
 void FlushBatch();
-void EndFlushBatch(Batch *batch);
+void ShaderBatch(Batch *batch);
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);

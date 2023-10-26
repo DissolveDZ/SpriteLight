@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 			for (int x = 0; x < 50; x++)
 			{
 				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-				DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f, 3);
+				DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f);
 			}
 		}
 		for (int y = 0; y < 50; y++)
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
 			for (int x = 0; x < 50; x++)
 			{
 				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-				DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f, 6);
+				DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f);
 			}
 		}
-		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200, 3);
+		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200);
 		EnginePresent();
 	}
 	EngineQuit();
