@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200);
+		// DrawUIRect((Rectangle){state->screen_width/2, state->screen_height/2, sin(state->time)*20, sin(state->time)*20}, tex1, -state->time * 200);
 		EnginePresent();
 	}
 	EngineQuit();

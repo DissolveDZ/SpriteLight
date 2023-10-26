@@ -66,10 +66,10 @@ void BatchSetup()
 	for (int i = 0; i < 32; i++)
 		textures[i] = i;
 
-	glUseProgram(basic_shader.ID);
-	glUniform1iv(glGetUniformLocation(basic_shader.ID, "textures"), 32, textures);
-	glUseProgram(0);
-
+	glUseProgram(general_shader.ID);
+	glUniform1iv(glGetUniformLocation(general_shader.ID, "textures"), 32, textures);
+	glUseProgram(ui_shader.ID);
+	glUniform1iv(glGetUniformLocation(ui_shader.ID, "textures"), 32, textures);
 	state->renderer.textures = malloc(state->renderer.max_textures * sizeof(u32));
 	state->renderer.batches = malloc(state->renderer.max_batches * sizeof(Batch));
 	state->renderer.batch_count = 0;

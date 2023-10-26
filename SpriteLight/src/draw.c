@@ -1,7 +1,3 @@
-void LightingPass()
-{
-}
-
 void DrawQuad()
 {
 	// glBindVertexArray(quad_vao);
@@ -20,7 +16,7 @@ Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, 
 		glm_rotate(transform, glm_rad(rotation), (vec3){0.0f, 0.0f, 1.0f});
 	glm_scale(transform, (vec3){width, height, 1.0f});
 
-	vec3s vertices[4] = {
+	Vector3 vertices[4] = {
 		{-half_width, -half_height, 0.0f},
 		{half_width, -half_height, 0.0f},
 		{half_width, half_height, 0.0f},
@@ -79,38 +75,56 @@ Batch *CheckBatch(u32 shader, Texture *tex)
 	if (!tex)
 		return &state->renderer.batches[state->renderer.current_batch];
 	// Handle texture indexing.
-	float texture_index = 0.0f;
-	for (u32 i = 1; i < state->renderer.tex_index; i++)
+	if (tex)
 	{
-		if (state->renderer.textures[i] == tex->ID)
+		float texture_index = 0.0f;
+		for (u32 i = 1; i < state->renderer.tex_index; i++)
 		{
-			texture_index = (float)i;
-			break;
+			if (state->renderer.textures[i] == tex->ID)
+			{
+				texture_index = (float)i;
+				break;
+			}
 		}
+
+		if (texture_index == 0.0f)
+		{
+			texture_index = (float)state->renderer.tex_index;
+			state->renderer.textures[state->renderer.tex_index] = tex->ID;
+			state->renderer.tex_index++;
+		}
+		tex->ID = texture_index;
 	}
 
-	if (texture_index == 0.0f)
-	{
-		texture_index = (float)state->renderer.tex_index;
-		state->renderer.textures[state->renderer.tex_index] = tex->ID;
-		state->renderer.tex_index++;
-	}
-	tex->ID = texture_index;
 	return &state->renderer.batches[state->renderer.current_batch];
 }
 
 void DrawRect(Rectangle rec, Texture tex, float rotation)
 {
-	if (state->renderer.current_shader != basic_shader.ID)
+	if (state->renderer.current_shader != general_shader.ID)
 	{
-		glUseProgram(basic_shader.ID);
-		SetShaderMat4(basic_shader.ID, "projection", state->projection);
-		SetShaderMat4(basic_shader.ID, "view", state->view);
+		glUseProgram(general_shader.ID);
+		SetShaderMat4(general_shader.ID, "projection", state->projection);
+		SetShaderMat4(general_shader.ID, "view", state->view);
 		ShaderBatch(&state->renderer.batches[state->renderer.current_batch]);
-		state->renderer.current_shader = basic_shader.ID;
+		state->renderer.current_shader = general_shader.ID;
 	}
-	Batch *batch = CheckBatch(basic_shader.ID, &tex);
+	Batch *batch = CheckBatch(general_shader.ID, &tex);
 	batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, rec.x, rec.y, rec.width, rec.height, rotation, tex.ID);
+	batch->vertex_count += 4;
+}
+
+void DrawUIRect(Rectangle rec, Texture tex, float rotation)
+{
+	if (state->renderer.current_shader != ui_shader.ID)
+	{
+		glUseProgram(ui_shader.ID);
+		SetShaderMat4(ui_shader.ID, "projection", state->ortho_projection);
+		ShaderBatch(&state->renderer.batches[state->renderer.current_batch]);
+		state->renderer.current_shader = ui_shader.ID;
+	}
+	Batch *batch = CheckBatch(ui_shader.ID, &tex);
+	batch->buffer_object_ptr = CreateQuad(batch->buffer_object_ptr, -rec.x, rec.y, rec.width, rec.height, rotation, tex.ID);
 	batch->vertex_count += 4;
 }
 
@@ -120,21 +134,21 @@ void DrawTexRectTint(Rectangle rec, Vector4 tint)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, rec.texture.ID);
 
-	UseShader(basic_shader);
-	SetShaderInt(basic_shader.ID, "tex", 0);
-	SetShaderMat4(basic_shader.ID, "projection", state->projection);
-	SetShaderMat4(basic_shader.ID, "view", state->view);
-	SetShaderVec4(basic_shader.ID, "tint", (vec4){tint.r / 255, tint.g / 255, tint.b / 255, tint.a / 255});
-	SetShaderBool(basic_shader.ID, "use_color", false);
-	SetShaderBool(basic_shader.ID, "use_normals", false);
-	SetShaderVec3(basic_shader.ID, "view_pos", (vec3){state->camera.position.x, state->camera.position.y, state->camera.position.z});
-	SetShaderFloat(basic_shader.ID, "exposure", 1);
-	SetShaderBool(basic_shader.ID, "hdr", true);
+	UseShader(general_shader);
+	SetShaderInt(general_shader.ID, "tex", 0);
+	SetShaderMat4(general_shader.ID, "projection", state->projection);
+	SetShaderMat4(general_shader.ID, "view", state->view);
+	SetShaderVec4(general_shader.ID, "tint", (vec4){tint.r / 255, tint.g / 255, tint.b / 255, tint.a / 255});
+	SetShaderBool(general_shader.ID, "use_color", false);
+	SetShaderBool(general_shader.ID, "use_normals", false);
+	SetShaderVec3(general_shader.ID, "view_pos", (vec3){state->camera.position.x, state->camera.position.y, state->camera.position.z});
+	SetShaderFloat(general_shader.ID, "exposure", 1);
+	SetShaderBool(general_shader.ID, "hdr", true);
 
 	glm_mat4_identity(state->model);
 	glm_translate(state->model, (vec3){rec.x, rec.y, 0.0f});
 	glm_scale(state->model, (vec3){rec.width, rec.height, 1});
-	SetShaderMat4(basic_shader.ID, "model", state->model);
+	SetShaderMat4(general_shader.ID, "model", state->model);
 
 	// glBindVertexArray(plane_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -146,55 +160,55 @@ void DrawTexRect(Rectangle rec)
 	DrawTexRectTint(rec, (Vector4){255, 255, 255, 255});
 }
 
-void DrawUIRect(Rectangle rec, Vector4 color)
-{
-	UseShader(basic_screen_space_shader);
-	glm_mat4_identity(state->model);
-	glm_translate(state->model, (vec3){rec.x, rec.y, 0.f});
-	glm_translate(state->model, (vec3){0.5f * rec.width, 0.5f * rec.height, 0.f});
-	glm_rotate(state->model, glm_rad(0), (vec3){0.0f, 0.0f, 1.f});
-	glm_translate(state->model, (vec3){-0.5f * rec.width, -0.5f * rec.height, 0.f});
-	glm_scale(state->model, (vec3){rec.width / 2, rec.height / 2, 0.5f});
-	SetShaderMat4(basic_screen_space_shader.ID, "model", state->model);
-	SetShaderMat4(basic_screen_space_shader.ID, "projection", state->ortho_projection);
-	SetShaderBool(basic_screen_space_shader.ID, "use_color", true);
-	SetShaderVec4(basic_screen_space_shader.ID, "color", (vec4){color.r / 255, color.g / 255, color.b / 255, color.a / 255});
-	SetShaderVec4(basic_screen_space_shader.ID, "tint", (vec4){1, 1, 1, 1});
+// void DrawUIRect(Rectangle rec, Vector4 color)
+// {
+// 	UseShader(ui_shader);
+// 	glm_mat4_identity(state->model);
+// 	glm_translate(state->model, (vec3){rec.x, rec.y, 0.f});
+// 	glm_translate(state->model, (vec3){0.5f * rec.width, 0.5f * rec.height, 0.f});
+// 	glm_rotate(state->model, glm_rad(0), (vec3){0.0f, 0.0f, 1.f});
+// 	glm_translate(state->model, (vec3){-0.5f * rec.width, -0.5f * rec.height, 0.f});
+// 	glm_scale(state->model, (vec3){rec.width / 2, rec.height / 2, 0.5f});
+// 	SetShaderMat4(ui_shader.ID, "model", state->model);
+// 	SetShaderMat4(ui_shader.ID, "projection", state->ortho_projection);
+// 	SetShaderBool(ui_shader.ID, "use_color", true);
+// 	SetShaderVec4(ui_shader.ID, "color", (vec4){color.r / 255, color.g / 255, color.b / 255, color.a / 255});
+// 	SetShaderVec4(ui_shader.ID, "tint", (vec4){1, 1, 1, 1});
 
-	// glBindVertexArray(quad_vao);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
+// 	// glBindVertexArray(quad_vao);
+// 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+// 	glBindVertexArray(0);
+// }
 
 void DrawUITexRect(Rectangle rec)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, rec.texture.ID);
-	UseShader(basic_screen_space_shader);
-	SetShaderInt(basic_screen_space_shader.ID, "tex", 0);
+	UseShader(ui_shader);
+	SetShaderInt(ui_shader.ID, "tex", 0);
 	glm_mat4_identity(state->model);
 	glm_translate(state->model, (vec3){rec.x, rec.y, 0.f});
 	glm_translate(state->model, (vec3){0.5f * rec.width, 0.5f * rec.height, 0.f});
 	glm_rotate(state->model, glm_rad(0), (vec3){0.0f, 0.0f, 1.f});
 	glm_translate(state->model, (vec3){-0.5f * rec.width, -0.5f * rec.height, 0.f});
 	glm_scale(state->model, (vec3){rec.width / 2, rec.height / 2, 0.5f});
-	SetShaderMat4(basic_screen_space_shader.ID, "model", state->model);
-	SetShaderMat4(basic_screen_space_shader.ID, "projection", state->ortho_projection);
-	SetShaderBool(basic_screen_space_shader.ID, "use_color", false);
+	SetShaderMat4(ui_shader.ID, "model", state->model);
+	SetShaderMat4(ui_shader.ID, "projection", state->ortho_projection);
+	SetShaderBool(ui_shader.ID, "use_color", false);
 
 	// glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
-
+/*
 void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color)
 {
-	UseShader(basic_shader);
-	SetShaderMat4(basic_shader.ID, "projection", state->projection);
-	SetShaderMat4(basic_shader.ID, "view", state->view);
-	SetShaderBool(basic_shader.ID, "use_color", true);
-	SetShaderVec4(basic_shader.ID, "color", (vec4){color.r / 255, color.g / 255, color.b / 255, color.a / 255});
-	SetShaderMat4(basic_shader.ID, "model", (mat4)GLM_MAT4_IDENTITY_INIT);
+	UseShader(general_shader);
+	SetShaderMat4(general_shader.ID, "projection", state->projection);
+	SetShaderMat4(general_shader.ID, "view", state->view);
+	SetShaderBool(general_shader.ID, "use_color", true);
+	SetShaderVec4(general_shader.ID, "color", (vec4){color.r / 255, color.g / 255, color.b / 255, color.a / 255});
+	SetShaderMat4(general_shader.ID, "model", (mat4)GLM_MAT4_IDENTITY_INIT);
 	glBindVertexArray(line_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(line_vertices), (float[]){start.x, start.y, 0, end.x, end.y, 0});
@@ -268,16 +282,16 @@ void DrawTextText(Text text, Font *font)
 void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture)
 {
 	glEnable(GL_DEPTH_TEST);
-	UseShader(basic_shader);
+	UseShader(general_shader);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture.ID);
-	SetShaderMat4(basic_shader.ID, "projection", state->projection);
-	SetShaderMat4(basic_shader.ID, "view", state->view);
-	SetShaderBool(basic_shader.ID, "use_color", false);
-	SetShaderBool(basic_shader.ID, "use_normals", true);
-	SetShaderVec3(basic_shader.ID, "view_pos", (vec3){state->camera.position.x, state->camera.position.y, state->camera.position.z});
-	SetShaderFloat(basic_shader.ID, "exposure", 1);
-	SetShaderBool(basic_shader.ID, "hdr", true);
+	SetShaderMat4(general_shader.ID, "projection", state->projection);
+	SetShaderMat4(general_shader.ID, "view", state->view);
+	SetShaderBool(general_shader.ID, "use_color", false);
+	SetShaderBool(general_shader.ID, "use_normals", true);
+	SetShaderVec3(general_shader.ID, "view_pos", (vec3){state->camera.position.x, state->camera.position.y, state->camera.position.z});
+	SetShaderFloat(general_shader.ID, "exposure", 1);
+	SetShaderBool(general_shader.ID, "hdr", true);
 
 	glm_mat4_identity(state->model);
 	mat4 temp;
@@ -304,7 +318,7 @@ void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture
 	glm_mat4_mul(state->model, rotationmat, state->model);
 	glm_scale(state->model, scale.raw);
 	// glm_rotate(model, glm_rad((float)SDL_GetTicks64() / 50), rotation);
-	SetShaderMat4(basic_shader.ID, "model", state->model);
+	SetShaderMat4(general_shader.ID, "model", state->model);
 	// glBindVertexArray(cube_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
 	glBindVertexArray(0);
@@ -343,7 +357,8 @@ void DrawSubText(char *text, Font *font, int count, float x, float y, float scal
 	DrawText(temp, font, x, y, scale, color);
 	free(temp);
 }
-
+*/
+/*
 void DrawWorldTextText(Text text, Font *font)
 {
 	UseShader(text_shader_world);
@@ -356,25 +371,27 @@ void DrawWorldTextText(Text text, Font *font)
 	glActiveTexture(GL_TEXTURE0);
 	// glBindVertexArray(text_vao);
 	text.scale *= 0.001f;
-	// commented for text-centering, might use later for UI objects like buttons etc.
-	// when changing text length the text would go up and down which is usually not wanted since text should be able to change dynamically best suited for static/centered text
-	/*
-	float offset_y = 0;
-	for (char i = 0; i != strlen(text.text); i++)
-	{
-		TextCharacter ch;
-		if (font == NULL)
-			ch = default_chars[text.text[i]];
-		else
-			ch = font->loaded_chars[text.text[i]];
-		float ypos  = (ch.size[1] - ch.bearing[1]) * text.scale;
-		if (!offset_y)
-			offset_y = ypos;
-		if (ypos < offset_y)
-			offset_y = ypos;
-	}
-	text.y += offset_y;
 	*/
+// commented for text-centering, might use later for UI objects like buttons etc.
+// when changing text length the text would go up and down which is usually not wanted since text should be able to change dynamically best suited for static/centered text
+/*
+float offset_y = 0;
+for (char i = 0; i != strlen(text.text); i++)
+{
+	TextCharacter ch;
+	if (font == NULL)
+		ch = default_chars[text.text[i]];
+	else
+		ch = font->loaded_chars[text.text[i]];
+	float ypos  = (ch.size[1] - ch.bearing[1]) * text.scale;
+	if (!offset_y)
+		offset_y = ypos;
+	if (ypos < offset_y)
+		offset_y = ypos;
+}
+text.y += offset_y;
+*/
+/*
 	for (char i = 0; i != strlen(text.text); i++)
 	{
 		TextCharacter ch;
@@ -403,3 +420,4 @@ void DrawWorldTextText(Text text, Font *font)
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+*/

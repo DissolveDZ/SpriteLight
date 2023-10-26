@@ -3,7 +3,7 @@ Batch *CheckBatch(u32 shader, Texture *tex);
 void DrawCube(Vector3 pos, Vector3 rotation, Vector3 scale, Texture texture);
 void DrawRect(Rectangle rec, Texture tex, float rotation);
 Vertex *CreateQuad(Vertex *target, float x, float y, float width, float height, float rotation, float tex);
-void DrawUIRect(Rectangle rec, Vector4 color);
+void DrawUIRect(Rectangle rec, Texture tex, float rotation);
 void DrawUITexRect(Rectangle rec);
 void DrawTexRect(Rectangle rec);
 void DrawTexRectTint(Rectangle rec, Vector4 tint);

@@ -286,7 +286,7 @@ typedef struct State
     bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, basic_shader, basic_screen_space_shader, circle_shader, text_shader_world, text_shader, gradient_shader;
+static Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader;
 static float line_vertices[6];
 
 static float quad_vertices[] = {
