@@ -5,8 +5,8 @@
 #include <stdarg.h>
 #include <math.h>
 #include <stdint.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
 #include <cglm/call.h>
 #include <cglm/struct.h>
 #include <flecs.h>
@@ -73,12 +73,12 @@ int main(int argc, char *argv[])
 	state = EngineInit("engine test", "resources/textures/cube.png", 1920, 1080, 0);
 	Texture tex1 = LoadTexture("cube.png");
 	Texture tex2 = LoadTexture("vedl.png");
-	u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
-	u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
-	u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
-	SetAudioStreamVolume(music, 10);
-	SetVolume(sound1, 1000);
-	SetVolume(sound2, 1000);
+	// u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
+	// u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
+	// u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
+	// SetAudioStreamVolume(music, 10);
+	// SetVolume(sound1, 1000);
+	// SetVolume(sound2, 1000);
 	// PlayAudioStream(music);
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
@@ -105,19 +105,18 @@ int main(int argc, char *argv[])
 		{
 			for (int x = 0; x < 50; x++)
 			{
-				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-				DrawRect((Rectangle){x, y, 1, 1}, (Texture){tex_id}, 0.f);
+				DrawTexRect((Rectangle){x, y, 1, 1}, (x + y) % 2 == 0 ? tex1.ID : tex2.ID, 0.f);
 			}
 		}
 		for (int y = 0; y < 50; y++)
 		{
 			for (int x = 0; x < 50; x++)
 			{
-				GLuint tex_id = (x + y) % 2 == 0 ? tex1.ID : tex2.ID;
-				DrawRect((Rectangle){-x, -y, 1, 1}, (Texture){tex_id}, 0.f);
+				DrawTexRect((Rectangle){-x, -y, 1, 1}, (x + y) % 2 == 0 ? tex1.ID : tex2.ID, 0.f);
 			}
 		}
-		DrawRect((Rectangle){0, 0, 2, 1}, tex1, -state->time * 200);
+		DrawTexRect((Rectangle){0, 0, 4, 1}, tex1.ID, -state->time * 200);
+		DrawWorldText("balck finger", 0, 0, 0, 10, (Vector4){255, 255, 255, 255});
 		// DrawUIRect((Rectangle){state->screen_width/2, state->screen_height/2, sin(state->time)*20, sin(state->time)*20}, tex1, -state->time * 200);
 		EnginePresent();
 	}

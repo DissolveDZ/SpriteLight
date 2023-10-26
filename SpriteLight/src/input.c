@@ -76,18 +76,18 @@ void ProcessKeys()
         state->mouse_state = SDL_GetMouseState(&state->mouse_pos.x, &state->mouse_pos.y);
         switch (state->window_event.type)
         {
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             state->quit = true;
             break;
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
             if (state->window_event.button.button == SDL_BUTTON_RIGHT && state->camera.type == PANNING_CAMERA)
                 state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
             state->input.key[NUM_KEYS + state->window_event.button.button] = INPUT_PRESS;
             break;
-        case SDL_MOUSEBUTTONUP:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
             state->input.key[NUM_KEYS + state->window_event.button.button] = INPUT_UP;
             break;
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             if (!state->window_event.key.repeat)
                 state->input.key[ScancodeToKeyCode[state->window_event.key.keysym.scancode]] = INPUT_PRESS;
             switch (state->window_event.key.keysym.scancode)
@@ -95,24 +95,21 @@ void ProcessKeys()
             case SDL_SCANCODE_F11:
                 state->fullscreen = !state->fullscreen;
                 if (state->fullscreen)
-                    SDL_SetWindowFullscreen(state->main_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    SDL_SetWindowFullscreen(state->main_window, 1);
                 else
                     SDL_SetWindowFullscreen(state->main_window, 0); // Set to 0 for windowed mode
                 break;
             }
             break;
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_UP:
             if (!state->window_event.key.repeat)
                 state->input.key[ScancodeToKeyCode[state->window_event.key.keysym.scancode]] = INPUT_UP;
             break;
-        case SDL_WINDOWEVENT:
-            if (state->window_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-            {
-                if (state->window_event.window.data1 || state->window_event.window.data2)
+        case SDL_EVENT_WINDOW_RESIZED:
+                 if (state->window_event.window.data1 || state->window_event.window.data2)
                     OnResize(state->window_event.window.data1, state->window_event.window.data2);
-            }
             break;
-        case SDL_MOUSEWHEEL:
+        case SDL_EVENT_MOUSE_WHEEL:
             state->wheel = state->window_event.wheel.y;
             break;
         }

@@ -6,32 +6,32 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     state = calloc(1, sizeof(State));
-    state->main_window = SDL_CreateWindow(window_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    state->main_window = SDL_CreateWindow(window_name, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     state->main_context = SDL_GL_CreateContext(state->main_window);
-    InitAudio();
+    // InitAudio();
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
     SDL_GL_SetSwapInterval(1);
-    SDL_DisplayMode cur_mode;
-    if (SDL_GetCurrentDisplayMode(0, &cur_mode) != 0)
+    SDL_DisplayMode *cur_mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
+    if (!cur_mode)
     {
         HandleError("Failed to get display mode! SDL_Error: %s\n", SDL_GetError());
         SDL_Quit();
         return NULL;
     }
-    state->target_fps = cur_mode.refresh_rate;
+    state->target_fps = cur_mode->refresh_rate;
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glEnable(GL_DEPTH_TEST);
-    // glDepthFunc(GL_LESS);
 
     InitHashTable(16);
-    // InitDefaultFont(256);
+    InitDefaultFont(256);
 
     general_shader = LoadShader("engine/quad.vert", "engine/quad.frag");
     ui_shader = LoadShader("ui/ui.vert", "engine/quad.frag");
-    // gradient_shader = LoadShader("engine/quad.vert", "ui/gradient.frag");
+    text_shader = LoadShader("engine/text.vert", "engine/text.frag");
+    text_shader_world = LoadShader("engine/text_world.vert", "engine/text.frag");
+    gradient_shader = LoadShader("engine/quad.vert", "ui/gradient.frag");
 
     SDL_Surface *icon = LoadSDLImage(icon_path);
     SDL_SetWindowIcon(state->main_window, icon);
@@ -47,7 +47,13 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
     state->quit = false;
     state->resize_callback = 0;
     OnResize(width, height);
-    BatchSetup();
+
+    BufferSetup(&quad_vao, &quad_vbo, quad_vertices, sizeof(quad_vertices), true, false);
+    BufferSetup(&text_vao, &text_vbo, quad_vertices, sizeof(quad_vertices), true, false);
+    BufferSetup(&plane_vao, &plane_vbo, plane_vertices, sizeof(plane_vertices), true, false);
+    BufferSetup(&line_vao, &line_vbo, line_vertices, sizeof(line_vertices), false, false);
+    BufferSetup(&cube_vao, &cube_vbo, cube_vertices, sizeof(cube_vertices), true, true);
+	
     if (bloom_mip_level)
         BloomInit(bloom_mip_level);
     return state;

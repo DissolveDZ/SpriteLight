@@ -58,7 +58,7 @@ typedef struct SDL_RWops
 
     /**
      *  Seek to \c offset relative to \c whence, one of stdio's whence values:
-     *  RW_SEEK_SET, RW_SEEK_CUR, RW_SEEK_END
+     *  SDL_RW_SEEK_SET, SDL_RW_SEEK_CUR, SDL_RW_SEEK_END
      *
      *  \return the final offset in the data stream, or -1 on error.
      */
@@ -325,26 +325,26 @@ extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromConstMem(const void *mem,
  * read/write a common data source, you should use the built-in
  * implementations in SDL, like SDL_RWFromFile() or SDL_RWFromMem(), etc.
  *
- * You must free the returned pointer with SDL_FreeRW(). Depending on your
+ * You must free the returned pointer with SDL_DestroyRW(). Depending on your
  * operating system and compiler, there may be a difference between the
  * malloc() and free() your program uses and the versions SDL calls
  * internally. Trying to mix the two can cause crashing such as segmentation
  * faults. Since all SDL_RWops must free themselves when their **close**
  * method is called, all SDL_RWops must be allocated through this function, so
- * they can all be freed correctly with SDL_FreeRW().
+ * they can all be freed correctly with SDL_DestroyRW().
  *
  * \returns a pointer to the allocated memory on success, or NULL on failure;
  *          call SDL_GetError() for more information.
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_FreeRW
+ * \sa SDL_DestroyRW
  */
-extern DECLSPEC SDL_RWops *SDLCALL SDL_AllocRW(void);
+extern DECLSPEC SDL_RWops *SDLCALL SDL_CreateRW(void);
 
 /**
  * Use this function to free an SDL_RWops structure allocated by
- * SDL_AllocRW().
+ * SDL_CreateRW().
  *
  * Applications do not need to use this function unless they are providing
  * their own SDL_RWops implementation. If you just need a SDL_RWops to
@@ -353,22 +353,22 @@ extern DECLSPEC SDL_RWops *SDLCALL SDL_AllocRW(void);
  * call the **close** method on those SDL_RWops pointers when you are done
  * with them.
  *
- * Only use SDL_FreeRW() on pointers returned by SDL_AllocRW(). The pointer is
+ * Only use SDL_DestroyRW() on pointers returned by SDL_CreateRW(). The pointer is
  * invalid as soon as this function returns. Any extra memory allocated during
- * creation of the SDL_RWops is not freed by SDL_FreeRW(); the programmer must
+ * creation of the SDL_RWops is not freed by SDL_DestroyRW(); the programmer must
  * be responsible for managing that memory in their **close** method.
  *
  * \param area the SDL_RWops structure to be freed
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_AllocRW
+ * \sa SDL_CreateRW
  */
-extern DECLSPEC void SDLCALL SDL_FreeRW(SDL_RWops * area);
+extern DECLSPEC void SDLCALL SDL_DestroyRW(SDL_RWops * area);
 
-#define RW_SEEK_SET 0       /**< Seek from the beginning of data */
-#define RW_SEEK_CUR 1       /**< Seek relative to current read point */
-#define RW_SEEK_END 2       /**< Seek relative to the end of data */
+#define SDL_RW_SEEK_SET 0       /**< Seek from the beginning of data */
+#define SDL_RW_SEEK_CUR 1       /**< Seek relative to current read point */
+#define SDL_RW_SEEK_END 2       /**< Seek relative to the end of data */
 
 /**
  * Use this function to get the size of the data stream in an SDL_RWops.
@@ -391,9 +391,9 @@ extern DECLSPEC Sint64 SDLCALL SDL_RWsize(SDL_RWops *context);
  *
  * `whence` may be any of the following values:
  *
- * - `RW_SEEK_SET`: seek from the beginning of data
- * - `RW_SEEK_CUR`: seek relative to current read point
- * - `RW_SEEK_END`: seek relative to the end of data
+ * - `SDL_RW_SEEK_SET`: seek from the beginning of data
+ * - `SDL_RW_SEEK_CUR`: seek relative to current read point
+ * - `SDL_RW_SEEK_END`: seek relative to the end of data
  *
  * If this stream can not seek, it will return -1.
  *
@@ -405,7 +405,7 @@ extern DECLSPEC Sint64 SDLCALL SDL_RWsize(SDL_RWops *context);
  * \param context a pointer to an SDL_RWops structure
  * \param offset an offset in bytes, relative to **whence** location; can be
  *               negative
- * \param whence any of `RW_SEEK_SET`, `RW_SEEK_CUR`, `RW_SEEK_END`
+ * \param whence any of `SDL_RW_SEEK_SET`, `SDL_RW_SEEK_CUR`, `SDL_RW_SEEK_END`
  * \returns the final offset in the data stream after the seek or -1 on error.
  *
  * \since This function is available since SDL 2.0.10.
@@ -426,7 +426,7 @@ extern DECLSPEC Sint64 SDLCALL SDL_RWseek(SDL_RWops *context,
  * Determine the current read/write offset in an SDL_RWops data stream.
  *
  * SDL_RWtell is actually a wrapper function that calls the SDL_RWops's `seek`
- * method, with an offset of 0 bytes from `RW_SEEK_CUR`, to simplify
+ * method, with an offset of 0 bytes from `SDL_RW_SEEK_CUR`, to simplify
  * application development.
  *
  * Prior to SDL 2.0.10, this function was a macro.
@@ -522,7 +522,7 @@ extern DECLSPEC size_t SDLCALL SDL_RWwrite(SDL_RWops *context,
  *
  * SDL_RWclose() closes and cleans up the SDL_RWops stream. It releases any
  * resources used by the stream and frees the SDL_RWops itself with
- * SDL_FreeRW(). This returns 0 on success, or -1 if the stream failed to
+ * SDL_DestroyRW(). This returns 0 on success, or -1 if the stream failed to
  * flush to its output (e.g. to disk).
  *
  * Note that if this fails to flush the stream to disk, this function reports
@@ -618,9 +618,9 @@ extern DECLSPEC Uint8 SDLCALL SDL_ReadU8(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadBE16
+ * \sa SDL_ReadU16BE
  */
-extern DECLSPEC Uint16 SDLCALL SDL_ReadLE16(SDL_RWops * src);
+extern DECLSPEC Uint16 SDLCALL SDL_ReadU16LE(SDL_RWops * src);
 
 /**
  * Use this function to read 16 bits of big-endian data from an SDL_RWops and
@@ -634,9 +634,9 @@ extern DECLSPEC Uint16 SDLCALL SDL_ReadLE16(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadLE16
+ * \sa SDL_ReadU16LE
  */
-extern DECLSPEC Uint16 SDLCALL SDL_ReadBE16(SDL_RWops * src);
+extern DECLSPEC Uint16 SDLCALL SDL_ReadU16BE(SDL_RWops * src);
 
 /**
  * Use this function to read 32 bits of little-endian data from an SDL_RWops
@@ -650,9 +650,9 @@ extern DECLSPEC Uint16 SDLCALL SDL_ReadBE16(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadBE32
+ * \sa SDL_ReadU32BE
  */
-extern DECLSPEC Uint32 SDLCALL SDL_ReadLE32(SDL_RWops * src);
+extern DECLSPEC Uint32 SDLCALL SDL_ReadU32LE(SDL_RWops * src);
 
 /**
  * Use this function to read 32 bits of big-endian data from an SDL_RWops and
@@ -666,9 +666,9 @@ extern DECLSPEC Uint32 SDLCALL SDL_ReadLE32(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadLE32
+ * \sa SDL_ReadU32LE
  */
-extern DECLSPEC Uint32 SDLCALL SDL_ReadBE32(SDL_RWops * src);
+extern DECLSPEC Uint32 SDLCALL SDL_ReadU32BE(SDL_RWops * src);
 
 /**
  * Use this function to read 64 bits of little-endian data from an SDL_RWops
@@ -682,9 +682,9 @@ extern DECLSPEC Uint32 SDLCALL SDL_ReadBE32(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadBE64
+ * \sa SDL_ReadU64BE
  */
-extern DECLSPEC Uint64 SDLCALL SDL_ReadLE64(SDL_RWops * src);
+extern DECLSPEC Uint64 SDLCALL SDL_ReadU64LE(SDL_RWops * src);
 
 /**
  * Use this function to read 64 bits of big-endian data from an SDL_RWops and
@@ -698,9 +698,9 @@ extern DECLSPEC Uint64 SDLCALL SDL_ReadLE64(SDL_RWops * src);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_ReadLE64
+ * \sa SDL_ReadU64LE
  */
-extern DECLSPEC Uint64 SDLCALL SDL_ReadBE64(SDL_RWops * src);
+extern DECLSPEC Uint64 SDLCALL SDL_ReadU64BE(SDL_RWops * src);
 /* @} *//* Read endian functions */
 
 /**
@@ -738,9 +738,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteU8(SDL_RWops * dst, Uint8 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteBE16
+ * \sa SDL_WriteU16BE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteLE16(SDL_RWops * dst, Uint16 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU16LE(SDL_RWops * dst, Uint16 value);
 
 /**
  * Use this function to write 16 bits in native format to a SDL_RWops as
@@ -755,9 +755,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteLE16(SDL_RWops * dst, Uint16 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteLE16
+ * \sa SDL_WriteU16LE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteBE16(SDL_RWops * dst, Uint16 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU16BE(SDL_RWops * dst, Uint16 value);
 
 /**
  * Use this function to write 32 bits in native format to a SDL_RWops as
@@ -773,9 +773,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteBE16(SDL_RWops * dst, Uint16 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteBE32
+ * \sa SDL_WriteU32BE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteLE32(SDL_RWops * dst, Uint32 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU32LE(SDL_RWops * dst, Uint32 value);
 
 /**
  * Use this function to write 32 bits in native format to a SDL_RWops as
@@ -790,9 +790,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteLE32(SDL_RWops * dst, Uint32 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteLE32
+ * \sa SDL_WriteU32LE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteBE32(SDL_RWops * dst, Uint32 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU32BE(SDL_RWops * dst, Uint32 value);
 
 /**
  * Use this function to write 64 bits in native format to a SDL_RWops as
@@ -808,9 +808,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteBE32(SDL_RWops * dst, Uint32 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteBE64
+ * \sa SDL_WriteU64BE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteLE64(SDL_RWops * dst, Uint64 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU64LE(SDL_RWops * dst, Uint64 value);
 
 /**
  * Use this function to write 64 bits in native format to a SDL_RWops as
@@ -825,9 +825,9 @@ extern DECLSPEC size_t SDLCALL SDL_WriteLE64(SDL_RWops * dst, Uint64 value);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_WriteLE64
+ * \sa SDL_WriteU64LE
  */
-extern DECLSPEC size_t SDLCALL SDL_WriteBE64(SDL_RWops * dst, Uint64 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU64BE(SDL_RWops * dst, Uint64 value);
 /* @} *//* Write endian functions */
 
 /* Ends C function definitions when using C++ */

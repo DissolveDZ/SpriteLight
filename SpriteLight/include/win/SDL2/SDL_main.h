@@ -60,7 +60,7 @@
 */
 #define SDL_MAIN_NEEDED
 
-#elif defined(__IPHONEOS__)
+#elif defined(__IOS__)
 /* On iOS SDL provides a main function that creates an application delegate
    and starts the iOS application run loop.
 
@@ -233,7 +233,7 @@ extern DECLSPEC int SDLCALL SDL_WinRTRunApp(SDL_main_func mainFunction, void * r
 
 #endif /* __WINRT__ */
 
-#if defined(__IPHONEOS__)
+#if defined(__IOS__)
 
 /**
  * Initializes and launches an SDL application.
@@ -247,7 +247,7 @@ extern DECLSPEC int SDLCALL SDL_WinRTRunApp(SDL_main_func mainFunction, void * r
  */
 extern DECLSPEC int SDLCALL SDL_UIKitRunApp(int argc, char *argv[], SDL_main_func mainFunction);
 
-#endif /* __IPHONEOS__ */
+#endif /* __IOS__ */
 
 #ifdef __GDK__
 

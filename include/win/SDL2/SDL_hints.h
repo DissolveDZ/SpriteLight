@@ -132,7 +132,7 @@ extern "C" {
  * \brief A variable to control whether we trap the Android back button to handle it manually.
  *        This is necessary for the right mouse button to work on some Android devices, or
  *        to be able to trap the back button for use in your code reliably.  If set to true,
- *        the back button will show up as an SDL_KEYDOWN / SDL_KEYUP pair with a keycode of
+ *        the back button will show up as an SDL_EVENT_KEY_DOWN / SDL_EVENT_KEY_UP pair with a keycode of
  *        SDL_SCANCODE_AC_BACK.
  *
  * The variable can be set to the following values:
@@ -296,8 +296,8 @@ extern "C" {
  *
  *  This variable can be set to the following values:
  *
- *    "0"     - You'll call SDL_JoystickUpdate() manually
- *    "1"     - SDL will automatically call SDL_JoystickUpdate() (default)
+ *    "0"     - You'll call SDL_UpdateJoysticks() manually
+ *    "1"     - SDL will automatically call SDL_UpdateJoysticks() (default)
  *
  *  This hint can be toggled on and off at runtime.
  */
@@ -308,8 +308,8 @@ extern "C" {
  *
  *  This variable can be set to the following values:
  *
- *    "0"     - You'll call SDL_SensorUpdate() manually
- *    "1"     - SDL will automatically call SDL_SensorUpdate() (default)
+ *    "0"     - You'll call SDL_UpdateSensors() manually
+ *    "1"     - SDL will automatically call SDL_UpdateSensors() (default)
  *
  *  This hint can be toggled on and off at runtime.
  */
@@ -456,8 +456,8 @@ extern "C" {
  *
  *  The variable should be newline delimited rows of gamecontroller config data, see SDL_gamecontroller.h
  *
- *  This hint must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
- *  You can update mappings after the system is initialized with SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
+ *  This hint must be set before calling SDL_Init(SDL_INIT_GAMEPAD)
+ *  You can update mappings after the system is initialized with SDL_GetGamepadMappingForGUID() and SDL_AddGamepadMapping()
  */
 #define SDL_HINT_GAMECONTROLLERCONFIG "SDL_GAMECONTROLLERCONFIG"
 
@@ -466,8 +466,8 @@ extern "C" {
  *
  *  The file should contain lines of gamecontroller config data, see SDL_gamecontroller.h
  *
- *  This hint must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
- *  You can update mappings after the system is initialized with SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
+ *  This hint must be set before calling SDL_Init(SDL_INIT_GAMEPAD)
+ *  You can update mappings after the system is initialized with SDL_GetGamepadMappingForGUID() and SDL_AddGamepadMapping()
  */
 #define SDL_HINT_GAMECONTROLLERCONFIG_FILE "SDL_GAMECONTROLLERCONFIG_FILE"
 
@@ -486,7 +486,7 @@ extern "C" {
  *      PS5
  *      SwitchPro
  *
- *  This hint affects what driver is used, and must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
+ *  This hint affects what driver is used, and must be set before calling SDL_Init(SDL_INIT_GAMEPAD)
  */
 #define SDL_HINT_GAMECONTROLLERTYPE "SDL_GAMECONTROLLERTYPE"
 
@@ -576,13 +576,13 @@ extern "C" {
 #define SDL_HINT_IDLE_TIMER_DISABLED "SDL_IOS_IDLE_TIMER_DISABLED"
 
 /**
- * \brief A variable to control whether certain IMEs should handle text editing internally instead of sending SDL_TEXTEDITING events.
+ * \brief A variable to control whether certain IMEs should handle text editing internally instead of sending SDL_EVENT_TEXT_EDITING events.
  *
  * The variable can be set to the following values:
- *   "0"       - SDL_TEXTEDITING events are sent, and it is the application's
+ *   "0"       - SDL_EVENT_TEXT_EDITING events are sent, and it is the application's
  *               responsibility to render the text from these events and
  *               differentiate it somehow from committed text. (default)
- *   "1"       - If supported by the IME then SDL_TEXTEDITING events are not sent,
+ *   "1"       - If supported by the IME then SDL_EVENT_TEXT_EDITING events are not sent,
  *               and text that is being composed will be rendered in its own UI.
  */
 #define SDL_HINT_IME_INTERNAL_EDITING "SDL_IME_INTERNAL_EDITING"
@@ -695,7 +695,7 @@ extern "C" {
   *    "0"       - Left and right Joy-Con controllers will not be in vertical mode (the default)
   *    "1"       - Left and right Joy-Con controllers will be in vertical mode
   *
-  *  This hint must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
+  *  This hint must be set before calling SDL_Init(SDL_INIT_GAMEPAD)
   */
 #define SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS "SDL_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS"
 
@@ -1239,7 +1239,7 @@ extern "C" {
  *
  * The variable can be set to the following values:
  *   "0"       - SDL will install a SIGINT and SIGTERM handler, and when it
- *               catches a signal, convert it into an SDL_QUIT event.
+ *               catches a signal, convert it into an SDL_EVENT_QUIT event.
  *   "1"       - SDL will not install a signal handler at all.
  */
 #define SDL_HINT_NO_SIGNAL_HANDLERS   "SDL_NO_SIGNAL_HANDLERS"
@@ -1307,7 +1307,7 @@ extern "C" {
  *
  *  If set, this will be favored over anything the OS might report for the
  *  user's preferred locales. Changing this hint at runtime will not generate
- *  a SDL_LOCALECHANGED event (but if you can change the hint, you can push
+ *  a SDL_EVENT_LOCALE_CHANGED event (but if you can change the hint, you can push
  *  your own event, if you want).
  *
  *  The format of this hint is a comma-separated list of language and locale,
@@ -1430,7 +1430,7 @@ extern "C" {
 #define SDL_HINT_RENDER_DRIVER              "SDL_RENDER_DRIVER"
 
 /**
- *  \brief  A variable controlling the scaling policy for SDL_RenderSetLogicalSize.
+ *  \brief  A variable controlling the scaling policy for SDL_SetRenderLogicalPresentation.
  *
  *  This variable can be set to the following values:
  *    "0" or "letterbox" - Uses letterbox/sidebars to fit the entire rendering on screen
@@ -2114,7 +2114,7 @@ extern "C" {
  *  will create a window with an 800x600 client area (in pixels).
  *
  *  Setting this to "1" implicitly requests process DPI awareness (setting SDL_WINDOWS_DPI_AWARENESS is unnecessary),
- *  and forces SDL_WINDOW_ALLOW_HIGHDPI on all windows.
+ *  and forces SDL_WINDOW_HIGH_PIXEL_DENSITY on all windows.
  *
  *  This variable can be set to the following values:
  *    "0"       - SDL coordinates equal Windows coordinates. No automatic window resizing when dragging
@@ -2173,8 +2173,8 @@ extern "C" {
  *  the app).
  *
  *  SDL registers its own back-button-press callback with the Windows Phone
- *  OS.  This callback will emit a pair of SDL key-press events (SDL_KEYDOWN
- *  and SDL_KEYUP), each with a scancode of SDL_SCANCODE_AC_BACK, after which
+ *  OS.  This callback will emit a pair of SDL key-press events (SDL_EVENT_KEY_DOWN
+ *  and SDL_EVENT_KEY_UP), each with a scancode of SDL_SCANCODE_AC_BACK, after which
  *  it will check the contents of the hint, SDL_HINT_WINRT_HANDLE_BACK_BUTTON.
  *  If the hint's value is set to "1", the back button event's Handled
  *  property will get set to 'true'.  If the hint's value is set to something
@@ -2187,8 +2187,8 @@ extern "C" {
  *
  *  In order to get notified when a back button is pressed, SDL apps should
  *  register a callback function with SDL_AddEventWatch(), and have it listen
- *  for SDL_KEYDOWN events that have a scancode of SDL_SCANCODE_AC_BACK.
- *  (Alternatively, SDL_KEYUP events can be listened-for.  Listening for
+ *  for SDL_EVENT_KEY_DOWN events that have a scancode of SDL_SCANCODE_AC_BACK.
+ *  (Alternatively, SDL_EVENT_KEY_UP events can be listened-for.  Listening for
  *  either event type is suitable.)  Any value of SDL_HINT_WINRT_HANDLE_BACK_BUTTON
  *  set by such a callback, will be applied to the OS' current
  *  back-button-press event.
@@ -2325,26 +2325,26 @@ extern "C" {
 #define SDL_HINT_X11_WINDOW_TYPE "SDL_X11_WINDOW_TYPE"
 
 /**
- *  \brief  A variable that decides whether to send SDL_QUIT when closing the final window.
+ *  \brief  A variable that decides whether to send SDL_EVENT_QUIT when closing the final window.
  *
- *  By default, SDL sends an SDL_QUIT event when there is only one window
- *  and it receives an SDL_WINDOWEVENT_CLOSE event, under the assumption most
+ *  By default, SDL sends an SDL_EVENT_QUIT event when there is only one window
+ *  and it receives an SDL_EVENT_WINDOW_CLOSE_REQUESTED event, under the assumption most
  *  apps would also take the loss of this window as a signal to terminate the
  *  program.
  *
  *  However, it's not unreasonable in some cases to have the program continue
  *  to live on, perhaps to create new windows later.
  *
- *  Changing this hint to "0" will cause SDL to not send an SDL_QUIT event
+ *  Changing this hint to "0" will cause SDL to not send an SDL_EVENT_QUIT event
  *  when the final window is requesting to close. Note that in this case,
- *  there are still other legitimate reasons one might get an SDL_QUIT
+ *  there are still other legitimate reasons one might get an SDL_EVENT_QUIT
  *  event: choosing "Quit" from the macOS menu bar, sending a SIGINT (ctrl-c)
  *  on Unix, etc.
  *
  *  The default value is "1".  This hint can be changed at any time.
  *
  *  This hint is available since SDL 2.0.22. Before then, you always get
- *  an SDL_QUIT event when closing the final window.
+ *  an SDL_EVENT_QUIT event when closing the final window.
  */
 #define SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE "SDL_QUIT_ON_LAST_WINDOW_CLOSE"
 

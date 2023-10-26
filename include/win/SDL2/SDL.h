@@ -50,7 +50,7 @@
 #include "SDL_log.h"
 #include "SDL_messagebox.h"
 #include "SDL_metal.h"
-#include "SDL_mutex.h"
+#include "SDL_Mutex.h"
 #include "SDL_power.h"
 #include "SDL_render.h"
 #include "SDL_rwops.h"
@@ -84,13 +84,13 @@ extern "C" {
 #define SDL_INIT_VIDEO          0x00000020u  /**< SDL_INIT_VIDEO implies SDL_INIT_EVENTS */
 #define SDL_INIT_JOYSTICK       0x00000200u  /**< SDL_INIT_JOYSTICK implies SDL_INIT_EVENTS */
 #define SDL_INIT_HAPTIC         0x00001000u
-#define SDL_INIT_GAMECONTROLLER 0x00002000u  /**< SDL_INIT_GAMECONTROLLER implies SDL_INIT_JOYSTICK */
+#define SDL_INIT_GAMEPAD 0x00002000u  /**< SDL_INIT_GAMEPAD implies SDL_INIT_JOYSTICK */
 #define SDL_INIT_EVENTS         0x00004000u
 #define SDL_INIT_SENSOR         0x00008000u
 #define SDL_INIT_NOPARACHUTE    0x00100000u  /**< compatibility; this flag is ignored. */
 #define SDL_INIT_EVERYTHING ( \
                 SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | \
-                SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR \
+                SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD | SDL_INIT_SENSOR \
             )
 /* @} */
 
@@ -119,7 +119,7 @@ extern "C" {
  * - `SDL_INIT_JOYSTICK`: joystick subsystem; automatically initializes the
  *   events subsystem
  * - `SDL_INIT_HAPTIC`: haptic (force feedback) subsystem
- * - `SDL_INIT_GAMECONTROLLER`: controller subsystem; automatically
+ * - `SDL_INIT_GAMEPAD`: controller subsystem; automatically
  *   initializes the joystick subsystem
  * - `SDL_INIT_EVENTS`: events subsystem
  * - `SDL_INIT_EVERYTHING`: all of the above subsystems

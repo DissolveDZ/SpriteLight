@@ -14,6 +14,7 @@ typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
+
 typedef float f32;
 typedef double f64;
 
@@ -65,8 +66,6 @@ typedef struct Rectangle
     float y;
     float width;
     float height;
-    Texture texture;
-    // Material mat;
 } Rectangle;
 
 typedef struct Collider
@@ -79,23 +78,6 @@ typedef struct Collider
     bool dynamic;
     bool rotating;
 } Collider;
-
-typedef struct Entity
-{
-    float accel;
-    float decel;
-    Vector2 velocity;
-    Vector2 pelocity;
-    bool is_floor;
-    float speed;
-    float max_speed;
-    float jump_height;
-    float health;
-    bool flip;
-    Texture tex;
-    Collider col;
-    Rectangle floor_check;
-} Entity;
 
 typedef struct BloomMip
 {
@@ -111,27 +93,12 @@ typedef struct Bloom
     bool karis_average;
     bool enabled;
 } Bloom;
+
 typedef struct PointIntersect
 {
     Vector2 dist;
     bool hit;
 } PointIntersect;
-
-typedef enum Player_State
-{
-    IDLE,
-    WALKING
-} Player_State;
-
-typedef struct Player
-{
-    float turn_mult;
-    float vertical_to_horizontal;
-    Vector2 last_velocity;
-    bool was_floor;
-    Entity entity;
-    Player_State state;
-} Player;
 
 typedef struct TextCharacter
 {
@@ -161,12 +128,13 @@ static unsigned int text_characters_max = 100;
 
 typedef struct Sound
 {
-    Mix_Chunk *chunk;
+    //Mix_Chunk *chunk;
+	u32 volume;
 } Sound;
 
 typedef struct Music
 {
-    Mix_Music *music;
+    //Mix_Music *music;
     u32 volume;
 } Music;
 
@@ -209,46 +177,37 @@ typedef struct {
 } Salad;
 
 typedef struct {
-    GLuint vao;
-    GLuint vbo;
-    GLuint ibo;
-
-    Vertex *buffer_object;
-    Vertex *buffer_object_ptr;
-
-    Shader shader;
-    int index;
-    u32 vertex_count;
-    u32 index_count;
-} Batch;
+    GLuint count;
+    GLuint prim_count;
+    GLuint first;
+    GLuint base_instance;
+} DrawCommand;
 
 typedef struct {
-    GLuint white;
-    u32 white_tex_index;
+	GLuint command_buffer;
 
-    Batch *batches;
+    GLuint white;
+    u32 white_ID;
+
     u32 batch_count;
 	u32 current_shader;
 	u32 current_batch;
 
     u32 *textures;
-    u32 tex_index;
-    u32 *indices;
+    u32 tex_count;
 
-    u32 max_batches;
     u32 max_quads;
     u32 max_vertices;
-    u32 max_indices;
     u32 max_textures;
 } Renderer;
 
 typedef struct State
 {
-    int screen_width;
-    int screen_height;
+    u32 screen_width;
+    u32 screen_height;
     float near_z;
     float far_z;
-    int target_fps;
+    u32 target_fps;
     SDL_Event window_event;
     SDL_Window *main_window;
     SDL_GLContext main_context;
@@ -266,27 +225,26 @@ typedef struct State
     Vector2 mouse_world;
     Vector2 camera_pan_start;
     Vector2 camera_pan_end;
-    Vector2I mouse_pos;
-    Vector2I mouse_delta;
+    Vector2 mouse_pos;
+    Vector2 mouse_delta;
     int wheel;
     bool deferred;
     bool sdf_font;
     void (*resize_callback)(int, int);
     Bloom bloom;
-    Player player;
     Camera camera;
-    double frame_time;
-    double time;
-    int active_camera;
-    float gravity;
+    f64 frame_time;
+    f64 time;
+    u32 active_camera;
+    f32 gravity;
     bool quit;
     mat4 model, view, projection, ortho_projection;
-    unsigned int max_colliders;
-    unsigned int cur_colliders;
+    u32 max_colliders;
+    u32 cur_colliders;
     bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader;
+static Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
 static float line_vertices[6];
 
 static float quad_vertices[] = {
@@ -346,7 +304,11 @@ static int MAX_BLOOM_MIP = 10;
 static u64 last_frame;
 static u64 current_frame;
 
-static unsigned int line_vbo, line_vao;
+static u32 quad_vbo, quad_vao;
+static u32 plane_vbo, plane_vao;
+static u32 text_vbo, text_vao;
+static u32 line_vbo, line_vao;
+static u32 cube_vbo, cube_vao;
 
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
@@ -377,11 +339,7 @@ Vector2 GetScreenToWorld2D(Vector2 position, mat4 projection);
 Camera *CreateCamera2D(float fov, Vector3 position, CameraType type);
 void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int *g_normal, unsigned int *g_albedo, unsigned int *depth, int screen_width, int screen_height);
 void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_process_color, unsigned int *depth, int screen_width, int screen_height);
-void BatchSetup();
-void BeginBatch();
-void EndBatch(Batch *batch);
-void FlushBatch();
-void ShaderBatch(Batch *batch);
+void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int size, bool textured, bool normals);
 void OnResize(int new_width, int new_height);
 Font *LoadFont(const char *font_name, unsigned int resolution);
 void InitDefaultFont(unsigned int resolution);

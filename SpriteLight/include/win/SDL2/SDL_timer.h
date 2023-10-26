@@ -42,7 +42,7 @@ extern "C" {
  *
  * This value wraps if the program runs for more than ~49 days.
  *
- * This function is not recommended as of SDL 2.0.18; use SDL_GetTicks64()
+ * This function is not recommended as of SDL 2.0.18; use SDL_GetTicks()
  * instead, where the value doesn't wrap every ~49 days. There are places in
  * SDL where we provide a 32-bit timestamp that can not change without
  * breaking binary compatibility, though, so this function isn't officially
@@ -68,8 +68,8 @@ extern DECLSPEC Uint32 SDLCALL SDL_GetTicks(void);
  * For example, if you want to wait 100 ms, you could do this:
  *
  * ```c
- * const Uint64 timeout = SDL_GetTicks64() + 100;
- * while (SDL_GetTicks64() < timeout) {
+ * const Uint64 timeout = SDL_GetTicks() + 100;
+ * while (SDL_GetTicks() < timeout) {
  *     // ... do work until timeout has elapsed
  * }
  * ```
@@ -79,14 +79,14 @@ extern DECLSPEC Uint32 SDLCALL SDL_GetTicks(void);
  *
  * \since This function is available since SDL 2.0.18.
  */
-extern DECLSPEC Uint64 SDLCALL SDL_GetTicks64(void);
+extern DECLSPEC Uint64 SDLCALL SDL_GetTicks(void);
 
 /**
  * Compare 32-bit SDL ticks values, and return true if `A` has passed `B`.
  *
  * This should be used with results from SDL_GetTicks(), as this macro
  * attempts to deal with the 32-bit counter wrapping back to zero every ~49
- * days, but should _not_ be used with SDL_GetTicks64(), which does not have
+ * days, but should _not_ be used with SDL_GetTicks(), which does not have
  * that problem.
  *
  * For example, with SDL_GetTicks(), if you want to wait 100 ms, you could

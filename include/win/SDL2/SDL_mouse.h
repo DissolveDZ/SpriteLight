@@ -287,7 +287,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_GetRelativeMouseMode(void);
  * - data=0, mask=0: transparent
  * - data=1, mask=0: inverted color if possible, black if not.
  *
- * Cursors created with this function must be freed with SDL_FreeCursor().
+ * Cursors created with this function must be freed with SDL_DestroyCursor().
  *
  * If you want to have a color cursor, or create your cursor from an
  * SDL_Surface, you should use SDL_CreateColorCursor(). Alternately, you can
@@ -310,7 +310,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_GetRelativeMouseMode(void);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_FreeCursor
+ * \sa SDL_DestroyCursor
  * \sa SDL_SetCursor
  * \sa SDL_ShowCursor
  */
@@ -331,7 +331,7 @@ extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateCursor(const Uint8 * data,
  * \since This function is available since SDL 2.0.0.
  *
  * \sa SDL_CreateCursor
- * \sa SDL_FreeCursor
+ * \sa SDL_DestroyCursor
  */
 extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateColorCursor(SDL_Surface *surface,
                                                           int hot_x,
@@ -346,7 +346,7 @@ extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateColorCursor(SDL_Surface *surface,
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_FreeCursor
+ * \sa SDL_DestroyCursor
  */
 extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateSystemCursor(SDL_SystemCursor id);
 
@@ -372,7 +372,7 @@ extern DECLSPEC void SDLCALL SDL_SetCursor(SDL_Cursor * cursor);
  * Get the active cursor.
  *
  * This function returns a pointer to the current cursor which is owned by the
- * library. It is not necessary to free the cursor with SDL_FreeCursor().
+ * library. It is not necessary to free the cursor with SDL_DestroyCursor().
  *
  * \returns the active cursor or NULL if there is no mouse.
  *
@@ -385,7 +385,7 @@ extern DECLSPEC SDL_Cursor *SDLCALL SDL_GetCursor(void);
 /**
  * Get the default cursor.
  *
- * You do not have to call SDL_FreeCursor() on the return value, but it is
+ * You do not have to call SDL_DestroyCursor() on the return value, but it is
  * safe to do so.
  *
  * \returns the default cursor on success or NULL on failure.
@@ -410,7 +410,7 @@ extern DECLSPEC SDL_Cursor *SDLCALL SDL_GetDefaultCursor(void);
  * \sa SDL_CreateCursor
  * \sa SDL_CreateSystemCursor
  */
-extern DECLSPEC void SDLCALL SDL_FreeCursor(SDL_Cursor * cursor);
+extern DECLSPEC void SDLCALL SDL_DestroyCursor(SDL_Cursor * cursor);
 
 /**
  * Toggle whether or not the cursor is shown.

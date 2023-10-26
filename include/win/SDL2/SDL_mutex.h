@@ -23,7 +23,7 @@
 #define SDL_mutex_h_
 
 /**
- *  \file SDL_mutex.h
+ *  \file SDL_Mutex.h
  *
  *  Functions to provide thread synchronization primitives.
  */
@@ -129,8 +129,8 @@ extern "C" {
 /* @{ */
 
 /* The SDL mutex structure, defined in SDL_sysmutex.c */
-struct SDL_mutex;
-typedef struct SDL_mutex SDL_mutex;
+struct SDL_Mutex;
+typedef struct SDL_Mutex SDL_Mutex;
 
 /**
  * Create a new mutex.
@@ -152,7 +152,7 @@ typedef struct SDL_mutex SDL_mutex;
  * \sa SDL_TryLockMutex
  * \sa SDL_UnlockMutex
  */
-extern DECLSPEC SDL_mutex *SDLCALL SDL_CreateMutex(void);
+extern DECLSPEC SDL_Mutex *SDLCALL SDL_CreateMutex(void);
 
 /**
  * Lock the mutex.
@@ -170,7 +170,7 @@ extern DECLSPEC SDL_mutex *SDLCALL SDL_CreateMutex(void);
  *
  * \since This function is available since SDL 2.0.0.
  */
-extern DECLSPEC int SDLCALL SDL_LockMutex(SDL_mutex * mutex) SDL_ACQUIRE(mutex);
+extern DECLSPEC int SDLCALL SDL_LockMutex(SDL_Mutex * mutex) SDL_ACQUIRE(mutex);
 #define SDL_mutexP(m)   SDL_LockMutex(m)
 
 /**
@@ -193,7 +193,7 @@ extern DECLSPEC int SDLCALL SDL_LockMutex(SDL_mutex * mutex) SDL_ACQUIRE(mutex);
  * \sa SDL_LockMutex
  * \sa SDL_UnlockMutex
  */
-extern DECLSPEC int SDLCALL SDL_TryLockMutex(SDL_mutex * mutex) SDL_TRY_ACQUIRE(0, mutex);
+extern DECLSPEC int SDLCALL SDL_TryLockMutex(SDL_Mutex * mutex) SDL_TRY_ACQUIRE(0, mutex);
 
 /**
  * Unlock the mutex.
@@ -212,7 +212,7 @@ extern DECLSPEC int SDLCALL SDL_TryLockMutex(SDL_mutex * mutex) SDL_TRY_ACQUIRE(
  *
  * \since This function is available since SDL 2.0.0.
  */
-extern DECLSPEC int SDLCALL SDL_UnlockMutex(SDL_mutex * mutex) SDL_RELEASE(mutex);
+extern DECLSPEC int SDLCALL SDL_UnlockMutex(SDL_Mutex * mutex) SDL_RELEASE(mutex);
 #define SDL_mutexV(m)   SDL_UnlockMutex(m)
 
 /**
@@ -233,7 +233,7 @@ extern DECLSPEC int SDLCALL SDL_UnlockMutex(SDL_mutex * mutex) SDL_RELEASE(mutex
  * \sa SDL_TryLockMutex
  * \sa SDL_UnlockMutex
  */
-extern DECLSPEC void SDLCALL SDL_DestroyMutex(SDL_mutex * mutex);
+extern DECLSPEC void SDLCALL SDL_DestroyMutex(SDL_Mutex * mutex);
 
 /* @} *//* Mutex functions */
 
@@ -245,7 +245,7 @@ extern DECLSPEC void SDLCALL SDL_DestroyMutex(SDL_mutex * mutex);
 
 /* The SDL semaphore structure, defined in SDL_syssem.c */
 struct SDL_semaphore;
-typedef struct SDL_semaphore SDL_sem;
+typedef struct SDL_semaphore SDL_Semaphore;
 
 /**
  * Create a semaphore.
@@ -263,13 +263,13 @@ typedef struct SDL_semaphore SDL_sem;
  * \since This function is available since SDL 2.0.0.
  *
  * \sa SDL_DestroySemaphore
- * \sa SDL_SemPost
- * \sa SDL_SemTryWait
- * \sa SDL_SemValue
- * \sa SDL_SemWait
- * \sa SDL_SemWaitTimeout
+ * \sa SDL_PostSemaphore
+ * \sa SDL_TryWaitSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
+ * \sa SDL_WaitSemaphoreTimeout
  */
-extern DECLSPEC SDL_sem *SDLCALL SDL_CreateSemaphore(Uint32 initial_value);
+extern DECLSPEC SDL_Semaphore *SDLCALL SDL_CreateSemaphore(Uint32 initial_value);
 
 /**
  * Destroy a semaphore.
@@ -282,13 +282,13 @@ extern DECLSPEC SDL_sem *SDLCALL SDL_CreateSemaphore(Uint32 initial_value);
  * \since This function is available since SDL 2.0.0.
  *
  * \sa SDL_CreateSemaphore
- * \sa SDL_SemPost
- * \sa SDL_SemTryWait
- * \sa SDL_SemValue
- * \sa SDL_SemWait
- * \sa SDL_SemWaitTimeout
+ * \sa SDL_PostSemaphore
+ * \sa SDL_TryWaitSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
+ * \sa SDL_WaitSemaphoreTimeout
  */
-extern DECLSPEC void SDLCALL SDL_DestroySemaphore(SDL_sem * sem);
+extern DECLSPEC void SDLCALL SDL_DestroySemaphore(SDL_Semaphore * sem);
 
 /**
  * Wait until a semaphore has a positive value and then decrements it.
@@ -298,7 +298,7 @@ extern DECLSPEC void SDLCALL SDL_DestroySemaphore(SDL_sem * sem);
  * signal or error. If the call is successful it will atomically decrement the
  * semaphore value.
  *
- * This function is the equivalent of calling SDL_SemWaitTimeout() with a time
+ * This function is the equivalent of calling SDL_WaitSemaphoreTimeout() with a time
  * length of `SDL_MUTEX_MAXWAIT`.
  *
  * \param sem the semaphore wait on
@@ -309,13 +309,13 @@ extern DECLSPEC void SDLCALL SDL_DestroySemaphore(SDL_sem * sem);
  *
  * \sa SDL_CreateSemaphore
  * \sa SDL_DestroySemaphore
- * \sa SDL_SemPost
- * \sa SDL_SemTryWait
- * \sa SDL_SemValue
- * \sa SDL_SemWait
- * \sa SDL_SemWaitTimeout
+ * \sa SDL_PostSemaphore
+ * \sa SDL_TryWaitSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
+ * \sa SDL_WaitSemaphoreTimeout
  */
-extern DECLSPEC int SDLCALL SDL_SemWait(SDL_sem * sem);
+extern DECLSPEC int SDLCALL SDL_WaitSemaphore(SDL_Semaphore * sem);
 
 /**
  * See if a semaphore has a positive value and decrement it if it does.
@@ -334,12 +334,12 @@ extern DECLSPEC int SDLCALL SDL_SemWait(SDL_sem * sem);
  *
  * \sa SDL_CreateSemaphore
  * \sa SDL_DestroySemaphore
- * \sa SDL_SemPost
- * \sa SDL_SemValue
- * \sa SDL_SemWait
- * \sa SDL_SemWaitTimeout
+ * \sa SDL_PostSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
+ * \sa SDL_WaitSemaphoreTimeout
  */
-extern DECLSPEC int SDLCALL SDL_SemTryWait(SDL_sem * sem);
+extern DECLSPEC int SDLCALL SDL_TryWaitSemaphore(SDL_Semaphore * sem);
 
 /**
  * Wait until a semaphore has a positive value and then decrements it.
@@ -359,12 +359,12 @@ extern DECLSPEC int SDLCALL SDL_SemTryWait(SDL_sem * sem);
  *
  * \sa SDL_CreateSemaphore
  * \sa SDL_DestroySemaphore
- * \sa SDL_SemPost
- * \sa SDL_SemTryWait
- * \sa SDL_SemValue
- * \sa SDL_SemWait
+ * \sa SDL_PostSemaphore
+ * \sa SDL_TryWaitSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
  */
-extern DECLSPEC int SDLCALL SDL_SemWaitTimeout(SDL_sem *sem, Uint32 timeout);
+extern DECLSPEC int SDLCALL SDL_WaitSemaphoreTimeout(SDL_Semaphore *sem, Uint32 timeout);
 
 /**
  * Atomically increment a semaphore's value and wake waiting threads.
@@ -377,12 +377,12 @@ extern DECLSPEC int SDLCALL SDL_SemWaitTimeout(SDL_sem *sem, Uint32 timeout);
  *
  * \sa SDL_CreateSemaphore
  * \sa SDL_DestroySemaphore
- * \sa SDL_SemTryWait
- * \sa SDL_SemValue
- * \sa SDL_SemWait
- * \sa SDL_SemWaitTimeout
+ * \sa SDL_TryWaitSemaphore
+ * \sa SDL_GetSemaphoreValue
+ * \sa SDL_WaitSemaphore
+ * \sa SDL_WaitSemaphoreTimeout
  */
-extern DECLSPEC int SDLCALL SDL_SemPost(SDL_sem * sem);
+extern DECLSPEC int SDLCALL SDL_PostSemaphore(SDL_Semaphore * sem);
 
 /**
  * Get the current value of a semaphore.
@@ -394,7 +394,7 @@ extern DECLSPEC int SDLCALL SDL_SemPost(SDL_sem * sem);
  *
  * \sa SDL_CreateSemaphore
  */
-extern DECLSPEC Uint32 SDLCALL SDL_SemValue(SDL_sem * sem);
+extern DECLSPEC Uint32 SDLCALL SDL_GetSemaphoreValue(SDL_Semaphore * sem);
 
 /* @} *//* Semaphore functions */
 
@@ -405,8 +405,8 @@ extern DECLSPEC Uint32 SDLCALL SDL_SemValue(SDL_sem * sem);
 /* @{ */
 
 /* The SDL condition variable structure, defined in SDL_syscond.c */
-struct SDL_cond;
-typedef struct SDL_cond SDL_cond;
+struct SDL_Condition;
+typedef struct SDL_Condition SDL_Condition;
 
 /**
  * Create a condition variable.
@@ -416,13 +416,13 @@ typedef struct SDL_cond SDL_cond;
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondBroadcast
- * \sa SDL_CondSignal
- * \sa SDL_CondWait
- * \sa SDL_CondWaitTimeout
- * \sa SDL_DestroyCond
+ * \sa SDL_BroadcastCondition
+ * \sa SDL_SignalCondition
+ * \sa SDL_WaitCondition
+ * \sa SDL_WaitConditionTimeout
+ * \sa SDL_DestroyCondition
  */
-extern DECLSPEC SDL_cond *SDLCALL SDL_CreateCond(void);
+extern DECLSPEC SDL_Condition *SDLCALL SDL_CreateCondition(void);
 
 /**
  * Destroy a condition variable.
@@ -431,13 +431,13 @@ extern DECLSPEC SDL_cond *SDLCALL SDL_CreateCond(void);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondBroadcast
- * \sa SDL_CondSignal
- * \sa SDL_CondWait
- * \sa SDL_CondWaitTimeout
- * \sa SDL_CreateCond
+ * \sa SDL_BroadcastCondition
+ * \sa SDL_SignalCondition
+ * \sa SDL_WaitCondition
+ * \sa SDL_WaitConditionTimeout
+ * \sa SDL_CreateCondition
  */
-extern DECLSPEC void SDLCALL SDL_DestroyCond(SDL_cond * cond);
+extern DECLSPEC void SDLCALL SDL_DestroyCondition(SDL_Condition * cond);
 
 /**
  * Restart one of the threads that are waiting on the condition variable.
@@ -448,13 +448,13 @@ extern DECLSPEC void SDLCALL SDL_DestroyCond(SDL_cond * cond);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondBroadcast
- * \sa SDL_CondWait
- * \sa SDL_CondWaitTimeout
- * \sa SDL_CreateCond
- * \sa SDL_DestroyCond
+ * \sa SDL_BroadcastCondition
+ * \sa SDL_WaitCondition
+ * \sa SDL_WaitConditionTimeout
+ * \sa SDL_CreateCondition
+ * \sa SDL_DestroyCondition
  */
-extern DECLSPEC int SDLCALL SDL_CondSignal(SDL_cond * cond);
+extern DECLSPEC int SDLCALL SDL_SignalCondition(SDL_Condition * cond);
 
 /**
  * Restart all threads that are waiting on the condition variable.
@@ -465,25 +465,25 @@ extern DECLSPEC int SDLCALL SDL_CondSignal(SDL_cond * cond);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondSignal
- * \sa SDL_CondWait
- * \sa SDL_CondWaitTimeout
- * \sa SDL_CreateCond
- * \sa SDL_DestroyCond
+ * \sa SDL_SignalCondition
+ * \sa SDL_WaitCondition
+ * \sa SDL_WaitConditionTimeout
+ * \sa SDL_CreateCondition
+ * \sa SDL_DestroyCondition
  */
-extern DECLSPEC int SDLCALL SDL_CondBroadcast(SDL_cond * cond);
+extern DECLSPEC int SDLCALL SDL_BroadcastCondition(SDL_Condition * cond);
 
 /**
  * Wait until a condition variable is signaled.
  *
  * This function unlocks the specified `mutex` and waits for another thread to
- * call SDL_CondSignal() or SDL_CondBroadcast() on the condition variable
+ * call SDL_SignalCondition() or SDL_BroadcastCondition() on the condition variable
  * `cond`. Once the condition variable is signaled, the mutex is re-locked and
  * the function returns.
  *
  * The mutex must be locked before calling this function.
  *
- * This function is the equivalent of calling SDL_CondWaitTimeout() with a
+ * This function is the equivalent of calling SDL_WaitConditionTimeout() with a
  * time length of `SDL_MUTEX_MAXWAIT`.
  *
  * \param cond the condition variable to wait on
@@ -493,19 +493,19 @@ extern DECLSPEC int SDLCALL SDL_CondBroadcast(SDL_cond * cond);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondBroadcast
- * \sa SDL_CondSignal
- * \sa SDL_CondWaitTimeout
- * \sa SDL_CreateCond
- * \sa SDL_DestroyCond
+ * \sa SDL_BroadcastCondition
+ * \sa SDL_SignalCondition
+ * \sa SDL_WaitConditionTimeout
+ * \sa SDL_CreateCondition
+ * \sa SDL_DestroyCondition
  */
-extern DECLSPEC int SDLCALL SDL_CondWait(SDL_cond * cond, SDL_mutex * mutex);
+extern DECLSPEC int SDLCALL SDL_WaitCondition(SDL_Condition * cond, SDL_Mutex * mutex);
 
 /**
  * Wait until a condition variable is signaled or a certain time has passed.
  *
  * This function unlocks the specified `mutex` and waits for another thread to
- * call SDL_CondSignal() or SDL_CondBroadcast() on the condition variable
+ * call SDL_SignalCondition() or SDL_BroadcastCondition() on the condition variable
  * `cond`, or for the specified time to elapse. Once the condition variable is
  * signaled or the time elapsed, the mutex is re-locked and the function
  * returns.
@@ -522,14 +522,14 @@ extern DECLSPEC int SDLCALL SDL_CondWait(SDL_cond * cond, SDL_mutex * mutex);
  *
  * \since This function is available since SDL 2.0.0.
  *
- * \sa SDL_CondBroadcast
- * \sa SDL_CondSignal
- * \sa SDL_CondWait
- * \sa SDL_CreateCond
- * \sa SDL_DestroyCond
+ * \sa SDL_BroadcastCondition
+ * \sa SDL_SignalCondition
+ * \sa SDL_WaitCondition
+ * \sa SDL_CreateCondition
+ * \sa SDL_DestroyCondition
  */
-extern DECLSPEC int SDLCALL SDL_CondWaitTimeout(SDL_cond * cond,
-                                                SDL_mutex * mutex, Uint32 ms);
+extern DECLSPEC int SDLCALL SDL_WaitConditionTimeout(SDL_Condition * cond,
+                                                SDL_Mutex * mutex, Uint32 ms);
 
 /* @} *//* Condition variable functions */
 

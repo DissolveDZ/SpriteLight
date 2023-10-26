@@ -52,125 +52,172 @@ void PostProcessBuffer(unsigned int *post_process_fbo, unsigned int *post_proces
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *depth);
 }
 
-void BatchSetup()
+void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int size, bool textured, bool normals)
 {
-	state->renderer.max_quads = 20000;
-	state->renderer.max_vertices = state->renderer.max_quads * 4;
-	state->renderer.max_indices = state->renderer.max_quads * 6;
-	state->renderer.max_textures = 32;
-	state->renderer.max_batches = 10;
-	// glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &state->renderer.max_textures);
-	// use UBO
-
-	int textures[32];
-	for (int i = 0; i < 32; i++)
-		textures[i] = i;
-
-	glUseProgram(general_shader.ID);
-	glUniform1iv(glGetUniformLocation(general_shader.ID, "textures"), 32, textures);
-	glUseProgram(ui_shader.ID);
-	glUniform1iv(glGetUniformLocation(ui_shader.ID, "textures"), 32, textures);
-	state->renderer.textures = malloc(state->renderer.max_textures * sizeof(u32));
-	state->renderer.batches = malloc(state->renderer.max_batches * sizeof(Batch));
-	state->renderer.batch_count = 0;
-	state->renderer.max_batches = 10;
-	state->renderer.indices = malloc(state->renderer.max_indices * sizeof(u32));
-	state->renderer.current_batch = 0;
-	state->renderer.current_shader = -1;
-
-	u32 offset = 0;
-	for (size_t i = 0; i < state->renderer.max_indices; i += 6)
-	{
-		state->renderer.indices[i + 0] = 0 + offset;
-		state->renderer.indices[i + 1] = 1 + offset;
-		state->renderer.indices[i + 2] = 2 + offset;
-
-		state->renderer.indices[i + 3] = 2 + offset;
-		state->renderer.indices[i + 4] = 3 + offset;
-		state->renderer.indices[i + 5] = 0 + offset;
-
-		offset += 4;
-	}
-
-	for (int i = 0; i < state->renderer.max_batches; i++)
-	{
-		state->renderer.batches[i].buffer_object = malloc(state->renderer.max_vertices * sizeof(Vertex));
-		state->renderer.batches[i].buffer_object_ptr = state->renderer.batches[i].buffer_object;
-
-		glCreateVertexArrays(1, &state->renderer.batches[i].vao);
-		glBindVertexArray(state->renderer.batches[i].vao);
-
-		glCreateBuffers(1, &state->renderer.batches[i].vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, state->renderer.batches[i].vbo);
-		glBufferData(GL_ARRAY_BUFFER, state->renderer.max_vertices * sizeof(Vertex), NULL, GL_DYNAMIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, position));
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_coords));
-		glEnableVertexAttribArray(1);
-
-		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_id));
-		glEnableVertexAttribArray(2);
-
-		glCreateBuffers(1, &state->renderer.batches[i].ibo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->renderer.batches[i].ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(state->renderer.indices) * state->renderer.max_indices, state->renderer.indices, GL_STATIC_DRAW);
-	}
-
-	glCreateTextures(GL_TEXTURE_2D, 1, &state->renderer.white);
-	glBindTexture(GL_TEXTURE_2D, state->renderer.white);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	u32 color = 0xffffffff;
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &color);
-
-	memset(state->renderer.textures, 0, state->renderer.max_textures * sizeof(u32));
-	state->renderer.textures[0] = state->renderer.white;
+    glGenVertexArrays(1, VAO);
+    glGenBuffers(1, VBO);
+    glBindVertexArray(*VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+    if (normals && textured)
+    {
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+    }
+    else
+    {
+        if (normals)
+        {
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+            glEnableVertexAttribArray(2);
+        }
+        else if (textured)
+        {
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+        }
+        else
+        {
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+        }
+    }
 }
 
-void BeginBatch()
+void InitRenderer()
 {
-	for (int i = 0; i < state->renderer.batch_count; i++)
-		state->renderer.batches[i].buffer_object_ptr = state->renderer.batches[i].buffer_object;
+	DrawCommand draw_command;
+
+	draw_command.count = 4;
 }
 
-void EndBatch(Batch *batch)
-{
-	if (batch->vertex_count <= 0)
-		return;
-	GLsizeiptr size = (u8 *)batch->buffer_object_ptr - (u8 *)batch->buffer_object;
-	if (size)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, size, batch->buffer_object);
-	}
-}
+// void BatchSetup()
+// {
+// 	state->renderer.max_quads = 20000;
+// 	state->renderer.max_vertices = state->renderer.max_quads * 4;
+// 	state->renderer.max_indices = state->renderer.max_quads * 6;
+// 	state->renderer.max_textures = 32;
+// 	state->renderer.max_batches = 10;
+// 	// glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &state->renderer.max_textures);
+// 	// use UBO
 
-void FlushBatch(Batch *batch)
-{
-	if (batch->vertex_count <= 0)
-		return;
-	batch->index_count = (batch->vertex_count / 4) * 6;
+// 	int textures[32];
+// 	for (int i = 0; i < 32; i++)
+// 		textures[i] = i;
 
-	for (u32 i = 0; i < state->renderer.tex_index; i++)
-		glBindTextureUnit(i, state->renderer.textures[i]);
+// 	glUseProgram(general_shader.ID);
+// 	glUniform1iv(glGetUniformLocation(general_shader.ID, "textures"), 32, textures);
+// 	glUseProgram(ui_shader.ID);
+// 	glUniform1iv(glGetUniformLocation(ui_shader.ID, "textures"), 32, textures);
+// 	state->renderer.textures = malloc(state->renderer.max_textures * sizeof(u32));
+// 	state->renderer.batches = malloc(state->renderer.max_batches * sizeof(Batch));
+// 	state->renderer.batch_count = 0;
+// 	state->renderer.max_batches = 10;
+// 	state->renderer.indices = malloc(state->renderer.max_indices * sizeof(u32));
+// 	state->renderer.current_batch = 0;
+// 	state->renderer.current_shader = -1;
 
-	glBindVertexArray(batch->vao);
-	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
-	glBindVertexArray(0);
-	batch->vertex_count = 0;
-	state->renderer.tex_index = 1;
-}
+// 	u32 offset = 0;
+// 	for (size_t i = 0; i < state->renderer.max_indices; i += 6)
+// 	{
+// 		state->renderer.indices[i + 0] = 0 + offset;
+// 		state->renderer.indices[i + 1] = 1 + offset;
+// 		state->renderer.indices[i + 2] = 2 + offset;
 
-void ShaderBatch(Batch *batch)
-{
-	if (batch->vertex_count <= 0)
-		return;
-	EndBatch(batch);
-	FlushBatch(batch);
-	BeginBatch();
-}
+// 		state->renderer.indices[i + 3] = 2 + offset;
+// 		state->renderer.indices[i + 4] = 3 + offset;
+// 		state->renderer.indices[i + 5] = 0 + offset;
+
+// 		offset += 4;
+// 	}
+
+// 	for (int i = 0; i < state->renderer.max_batches; i++)
+// 	{
+// 		state->renderer.batches[i].buffer_object = malloc(state->renderer.max_vertices * sizeof(Vertex));
+// 		state->renderer.batches[i].buffer_object_ptr = state->renderer.batches[i].buffer_object;
+
+// 		glCreateVertexArrays(1, &state->renderer.batches[i].vao);
+// 		glBindVertexArray(state->renderer.batches[i].vao);
+
+// 		glCreateBuffers(1, &state->renderer.batches[i].vbo);
+// 		glBindBuffer(GL_ARRAY_BUFFER, state->renderer.batches[i].vbo);
+// 		glBufferData(GL_ARRAY_BUFFER, state->renderer.max_vertices * sizeof(Vertex), NULL, GL_DYNAMIC_DRAW);
+
+// 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, position));
+// 		glEnableVertexAttribArray(0);
+
+// 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_coords));
+// 		glEnableVertexAttribArray(1);
+
+// 		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)offsetof(Vertex, tex_id));
+// 		glEnableVertexAttribArray(2);
+
+// 		glCreateBuffers(1, &state->renderer.batches[i].ibo);
+// 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->renderer.batches[i].ibo);
+// 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(state->renderer.indices) * state->renderer.max_indices, state->renderer.indices, GL_STATIC_DRAW);
+// 	}
+
+// 	glCreateTextures(GL_TEXTURE_2D, 1, &state->renderer.white);
+// 	glBindTexture(GL_TEXTURE_2D, state->renderer.white);
+
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+// 	u32 color = 0xffffffff;
+// 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &color);
+
+// 	memset(state->renderer.textures, 0, state->renderer.max_textures * sizeof(u32));
+// 	state->renderer.textures[0] = state->renderer.white;
+// }
+
+// void BeginBatch()
+// {
+// 	for (int i = 0; i < state->renderer.batch_count; i++)
+// 		state->renderer.batches[i].buffer_object_ptr = state->renderer.batches[i].buffer_object;
+// }
+
+// void EndBatch(Batch *batch)
+// {
+// 	if (batch->vertex_count <= 0)
+// 		return;
+// 	GLsizeiptr size = (u8 *)batch->buffer_object_ptr - (u8 *)batch->buffer_object;
+// 	if (size)
+// 	{
+// 		glBindBuffer(GL_ARRAY_BUFFER, batch->vbo);
+// 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, batch->buffer_object);
+// 	}
+// }
+
+// void FlushBatch(Batch *batch)
+// {
+// 	if (batch->vertex_count <= 0)
+// 		return;
+// 	batch->index_count = (batch->vertex_count / 4) * 6;
+
+// 	for (u32 i = 0; i < state->renderer.tex_index; i++)
+// 		glBindTextureUnit(i, state->renderer.textures[i]);
+
+// 	glBindVertexArray(batch->vao);
+// 	glDrawElements(GL_TRIANGLES, batch->index_count, GL_UNSIGNED_INT, NULL);
+// 	glBindVertexArray(0);
+// 	batch->vertex_count = 0;
+// 	state->renderer.tex_index = 1;
+// }
+
+// void ShaderBatch(Batch *batch)
+// {
+// 	if (batch->vertex_count <= 0)
+// 		return;
+// 	EndBatch(batch);
+// 	FlushBatch(batch);
+// 	BeginBatch();
+// }

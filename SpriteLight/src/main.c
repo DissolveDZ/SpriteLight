@@ -7,8 +7,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include "win_include.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
 #include <cglm/call.h>
 #include <cglm/struct.h>
 #include "glad.c"
@@ -24,7 +24,6 @@
 #include "shader.c"
 #include "texture.c"
 #include "lights.c"
-#include "audio.c"
 #include "input.c"
 #include "buffers.c"
 #include "bloom.c"

@@ -88,7 +88,7 @@ typedef struct IDirect3DDevice9 IDirect3DDevice9;
  *
  * \since This function is available since SDL 2.0.1.
  */
-extern DECLSPEC IDirect3DDevice9* SDLCALL SDL_RenderGetD3D9Device(SDL_Renderer * renderer);
+extern DECLSPEC IDirect3DDevice9* SDLCALL SDL_GetRenderD3D9Device(SDL_Renderer * renderer);
 
 typedef struct ID3D11Device ID3D11Device;
 
@@ -104,7 +104,7 @@ typedef struct ID3D11Device ID3D11Device;
  *
  * \since This function is available since SDL 2.0.16.
  */
-extern DECLSPEC ID3D11Device* SDLCALL SDL_RenderGetD3D11Device(SDL_Renderer * renderer);
+extern DECLSPEC ID3D11Device* SDLCALL SDL_GetRenderD3D11Device(SDL_Renderer * renderer);
 
 #endif /* defined(__WIN32__) || defined(__WINGDK__) */
 
@@ -186,7 +186,7 @@ extern DECLSPEC int SDLCALL SDL_LinuxSetThreadPriorityAndPolicy(Sint64 threadID,
 #endif /* __LINUX__ */
 	
 /* Platform specific functions for iOS */
-#ifdef __IPHONEOS__
+#ifdef __IOS__
 
 #define SDL_iOSSetAnimationCallback(window, interval, callback, callbackParam) SDL_iPhoneSetAnimationCallback(window, interval, callback, callbackParam)
 
@@ -242,7 +242,7 @@ extern DECLSPEC int SDLCALL SDL_iPhoneSetAnimationCallback(SDL_Window * window, 
  */
 extern DECLSPEC void SDLCALL SDL_iPhoneSetEventPump(SDL_bool enabled);
 
-#endif /* __IPHONEOS__ */
+#endif /* __IOS__ */
 
 
 /* Platform specific functions for Android */
@@ -587,7 +587,7 @@ extern DECLSPEC void SDLCALL SDL_OnApplicationWillResignActive(void);
 extern DECLSPEC void SDLCALL SDL_OnApplicationDidEnterBackground(void);
 extern DECLSPEC void SDLCALL SDL_OnApplicationWillEnterForeground(void);
 extern DECLSPEC void SDLCALL SDL_OnApplicationDidBecomeActive(void);
-#ifdef __IPHONEOS__
+#ifdef __IOS__
 extern DECLSPEC void SDLCALL SDL_OnApplicationDidChangeStatusBarOrientation(void);
 #endif
 

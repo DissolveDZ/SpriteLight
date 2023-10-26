@@ -187,7 +187,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_Vulkan_CreateSurface(SDL_Window *window,
  * Get the size of the window's underlying drawable dimensions in pixels.
  *
  * This may differ from SDL_GetWindowSize() if we're rendering to a high-DPI
- * drawable, i.e. the window was created with `SDL_WINDOW_ALLOW_HIGHDPI` on a
+ * drawable, i.e. the window was created with `SDL_WINDOW_HIGH_PIXEL_DENSITY` on a
  * platform with high-DPI support (Apple calls this "Retina"), and not
  * disabled by the `SDL_HINT_VIDEO_HIGHDPI_DISABLED` hint.
  *

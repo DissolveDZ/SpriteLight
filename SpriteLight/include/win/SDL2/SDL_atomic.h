@@ -260,7 +260,7 @@ typedef void (*SDL_KernelMemoryBarrierFunc)();
  * \brief A type representing an atomic integer value.  It is a struct
  *        so people don't accidentally use numeric operations on it.
  */
-typedef struct { int value; } SDL_atomic_t;
+typedef struct { int value; } SDL_AtomicInt;
 
 /**
  * Set an atomic variable to a new value if it is currently an old value.
@@ -268,7 +268,7 @@ typedef struct { int value; } SDL_atomic_t;
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param a a pointer to an SDL_AtomicInt variable to be modified
  * \param oldval the old value
  * \param newval the new value
  * \returns SDL_TRUE if the atomic variable was set, SDL_FALSE otherwise.
@@ -279,7 +279,7 @@ typedef struct { int value; } SDL_atomic_t;
  * \sa SDL_AtomicGet
  * \sa SDL_AtomicSet
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int newval);
+extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_AtomicInt *a, int oldval, int newval);
 
 /**
  * Set an atomic variable to a value.
@@ -289,7 +289,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int 
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param a a pointer to an SDL_AtomicInt variable to be modified
  * \param v the desired value
  * \returns the previous value of the atomic variable.
  *
@@ -297,7 +297,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int 
  *
  * \sa SDL_AtomicGet
  */
-extern DECLSPEC int SDLCALL SDL_AtomicSet(SDL_atomic_t *a, int v);
+extern DECLSPEC int SDLCALL SDL_AtomicSet(SDL_AtomicInt *a, int v);
 
 /**
  * Get the value of an atomic variable.
@@ -305,14 +305,14 @@ extern DECLSPEC int SDLCALL SDL_AtomicSet(SDL_atomic_t *a, int v);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable
+ * \param a a pointer to an SDL_AtomicInt variable
  * \returns the current value of an atomic variable.
  *
  * \since This function is available since SDL 2.0.2.
  *
  * \sa SDL_AtomicSet
  */
-extern DECLSPEC int SDLCALL SDL_AtomicGet(SDL_atomic_t *a);
+extern DECLSPEC int SDLCALL SDL_AtomicGet(SDL_AtomicInt *a);
 
 /**
  * Add to an atomic variable.
@@ -322,7 +322,7 @@ extern DECLSPEC int SDLCALL SDL_AtomicGet(SDL_atomic_t *a);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param a a pointer to an SDL_AtomicInt variable to be modified
  * \param v the desired value to add
  * \returns the previous value of the atomic variable.
  *
@@ -331,7 +331,7 @@ extern DECLSPEC int SDLCALL SDL_AtomicGet(SDL_atomic_t *a);
  * \sa SDL_AtomicDecRef
  * \sa SDL_AtomicIncRef
  */
-extern DECLSPEC int SDLCALL SDL_AtomicAdd(SDL_atomic_t *a, int v);
+extern DECLSPEC int SDLCALL SDL_AtomicAdd(SDL_AtomicInt *a, int v);
 
 /**
  * \brief Increment an atomic variable used as a reference count.

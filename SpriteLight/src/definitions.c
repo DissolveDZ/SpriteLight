@@ -300,26 +300,15 @@ Vector3 MeasureWorldText(char *text, Font *font, float scale)
 
 void EnginePresent(void)
 {
-	state->renderer.current_shader = -1;
     SDL_GL_SwapWindow(state->main_window);
     last_frame = current_frame;
     current_frame = SDL_GetPerformanceCounter();
     state->frame_time = (current_frame - last_frame) / (double)SDL_GetPerformanceFrequency();
     state->time += state->frame_time;
-    double target_frame_time = 1000.0 / state->target_fps; // Target frame time for 60 FPS in milliseconds
-    double frame_delay = target_frame_time - state->frame_time;
+    f64 target_frame_time = 1000.0 / state->target_fps; // Target frame time for 60 FPS in milliseconds
+    f64 frame_delay = target_frame_time - state->frame_time;
     if (frame_delay > 0)
-    {
         SDL_Delay(frame_delay);
-    }
-    /*
-    frame_delay = 1.0 / state->target_fps - state->frame_time;
-    if (frame_delay > 0)
-    {
-        Uint32 delay_time = (Uint32)(frame_delay*1000);
-        SDL_Delay(delay_time);
-    }
-    */
 }
 
 void EngineQuit(void)

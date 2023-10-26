@@ -61,6 +61,7 @@ Texture LoadTexture(const char *texture_name)
 
 SDL_Surface *LoadSDLImage(char* filename)
 {
+	/*
 	// Read data
 	int32_t width, height, bytesPerPixel;
 	void* data = stbi_load(filename, &width, &height, &bytesPerPixel, 0);
@@ -92,4 +93,6 @@ SDL_Surface *LoadSDLImage(char* filename)
 		return NULL;
 	}
 	return surface;
+	*/
+	return 0;
 }
