@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
 		UpdateCamera();
 		glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		/*
 		for (int y = 0; y < 50; y++)
 		{
 			for (int x = 0; x < 50; x++)
@@ -117,6 +118,27 @@ int main(int argc, char *argv[])
 		}
 		DrawTexRect((Rectangle){0, 0, 4, 1}, tex1.ID, -state->time * 200);
 		DrawWorldText("balck finger", 0, 0, 0, 10, (Vector4){255, 255, 255, 255});
+		*/
+
+        DrawGradientV((Vector4){51, 76.5f, 153, 255}, (Vector4){178.5f, 229.5f, 255, 255}, state->camera.position.y / 100);
+        DrawRect((Rectangle){0, 0, 2, 1}, (Vector4){125, 125, 125, 255});
+        DrawRect((Rectangle){-3, 0, 2, 1}, (Vector4){255, 75, 75, 255});
+        DrawRect((Rectangle){3, 0, 2, 1}, (Vector4){75, 75, 75, 255});
+        DrawTexRect(rec, tex1.ID, 0.f);
+        Vector3 text_size = MeasureWorldTextText(&text, 0);
+        DrawRect((Rectangle){text.x + text_size.x / 2, text.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){25, 25, 25, 50});
+        DrawWorldTextText(text, 0);
+        DrawWorldText("this is a test", pixel_square, -7, 0, 5.f, (Vector4){0, 0, 255, 255});
+        text_size = MeasureWorldText("Measuring Text..()", antonio_bold, 3.f);
+        DrawRect((Rectangle){state->mouse_world.x + text_size.x / 2, state->mouse_world.y + text_size.y / 2 + text_size.z, text_size.x, text_size.y}, (Vector4){25, 25, 25, 50});
+        DrawWorldText("Measuring Text..()", antonio_bold, state->mouse_world.x, state->mouse_world.y, 3.f, (Vector4){255, 0, 0, 255});
+        text_size = MeasureText("100% he\nal\nth", pixel_square, 0.25f);
+        DrawUIRect((Rectangle){25 + text_size.x / 2, 125.f + text_size.y / 2 - text_size.z, text_size.x, text_size.y}, (Vector4){125, 125, 125, 50});
+        DrawSubText("100% he\na-l\nth", pixel_square, round((sinf(state->time) * 0.5f + 0.5f) * strlen("100% he\na-l\nth")), 25.f, 125.f, 0.25f, (Vector4){255, 0, 0, 255});
+        DrawLine2DWorld((Vector2){0, 0}, state->mouse_world, (Vector4){255, 0, 0, 255});
+        DrawCube((Vector3){1, 1.5, 0.5f}, (Vector3){1, 1, 1}, (Vector3){20, 0, 20}, tex1);
+        DrawCube((Vector3){5, 2, 0.5f}, (Vector3){5, 1, 1}, (Vector3){40, 40.f, 20.f}, tex1);
+
 		// DrawUIRect((Rectangle){state->screen_width/2, state->screen_height/2, sin(state->time)*20, sin(state->time)*20}, tex1, -state->time * 200);
 		EnginePresent();
 	}

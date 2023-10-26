@@ -9,3 +9,6 @@ void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 col
 void DrawTextText(Text text, Font *font);
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
 void DrawSubTextText(Text *text, Font *font, int count);
+void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture);
+void DrawGradientV(Vector4 start, Vector4 end, float offset);
+void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color);
