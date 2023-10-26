@@ -11,6 +11,7 @@
 #include <cglm/struct.h>
 #include "win_include.h"
 #include <glad/glad.h>
+#include <flecs.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "container.h"
