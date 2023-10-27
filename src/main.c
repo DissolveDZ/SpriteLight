@@ -74,14 +74,6 @@ int main(int argc, char *argv[])
 	Texture tex1 = LoadTexture("cube.png");
 	Texture tex2 = LoadTexture("vedl.png");
 
-	// u32 music = LoadAudioStream("resources/audio/music/crisp_5.flac");
-	// u32 sound1 = LoadSound("resources/audio/sounds/cash.mp3");
-	// u32 sound2 = LoadSound("resources/audio/sounds/water.mp3");
-	// SetAudioStreamVolume(music, 10);
-	// SetVolume(sound1, 1000);
-	// SetVolume(sound2, 1000);
-	// PlayAudioStream(music);
-
 	// glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 	Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
@@ -120,7 +112,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		DrawTexRect((Rectangle){0, 0, 4, 1}, tex1.ID, -state->time * 200);
-		DrawWorldText("balck finger", 0, 0, 0, 10, (Vector4){255, 255, 255, 255});
 		*/
 
 		DrawGradientV((Vector4){51, 76.5f, 153, 255}, (Vector4){178.5f, 229.5f, 255, 255}, state->camera.position.y / 100);

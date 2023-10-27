@@ -30,7 +30,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 	InitDefaultFont(256);
 
 	SetInputAction(KEY_F11, ToggleFullscreen, INPUT_PRESS, "Toggle Fullscreen", 0);
-	//SetInputAction(MOUSE_RIGHT, CameraPan, INPUT_PRESS, "Camera Pan", 0);
+	// SetInputAction(MOUSE_RIGHT, CameraPan, INPUT_PRESS, "Camera Pan", 0);
 
 	general_shader = LoadShader("engine/rec.vert", "engine/rec.frag");
 	ui_shader = LoadShader("ui/screen_space.vert", "engine/rec.frag");
