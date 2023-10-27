@@ -90,17 +90,6 @@ void ProcessKeys()
         case SDL_EVENT_KEY_DOWN:
             if (!state->window_event.key.repeat)
                 state->input.key[ScancodeToKeyCode[state->window_event.key.keysym.scancode]] = INPUT_PRESS;
-            switch (state->window_event.key.keysym.scancode)
-            {
-            case SDL_SCANCODE_F11:
-                state->fullscreen = !state->fullscreen;
-                if (state->fullscreen)
-                    SDL_SetWindowFullscreen(state->main_window, 1);
-                else
-                    SDL_SetWindowFullscreen(state->main_window, 0); // Set to 0 for windowed mode
-                break;
-            }
-            break;
         case SDL_EVENT_KEY_UP:
             if (!state->window_event.key.repeat)
                 state->input.key[ScancodeToKeyCode[state->window_event.key.keysym.scancode]] = INPUT_UP;

@@ -220,7 +220,7 @@ typedef struct State
 
     Renderer renderer;
 
-    u8 *key_state;
+    const u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
     Vector2 camera_pan_start;
@@ -310,6 +310,8 @@ static u32 text_vbo, text_vao;
 static u32 line_vbo, line_vao;
 static u32 cube_vbo, cube_vao;
 
+void ToggleFullscreen();
+
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
 float Lerp(float start, float end, float amount);
@@ -356,6 +358,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 void EngineUpdate();
 void EnginePresent(void);
 void UpdateKeys();
+void CameraPan();
 void UpdateCamera();
 void EngineQuit(void);
 void BloomInit(int mip_amount);

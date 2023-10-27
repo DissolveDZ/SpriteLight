@@ -152,7 +152,7 @@ void SetShaderVec3(int Shader_ID, const char *name, vec3 vector);
 
 void SetShaderVec4(int Shader_ID, const char *name, vec4 value);
 
-void SetShaderVec3v(int Shader_ID, const char *name, vec3 *vector, int amount);
+void SetShaderVec3v(int Shader_ID, const char *name, vec3 vector, int amount);
 # 5 "SpriteLight/engine_include/main.h" 2
 # 1 "SpriteLight/engine_include/texture.h" 1
        
@@ -436,7 +436,7 @@ typedef struct State
 
     Renderer renderer;
 
-    u8 *key_state;
+    const u8 *key_state;
     u32 mouse_state;
     Vector2 mouse_world;
     Vector2 camera_pan_start;
@@ -526,6 +526,8 @@ static u32 text_vbo, text_vao;
 static u32 line_vbo, line_vao;
 static u32 cube_vbo, cube_vao;
 
+void ToggleFullscreen();
+
 int GetRandomValue(int min, int max);
 char* TextFormat(const char* format, ...);
 float Lerp(float start, float end, float amount);
@@ -572,6 +574,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 void EngineUpdate();
 void EnginePresent(void);
 void UpdateKeys();
+void CameraPan();
 void UpdateCamera();
 void EngineQuit(void);
 void BloomInit(int mip_amount);
@@ -588,8 +591,8 @@ void RenderBloom(unsigned int src_texture, float filter_radius, float threshold,
 void InitHashTable(size_t initial_capacity);
 void FreeResources();
 Resource *LoadResource(const char* file_name);
-Resource *GetResource(int index_or_file_path);
-void RemoveResource(int index_or_file_path);
+Resource *GetResource(int index);
+void RemoveResource(int index);
 Texture LoadTexture(const char *texture_name);
 Shader Load_Shader(const char *vertex_name, const char *fragment_name);
 unsigned int Hash(const char *str);

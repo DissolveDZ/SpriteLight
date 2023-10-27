@@ -43,8 +43,8 @@ Shader LoadShader(const char *vertex_name, const char *fragment_name)
         snprintf(vertex_shader_path, len, "%s%s", base_path, vertex_name);
         snprintf(fragment_shader_path, len, "%s%s", base_path, fragment_name);
 
-        char *vertex_shader_source = ReadTextFile(vertex_shader_path);
-        char *fragment_shader_source = ReadTextFile(fragment_shader_path);
+        const char *vertex_shader_source = ReadTextFile(vertex_shader_path);
+        const char *fragment_shader_source = ReadTextFile(fragment_shader_path);
 
         unsigned int vertex, fragment;
 
@@ -96,8 +96,6 @@ Shader LoadShader(const char *vertex_name, const char *fragment_name)
         glDeleteShader(fragment);
         free(vertex_shader_path);
         free(fragment_shader_path);
-        free(vertex_shader_source);
-        free(fragment_shader_source);
         return shader;
     }
 }
@@ -120,8 +118,13 @@ void SetShaderFloat(int Shader_ID, const char *name, float value)
 }
 void SetShaderMat4(int Shader_ID, const char *name, mat4 matrix)
 {
-    glUniformMatrix4fv(glGetUniformLocation(Shader_ID, name), 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(glGetUniformLocation(Shader_ID, name), 1, GL_FALSE, matrix[0]);
 }
+void SetShaderVec3v(int Shader_ID, const char *name, vec3 vector, int amount)
+{
+    glUniform3fv(glGetUniformLocation(Shader_ID, name), amount, vector);
+}
+
 void SetShaderVec2(int Shader_ID, const char *name, vec2 vector)
 {
     glUniform2f(glGetUniformLocation(Shader_ID, name), vector[0], vector[1]);
@@ -134,9 +137,4 @@ void SetShaderVec3(int Shader_ID, const char *name, vec3 vector)
 inline void SetShaderVec4(int Shader_ID, const char *name, vec4 value)
 {
     glUniform4f(glGetUniformLocation(Shader_ID, name), value[0], value[1], value[2], value[3]);
-}
-
-void SetShaderVec3v(int Shader_ID, const char *name, vec3 *vector, int amount)
-{
-    glUniform3fv(glGetUniformLocation(Shader_ID, name), amount, vector);
 }

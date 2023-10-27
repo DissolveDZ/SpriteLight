@@ -29,4 +29,4 @@ void SetShaderVec3(int Shader_ID, const char *name, vec3 vector);
 
 void SetShaderVec4(int Shader_ID, const char *name, vec4 value);
 
-void SetShaderVec3v(int Shader_ID, const char *name, vec3 *vector, int amount);
+void SetShaderVec3v(int Shader_ID, const char *name, vec3 vector, int amount);

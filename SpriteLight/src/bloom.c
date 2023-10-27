@@ -20,9 +20,7 @@ void BloomInit(int mip_amount)
     {
         BloomMip mip;
         glm_vec2_mul(mip_size, (vec2){0.5f, 0.5f}, mip_size);
-        glm_vec2_div(mip_int_size, (ivec2){2, 2}, mip_int_size);
         glm_vec2_copy(mip_size, mip.size);
-        glm_ivec2_copy(mip_int_size, mip.int_size);
 
         glGenTextures(1, &mip.texture.ID);
         glBindTexture(GL_TEXTURE_2D, mip.texture.ID);
@@ -113,7 +111,7 @@ void DownSampleBloom(unsigned int src_texture, float threshold, float knee)
                                GL_TEXTURE_2D, mip->texture.ID, 0);
 
         // Render screen-filled quad of resolution of current mip
-        // glBindVertexArray(quad_vao);
+        glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
 
