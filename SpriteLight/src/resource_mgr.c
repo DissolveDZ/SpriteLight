@@ -1,3 +1,5 @@
+#include "engine.h"
+
 #define INITIAL_TABLE_SIZE 16
 #define LOAD_FACTOR_THRESHOLD 0.75
 

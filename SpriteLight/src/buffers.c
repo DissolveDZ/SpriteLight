@@ -1,3 +1,5 @@
+#include "engine.h"
+
 void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int *g_normal, unsigned int *g_albedo, unsigned int *depth, int screen_width, int screen_height)
 {
 	glGenFramebuffers(1, g_buffer);

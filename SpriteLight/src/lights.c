@@ -1,3 +1,5 @@
+#include "engine.h"
+
 void InitLights()
 {
     point_light_count = 0;

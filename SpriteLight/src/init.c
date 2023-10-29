@@ -1,9 +1,12 @@
+#include "engine.h"
+
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level)
 {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	state = calloc(1, sizeof(State));
 	state->main_window = SDL_CreateWindow(window_name, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -24,6 +27,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
+	glEnable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	InitHashTable(16);
@@ -66,10 +70,11 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 
 void InitDefaultFont(unsigned int resolution)
 {
-	Font *default_font = LoadFont("arial.ttf", resolution);
-	memcpy(default_chars, default_font->loaded_chars, 128 * sizeof(TextCharacter));
+	// Font *default_font = LoadFont("arial.ttf", resolution);
+	// memcpy(default_chars, default_font->loaded_chars, 128 * sizeof(TextCharacter));
 }
 
+#define NUM_GLYPHS 127
 // unnest code, will use freetype-GL anyways
 Font *LoadFont(const char *font_name, unsigned int resolution)
 {
@@ -115,62 +120,91 @@ Font *LoadFont(const char *font_name, unsigned int resolution)
 				FT_Done_FreeType(ft);
 				return NULL;
 			}
-			else
+			font = calloc(1, sizeof(Font));
+			font->path = font_path;
+			resolution = 512;
+			//f32 char_height = resolution << 6;
+			//f32 char_width = char_height;
+			FT_Set_Char_Size(face, 0, 16 << 6, resolution, resolution);
+			
+			// Disable byte-alignment restriction
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+			// Estimate the texture dimensions
+			int max_dim = (1 + (face->size->metrics.height >> 6)) * ceilf(sqrtf(NUM_GLYPHS));
+			int tex_width = 1;
+			while (tex_width < max_dim)
+				tex_width <<= 1;
+			int tex_height = tex_width;
+
+			// Allocate memory for pixel data
+			char *pixels = (char *)calloc(tex_width * tex_height, 1);
+			int pen_x = 0, pen_y = 0;
+
+			for (unsigned char i = 32; i < NUM_GLYPHS; i++)
 			{
-				font = calloc(1, sizeof(Font));
-				font->path = font_path;
-				FT_Set_Pixel_Sizes(face, 0, resolution);
-
-				// Disable byte-alignment restriction
-				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-				for (unsigned char c = 0; c < 128; c++)
+				FT_Load_Char(face, i, FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT);
+				FT_Bitmap *bmp = &face->glyph->bitmap;
+				if (!bmp)
+					continue;
+				if (pen_x + bmp->width >= tex_width)
 				{
-					// Load character glyph
-					if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-					{
-						printf("Failed to load Glyph");
-						continue;
-					}
-
-					if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LIGHT))
-						continue;
-
-					if (state->sdf_font)
-						FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF);
-
-					unsigned int texture;
-					glGenTextures(1, &texture);
-					glBindTexture(GL_TEXTURE_2D, texture);
-					glTexImage2D(
-						GL_TEXTURE_2D,
-						0,
-						GL_RED,
-						face->glyph->bitmap.width,
-						face->glyph->bitmap.rows,
-						0,
-						GL_RED,
-						GL_UNSIGNED_BYTE,
-						face->glyph->bitmap.buffer);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-					TextCharacter character =
-						{texture,
-						 {face->glyph->bitmap.width, face->glyph->bitmap.rows},
-						 {face->glyph->bitmap_left, face->glyph->bitmap_top},
-						 face->glyph->advance.x};
-					font->loaded_chars[c] = character;
+					pen_x = 0;
+					pen_y += ((face->size->metrics.height >> 6) + 1);
 				}
 
-				resource->data = font;
-				glBindTexture(GL_TEXTURE_2D, 0);
-				FT_Done_Face(face);
-				FT_Done_FreeType(ft);
-				return font;
+				for (int row = 0; row < bmp->rows; ++row)
+				{
+					for (int col = 0; col < bmp->width; ++col)
+					{
+						int x = pen_x + col;
+						int y = tex_height - (pen_y + row) - 1; // Flip Y-coordinate
+						pixels[y * tex_width + x] = bmp->buffer[row * bmp->pitch + col];
+					}
+				}
+
+				// Initialize the information for individual glyphs
+
+				font->characters[i].size.x = bmp->width;
+				font->characters[i].size.y = bmp->rows;
+				font->characters[i].bearing.x = pen_x;
+				font->characters[i].bearing.y = -pen_y;
+				font->characters[i].advance = face->glyph->advance.x >> 6;
+				// font->offsets[i].x = (face->glyph->advance.x >> 6) + face->glyph->bitmap_left;
+				// font->offsets[i].y = face->glyph->bitmap_top; 
+				pen_x += bmp->width + 1;
 			}
+
+			u32 texture_atlas;
+			glGenTextures(1, &texture_atlas);
+			glBindTexture(GL_TEXTURE_2D, texture_atlas);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				tex_width,
+				tex_height,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				pixels);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			font->texture_atlas.id = texture_atlas;
+			font->texture_atlas.num_columns = 1;
+			//font->texture_atlas.num_columns = tex_width / char_width;
+			//font->texture_atlas.character_width = char_width;
+			//font->texture_atlas.character_height = char_height;
+			font->texture_atlas.resolution = tex_width;
+
+			resource->data = font;
+			glBindTexture(GL_TEXTURE_2D, 0);
+			FT_Done_Face(face);
+			FT_Done_FreeType(ft);
+			free(pixels);
+			return font;
 		}
 	}
 	return NULL;

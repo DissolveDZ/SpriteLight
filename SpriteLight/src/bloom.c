@@ -1,3 +1,5 @@
+#include "engine.h"
+
 void BloomInit(int mip_amount)
 {
     glGenFramebuffers(1, &state->bloom.FBO);

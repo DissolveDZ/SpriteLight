@@ -1,3 +1,5 @@
+#include "engine.h"
+
 Texture LoadTexture(const char *texture_name)
 {
     const char *base_path = "resources/textures/";

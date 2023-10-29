@@ -1,0 +1,20 @@
+#ifndef SDL_MAIN_HANDLED 
+#define SDL_MAIN_HANDLED 
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include "win_include.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
+#include <cglm/call.h>
+#include <cglm/struct.h>
+#include <glad/glad.h>
+#include <flecs.h>
+#include <ft2build.h>
+#include <stb_image.h>
+#include FT_FREETYPE_H

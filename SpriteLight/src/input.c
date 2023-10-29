@@ -1,3 +1,5 @@
+#include "engine.h"
+
 // depricated for now
 /*
 KeyState *GetKeyState(KeyCode key)

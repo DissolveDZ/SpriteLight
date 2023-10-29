@@ -1,3 +1,5 @@
+#include "engine.h"
+
 Shader LoadShader(const char *vertex_name, const char *fragment_name)
 {
     const char *base_path = "resources/shaders/";

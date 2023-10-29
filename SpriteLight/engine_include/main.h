@@ -1,10 +1,7 @@
 #ifndef SPRITELIGHT_H
 #define SPRITELIGHT_H
 
-#include "shader.h"
-#include "texture.h"
-#include "lights.h"
-#pragma once
+#define MAX_BLOOM_MIP 10
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -27,27 +24,26 @@ typedef ivec4s Vector4I;
 
 typedef enum CameraType
 {
-    DEFAULT_CAMERA,
-    PANNING_CAMERA
+	DEFAULT_CAMERA,
+	PANNING_CAMERA
 } CameraType;
 
 typedef struct Camera
 {
-    Vector3 position;
-    Vector3 target;
-    CameraType type;
-    float angle;
-    float fov;
-    float zoom;
+	Vector3 position;
+	Vector3 target;
+	CameraType type;
+	float angle;
+	float fov;
+	float zoom;
 } Camera;
 
 typedef struct
 {
-    Vector3 position;
-    Vector2 tex_coords;
-    float tex_id;
-}Vertex;
-
+	Vector3 position;
+	Vector2 tex_coords;
+	float tex_id;
+} Vertex;
 
 typedef struct Material
 {
@@ -56,264 +52,231 @@ typedef struct Material
 
 typedef struct Line
 {
-    Vector2 start;
-    Vector2 end;
+	Vector2 start;
+	Vector2 end;
 } Line;
 
 typedef struct Rectangle
 {
-    float x;
-    float y;
-    float width;
-    float height;
+	float x;
+	float y;
+	float width;
+	float height;
 } Rectangle;
 
 typedef struct Collider
 {
-    float x;
-    float y;
-    float width;
-    float height;
-    Line *vertices;
-    bool dynamic;
-    bool rotating;
+	float x;
+	float y;
+	float width;
+	float height;
+	Line *vertices;
+	bool dynamic;
+	bool rotating;
 } Collider;
 
 typedef struct BloomMip
 {
-    vec2 size;
-    ivec2 int_size;
-    Texture texture;
+	vec2 size;
+	ivec2 int_size;
+	Texture texture;
 } BloomMip;
 typedef struct Bloom
 {
-    unsigned int mip_chain_len;
-    BloomMip *mip_chain;
-    unsigned int FBO;
-    bool karis_average;
-    bool enabled;
+	unsigned int mip_chain_len;
+	BloomMip *mip_chain;
+	unsigned int FBO;
+	bool karis_average;
+	bool enabled;
 } Bloom;
 
 typedef struct PointIntersect
 {
-    Vector2 dist;
-    bool hit;
+	Vector2 dist;
+	bool hit;
 } PointIntersect;
 
 typedef struct TextCharacter
 {
-    unsigned int texture_id; // ID handle of the glyph texture
-    ivec2 size;              // Size of glyph
-    ivec2 bearing;           // Offset from baseline to left/top of glyph
-    unsigned int advance;
+	Vector2I size;	  // Size of glyph
+	Vector2I bearing; // Offset from baseline to left/top of glyph
+	unsigned int advance;
 } TextCharacter;
-static TextCharacter default_chars[128];
+
+typedef struct
+{
+	unsigned int id;
+	int num_columns;
+	int character_width;
+	int character_height;
+	int resolution;
+} TextureAtlas;
 
 typedef struct Font
 {
-    char *path;
-    TextCharacter loaded_chars[128];
+	char *path;
+	TextureAtlas texture_atlas;
+	TextCharacter characters[128];
 } Font;
 
 typedef struct Text
 {
-    char *text;
-    float x;
-    float y;
-    float scale;
-    Vector4 color;
+	char *text;
+	float x;
+	float y;
+	float scale;
+	Vector4 color;
 } Text;
-
-static unsigned int text_characters_max = 100;
 
 typedef struct Sound
 {
-    //Mix_Chunk *chunk;
+	// Mix_Chunk *chunk;
 	u32 volume;
 } Sound;
 
 typedef struct Music
 {
-    //Mix_Music *music;
-    u32 volume;
+	// Mix_Music *music;
+	u32 volume;
 } Music;
 
 typedef struct Audio
 {
-    Music **music;
-    u32 music_len;
-    u32 music_max;
-    Sound **sounds;
-    u32 parallel_sounds;
-    u32 max_parallel_sounds;
-    u32 max_parallel_musics;
-    u32 sounds_playing;
-    u32 sounds_len;
-    u32 sounds_max;
-    u32 volume;
+	Music **music;
+	u32 music_len;
+	u32 music_max;
+	Sound **sounds;
+	u32 parallel_sounds;
+	u32 max_parallel_sounds;
+	u32 max_parallel_musics;
+	u32 sounds_playing;
+	u32 sounds_len;
+	u32 sounds_max;
+	u32 volume;
 } Audio;
 
-typedef struct {
-    char file_path[256];
-    int index;
-    void* data;
-    u32 program_index;
+typedef struct
+{
+	char file_path[256];
+	int index;
+	void *data;
+	u32 program_index;
 } Resource;
 
-typedef struct HashNode {
-    Resource resource;
-    struct HashNode *next;
+typedef struct HashNode
+{
+	Resource resource;
+	struct HashNode *next;
 } HashNode;
 
-typedef struct {
-    HashNode **table;
-    size_t size;
-    size_t capacity;
+typedef struct
+{
+	HashNode **table;
+	size_t size;
+	size_t capacity;
 } HashTable;
 
-typedef struct {
-    HashTable *hash_table;
-    int next_index;
+typedef struct
+{
+	HashTable *hash_table;
+	int next_index;
 } Salad;
 
-typedef struct {
-    GLuint count;
-    GLuint prim_count;
-    GLuint first;
-    GLuint base_instance;
+typedef struct
+{
+	GLuint count;
+	GLuint prim_count;
+	GLuint first;
+	GLuint base_instance;
 } DrawCommand;
 
-typedef struct {
+typedef struct
+{
 	GLuint command_buffer;
 
-    GLuint white;
-    u32 white_ID;
+	GLuint white;
+	u32 white_ID;
 
-    u32 batch_count;
+	u32 batch_count;
 	u32 current_shader;
 	u32 current_batch;
 
-    u32 *textures;
-    u32 tex_count;
+	u32 *textures;
+	u32 tex_count;
 
-    u32 max_quads;
-    u32 max_vertices;
-    u32 max_textures;
+	u32 max_quads;
+	u32 max_vertices;
+	u32 max_textures;
 } Renderer;
 
 typedef struct State
 {
-    u32 screen_width;
-    u32 screen_height;
-    float near_z;
-    float far_z;
-    u32 target_fps;
-    SDL_Event window_event;
-    SDL_Window *main_window;
-    SDL_GLContext main_context;
+	u32 screen_width;
+	u32 screen_height;
+	float near_z;
+	float far_z;
+	u32 target_fps;
+	SDL_Event window_event;
+	SDL_Window *main_window;
+	SDL_GLContext main_context;
 
-    Audio audio;
+	Audio audio;
 
-    Input input;
+	Input input;
 
-    Salad *salad;
+	Salad *salad;
 
-    Renderer renderer;
+	Renderer renderer;
 
-    const u8 *key_state;
-    u32 mouse_state;
-    Vector2 mouse_world;
-    Vector2 camera_pan_start;
-    Vector2 camera_pan_end;
-    Vector2 mouse_pos;
-    Vector2 mouse_delta;
-    int wheel;
-    bool deferred;
-    bool sdf_font;
-    void (*resize_callback)(int, int);
-    Bloom bloom;
-    Camera camera;
-    f64 frame_time;
-    f64 time;
-    u32 active_camera;
-    f32 gravity;
-    bool quit;
-    mat4 model, view, projection, ortho_projection;
-    u32 max_colliders;
-    u32 cur_colliders;
-    bool fullscreen;
+	const u8 *key_state;
+	u32 mouse_state;
+	Vector2 mouse_world;
+	Vector2 camera_pan_start;
+	Vector2 camera_pan_end;
+	Vector2 mouse_pos;
+	Vector2 mouse_delta;
+	int wheel;
+	bool deferred;
+	bool sdf_font;
+	void (*resize_callback)(int, int);
+	Bloom bloom;
+	Camera camera;
+	f64 frame_time;
+	f64 time;
+	u32 active_camera;
+	f32 gravity;
+	bool quit;
+	mat4 model, view, projection, ortho_projection;
+	u32 max_colliders;
+	u32 cur_colliders;
+	bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
-static float line_vertices[6];
+extern unsigned int text_characters_max;
 
-static float quad_vertices[] = {
-    -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-    -1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-     1.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  0.0f,  1.0f,  0.0f
-};
+extern Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
+extern float line_vertices[6];
 
-static float plane_vertices[] = {
-    -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-    -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.0f,  1.0f,  1.0f,
-     0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-};
+extern float quad_vertices[20];
 
-static float cube_vertices[] = {
-    // Front face
-   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f, // Vertex 0
-    1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // Vertex 1
-   -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f, // Vertex 2
-    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f, // Vertex 3
+extern float plane_vertices[20];
+extern float cube_vertices[192];
+extern State *state;
 
-    // Right face
-    1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // Vertex 1
-    1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, // Vertex 5
-    1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f, // Vertex 3
-    1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // Vertex 7
+extern u64 last_frame;
+extern u64 current_frame;
 
-    // Back face
-    1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, // Vertex 5
-   -1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f, // Vertex 4
-    1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f, // Vertex 7
-   -1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, // Vertex 6
-
-   // Left face
-   -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Vertex 4
-   -1.0f, -1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Vertex 0
-   -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // Vertex 6
-   -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // Vertex 2
-
-    // Bottom face
-   -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // Vertex 4
-    1.0f, -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // Vertex 5
-   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // Vertex 0
-    1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // Vertex 1
-
-    // Top face
-   -1.0f,  1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Vertex 2
-    1.0f,  1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Vertex 3
-   -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Vertex 6
-    1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Vertex 7
-};
-static State *state;
-
-static int MAX_BLOOM_MIP = 10;
-static u64 last_frame;
-static u64 current_frame;
-
-static u32 quad_vbo, quad_vao;
-static u32 plane_vbo, plane_vao;
-static u32 text_vbo, text_vao;
-static u32 line_vbo, line_vao;
-static u32 cube_vbo, cube_vao;
+extern u32 quad_vbo, quad_vao;
+extern u32 plane_vbo, plane_vao;
+extern u32 text_vbo, text_vao;
+extern u32 line_vbo, line_vao;
+extern u32 cube_vbo, cube_vao;
 
 void ToggleFullscreen();
 
 int GetRandomValue(int min, int max);
-char* TextFormat(const char* format, ...);
+char *TextFormat(const char *format, ...);
+TextCharacter CalculateCharacterInfo(TextureAtlas atlas, char character);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);

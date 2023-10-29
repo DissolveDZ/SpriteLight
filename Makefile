@@ -1,18 +1,24 @@
 header:
-	gcc -E -ISpriteLight/engine_include SpriteLight/engine_include/SpriteLight.h -o SpriteLight/include/engine.h
-	cp SpriteLight/include/engine.h include
+	./merge_headers.sh
+	# gcc -E -ISpriteLight/engine_include SpriteLight/engine_include/SpriteLight.h -o SpriteLight/include/engine.h
+	#cp SpriteLight/include/engine.h include
 
 dynamic: header
-	clang SpriteLight/src/main.c -shared -ISpriteLight/engine_include -o libSpriteLight.so -ISpriteLight/include -L. -lfreetype -lflecs -lmsdfgl -fPIC -lSDL3 -D_FILE_OFFSET_BITS=64 -ggdb
-	clang src/main.c libSpriteLight.so -Iinclude -L. -lfreetype -lflecs -lmsdfgl -lSDL3 -lm -ggdb -o engine_test
+	meson compile -C build sprite_light_shared
+	meson compile -C build engine_test_shared
+	cp build/libsprite_light_shared.so .
+	cp build/engine_test_shared .
+	cp build/compile_commands.json .
+	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(shell pwd)
+	./engine_test_shared
 
 static: header
-	clang -c SpriteLight/src/main.c -o libSpriteLight.o -ISpriteLight/include -DSLDL_MAIN_HANDLED -lflecs -lmsdfgl  -D_FILE_OFFSET_BITS=64 -ggdb
-	ar rcs libSpriteLight.a libSpriteLight.o
-	clang src/main.c libSpriteLight.o -Iinclude -L. -lfreetype -lflecs -lmsdfgl -lSDL3 -lm -ggdb -o engine_test
+	meson compile -C build sprite_light_static
+	meson compile -C build engine_test_static
+	cp build/libsprite_light_static.a .
+	cp build/engine_test_static .
+	cp build/compile_commands.json .
 	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(shell pwd)
-	./engine_test
+	./engine_test_static
 
-run: dynamic
-	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(shell pwd)
-	./engine_test
+run: dynamic static

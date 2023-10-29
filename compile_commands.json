@@ -1,0 +1,170 @@
+[
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_main.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_main.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_main.c.o -c ../SpriteLight/src/main.c",
+    "file": "../SpriteLight/src/main.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_main.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_glad.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_glad.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_glad.c.o -c ../SpriteLight/src/glad.c",
+    "file": "../SpriteLight/src/glad.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_glad.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_resource_mgr.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_resource_mgr.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_resource_mgr.c.o -c ../SpriteLight/src/resource_mgr.c",
+    "file": "../SpriteLight/src/resource_mgr.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_resource_mgr.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_definitions.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_definitions.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_definitions.c.o -c ../SpriteLight/src/definitions.c",
+    "file": "../SpriteLight/src/definitions.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_definitions.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_shader.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_shader.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_shader.c.o -c ../SpriteLight/src/shader.c",
+    "file": "../SpriteLight/src/shader.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_shader.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_texture.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_texture.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_texture.c.o -c ../SpriteLight/src/texture.c",
+    "file": "../SpriteLight/src/texture.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_texture.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_lights.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_lights.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_lights.c.o -c ../SpriteLight/src/lights.c",
+    "file": "../SpriteLight/src/lights.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_lights.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_input.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_input.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_input.c.o -c ../SpriteLight/src/input.c",
+    "file": "../SpriteLight/src/input.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_input.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_buffers.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_buffers.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_buffers.c.o -c ../SpriteLight/src/buffers.c",
+    "file": "../SpriteLight/src/buffers.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_buffers.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_bloom.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_bloom.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_bloom.c.o -c ../SpriteLight/src/bloom.c",
+    "file": "../SpriteLight/src/bloom.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_bloom.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_init.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_init.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_init.c.o -c ../SpriteLight/src/init.c",
+    "file": "../SpriteLight/src/init.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_init.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_update.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_update.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_update.c.o -c ../SpriteLight/src/update.c",
+    "file": "../SpriteLight/src/update.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_update.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_shared.so.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_shared.so.p/SpriteLight_src_draw.c.o -MF libsprite_light_shared.so.p/SpriteLight_src_draw.c.o.d -o libsprite_light_shared.so.p/SpriteLight_src_draw.c.o -c ../SpriteLight/src/draw.c",
+    "file": "../SpriteLight/src/draw.c",
+    "output": "libsprite_light_shared.so.p/SpriteLight_src_draw.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_main.c.o -MF libsprite_light_static.a.p/SpriteLight_src_main.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_main.c.o -c ../SpriteLight/src/main.c",
+    "file": "../SpriteLight/src/main.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_main.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_glad.c.o -MF libsprite_light_static.a.p/SpriteLight_src_glad.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_glad.c.o -c ../SpriteLight/src/glad.c",
+    "file": "../SpriteLight/src/glad.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_glad.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_resource_mgr.c.o -MF libsprite_light_static.a.p/SpriteLight_src_resource_mgr.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_resource_mgr.c.o -c ../SpriteLight/src/resource_mgr.c",
+    "file": "../SpriteLight/src/resource_mgr.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_resource_mgr.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_definitions.c.o -MF libsprite_light_static.a.p/SpriteLight_src_definitions.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_definitions.c.o -c ../SpriteLight/src/definitions.c",
+    "file": "../SpriteLight/src/definitions.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_definitions.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_shader.c.o -MF libsprite_light_static.a.p/SpriteLight_src_shader.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_shader.c.o -c ../SpriteLight/src/shader.c",
+    "file": "../SpriteLight/src/shader.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_shader.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_texture.c.o -MF libsprite_light_static.a.p/SpriteLight_src_texture.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_texture.c.o -c ../SpriteLight/src/texture.c",
+    "file": "../SpriteLight/src/texture.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_texture.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_lights.c.o -MF libsprite_light_static.a.p/SpriteLight_src_lights.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_lights.c.o -c ../SpriteLight/src/lights.c",
+    "file": "../SpriteLight/src/lights.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_lights.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_input.c.o -MF libsprite_light_static.a.p/SpriteLight_src_input.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_input.c.o -c ../SpriteLight/src/input.c",
+    "file": "../SpriteLight/src/input.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_input.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_buffers.c.o -MF libsprite_light_static.a.p/SpriteLight_src_buffers.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_buffers.c.o -c ../SpriteLight/src/buffers.c",
+    "file": "../SpriteLight/src/buffers.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_buffers.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_bloom.c.o -MF libsprite_light_static.a.p/SpriteLight_src_bloom.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_bloom.c.o -c ../SpriteLight/src/bloom.c",
+    "file": "../SpriteLight/src/bloom.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_bloom.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_init.c.o -MF libsprite_light_static.a.p/SpriteLight_src_init.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_init.c.o -c ../SpriteLight/src/init.c",
+    "file": "../SpriteLight/src/init.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_init.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_update.c.o -MF libsprite_light_static.a.p/SpriteLight_src_update.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_update.c.o -c ../SpriteLight/src/update.c",
+    "file": "../SpriteLight/src/update.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_update.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Ilibsprite_light_static.a.p -I. -I.. -I../SpriteLight/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -fPIC -pthread -ggdb -Bdynamic -Wno-switch -MD -MQ libsprite_light_static.a.p/SpriteLight_src_draw.c.o -MF libsprite_light_static.a.p/SpriteLight_src_draw.c.o.d -o libsprite_light_static.a.p/SpriteLight_src_draw.c.o -c ../SpriteLight/src/draw.c",
+    "file": "../SpriteLight/src/draw.c",
+    "output": "libsprite_light_static.a.p/SpriteLight_src_draw.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Iengine_test_shared.p -I. -I.. -I../include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -pthread -ggdb -Wno-missing-braces -MD -MQ engine_test_shared.p/src_main.c.o -MF engine_test_shared.p/src_main.c.o.d -o engine_test_shared.p/src_main.c.o -c ../src/main.c",
+    "file": "../src/main.c",
+    "output": "engine_test_shared.p/src_main.c.o"
+  },
+  {
+    "directory": "/home/colin/SpriteLight/build",
+    "command": "ccache cc -Iengine_test_static.p -I. -I.. -I../include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c17 -O0 -g -pthread -ggdb -Wno-missing-braces -MD -MQ engine_test_static.p/src_main.c.o -MF engine_test_static.p/src_main.c.o.d -o engine_test_static.p/src_main.c.o -c ../src/main.c",
+    "file": "../src/main.c",
+    "output": "engine_test_static.p/src_main.c.o"
+  }
+]

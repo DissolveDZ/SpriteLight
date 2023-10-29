@@ -1,3 +1,5 @@
+#include "engine.h"
+
 void ProcessCamera(Camera *camera)
 {
 	switch (camera->type)

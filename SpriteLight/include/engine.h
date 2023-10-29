@@ -1,11 +1,27 @@
-# 0 "SpriteLight/engine_include/SpriteLight.h"
-# 0 "<built-in>"
-# 0 "<command-line>"
-# 1 "/usr/include/stdc-predef.h" 1 3 4
-# 0 "<command-line>" 2
-# 1 "SpriteLight/engine_include/SpriteLight.h"
-# 1 "SpriteLight/engine_include/input.h" 1
+#pragma once
+#ifndef SDL_MAIN_HANDLED 
+#define SDL_MAIN_HANDLED 
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include "win_include.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
+#include <cglm/call.h>
+#include <cglm/struct.h>
+#include <glad/glad.h>
+#include <flecs.h>
+#include <ft2build.h>
+#include <stb_image.h>
+#include FT_FREETYPE_H
 
+
+#define MAX_INPUT_KEYS 512
 
 typedef enum KeyCode {
     KEY_NONE,
@@ -100,7 +116,7 @@ typedef struct {
 } KeyMap;
 
 typedef struct Input {
-    InputState key[512];
+    InputState key[MAX_INPUT_KEYS];
     InputAction *actions[NUM_INPUTS];
 } Input;
 
@@ -115,18 +131,13 @@ InputState *GetKeyState(KeyCode key);
 bool GetInputPress(KeyCode key);
 bool GetInputDown(KeyCode key);
 unsigned int *GetAnyKey();
-# 2 "SpriteLight/engine_include/SpriteLight.h" 2
-# 1 "SpriteLight/engine_include/main.h" 1
 
-
-
-# 1 "SpriteLight/engine_include/shader.h" 1
-       
+#pragma once
 
 char *ReadTextFile(char *path);
 
-
-
+// Function to format the shader uniform string
+// and return a dynamically allocated string.
 static char* FormatShaderUniform(const char* uniform_name, int index);
 
 typedef struct Shader
@@ -153,9 +164,8 @@ void SetShaderVec3(int Shader_ID, const char *name, vec3 vector);
 void SetShaderVec4(int Shader_ID, const char *name, vec4 value);
 
 void SetShaderVec3v(int Shader_ID, const char *name, vec3 vector, int amount);
-# 5 "SpriteLight/engine_include/main.h" 2
-# 1 "SpriteLight/engine_include/texture.h" 1
-       
+
+#pragma once
 
 typedef struct Texture
 {
@@ -168,11 +178,10 @@ typedef struct Texture
 
 Texture LoadTexture(const char *path);
 SDL_Surface *LoadSDLImage(char *path);
-# 6 "SpriteLight/engine_include/main.h" 2
-# 1 "SpriteLight/engine_include/lights.h" 1
-       
 
+#pragma once
 
+// Maximum number of point lights
 static int MAX_POINT_LIGHTS = 10;
 
 typedef struct PointLight
@@ -219,8 +228,11 @@ PointLight *CreatePointLight(vec3 position, vec3 color, vec3 ambient, float inte
 void UpdateLights();
 
 void FreeLights();
-# 7 "SpriteLight/engine_include/main.h" 2
-       
+
+#ifndef SPRITELIGHT_H
+#define SPRITELIGHT_H
+
+#define MAX_BLOOM_MIP 10
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -243,27 +255,26 @@ typedef ivec4s Vector4I;
 
 typedef enum CameraType
 {
-    DEFAULT_CAMERA,
-    PANNING_CAMERA
+	DEFAULT_CAMERA,
+	PANNING_CAMERA
 } CameraType;
 
 typedef struct Camera
 {
-    Vector3 position;
-    Vector3 target;
-    CameraType type;
-    float angle;
-    float fov;
-    float zoom;
+	Vector3 position;
+	Vector3 target;
+	CameraType type;
+	float angle;
+	float fov;
+	float zoom;
 } Camera;
 
 typedef struct
 {
-    Vector3 position;
-    Vector2 tex_coords;
-    float tex_id;
-}Vertex;
-
+	Vector3 position;
+	Vector2 tex_coords;
+	float tex_id;
+} Vertex;
 
 typedef struct Material
 {
@@ -272,271 +283,238 @@ typedef struct Material
 
 typedef struct Line
 {
-    Vector2 start;
-    Vector2 end;
+	Vector2 start;
+	Vector2 end;
 } Line;
 
 typedef struct Rectangle
 {
-    float x;
-    float y;
-    float width;
-    float height;
+	float x;
+	float y;
+	float width;
+	float height;
 } Rectangle;
 
 typedef struct Collider
 {
-    float x;
-    float y;
-    float width;
-    float height;
-    Line *vertices;
-    bool dynamic;
-    bool rotating;
+	float x;
+	float y;
+	float width;
+	float height;
+	Line *vertices;
+	bool dynamic;
+	bool rotating;
 } Collider;
 
 typedef struct BloomMip
 {
-    vec2 size;
-    ivec2 int_size;
-    Texture texture;
+	vec2 size;
+	ivec2 int_size;
+	Texture texture;
 } BloomMip;
 typedef struct Bloom
 {
-    unsigned int mip_chain_len;
-    BloomMip *mip_chain;
-    unsigned int FBO;
-    bool karis_average;
-    bool enabled;
+	unsigned int mip_chain_len;
+	BloomMip *mip_chain;
+	unsigned int FBO;
+	bool karis_average;
+	bool enabled;
 } Bloom;
 
 typedef struct PointIntersect
 {
-    Vector2 dist;
-    bool hit;
+	Vector2 dist;
+	bool hit;
 } PointIntersect;
 
 typedef struct TextCharacter
 {
-    unsigned int texture_id;
-    ivec2 size;
-    ivec2 bearing;
-    unsigned int advance;
+	Vector2I size;	  // Size of glyph
+	Vector2I bearing; // Offset from baseline to left/top of glyph
+	unsigned int advance;
 } TextCharacter;
-static TextCharacter default_chars[128];
+
+typedef struct
+{
+	unsigned int id;
+	int num_columns;
+	int character_width;
+	int character_height;
+	int resolution;
+} TextureAtlas;
 
 typedef struct Font
 {
-    char *path;
-    TextCharacter loaded_chars[128];
+	char *path;
+	TextureAtlas texture_atlas;
+	TextCharacter characters[128];
 } Font;
 
 typedef struct Text
 {
-    char *text;
-    float x;
-    float y;
-    float scale;
-    Vector4 color;
+	char *text;
+	float x;
+	float y;
+	float scale;
+	Vector4 color;
 } Text;
-
-static unsigned int text_characters_max = 100;
 
 typedef struct Sound
 {
-
- u32 volume;
+	// Mix_Chunk *chunk;
+	u32 volume;
 } Sound;
 
 typedef struct Music
 {
-
-    u32 volume;
+	// Mix_Music *music;
+	u32 volume;
 } Music;
 
 typedef struct Audio
 {
-    Music **music;
-    u32 music_len;
-    u32 music_max;
-    Sound **sounds;
-    u32 parallel_sounds;
-    u32 max_parallel_sounds;
-    u32 max_parallel_musics;
-    u32 sounds_playing;
-    u32 sounds_len;
-    u32 sounds_max;
-    u32 volume;
+	Music **music;
+	u32 music_len;
+	u32 music_max;
+	Sound **sounds;
+	u32 parallel_sounds;
+	u32 max_parallel_sounds;
+	u32 max_parallel_musics;
+	u32 sounds_playing;
+	u32 sounds_len;
+	u32 sounds_max;
+	u32 volume;
 } Audio;
 
-typedef struct {
-    char file_path[256];
-    int index;
-    void* data;
-    u32 program_index;
+typedef struct
+{
+	char file_path[256];
+	int index;
+	void *data;
+	u32 program_index;
 } Resource;
 
-typedef struct HashNode {
-    Resource resource;
-    struct HashNode *next;
+typedef struct HashNode
+{
+	Resource resource;
+	struct HashNode *next;
 } HashNode;
 
-typedef struct {
-    HashNode **table;
-    size_t size;
-    size_t capacity;
+typedef struct
+{
+	HashNode **table;
+	size_t size;
+	size_t capacity;
 } HashTable;
 
-typedef struct {
-    HashTable *hash_table;
-    int next_index;
+typedef struct
+{
+	HashTable *hash_table;
+	int next_index;
 } Salad;
 
-typedef struct {
-    GLuint count;
-    GLuint prim_count;
-    GLuint first;
-    GLuint base_instance;
+typedef struct
+{
+	GLuint count;
+	GLuint prim_count;
+	GLuint first;
+	GLuint base_instance;
 } DrawCommand;
 
-typedef struct {
- GLuint command_buffer;
+typedef struct
+{
+	GLuint command_buffer;
 
-    GLuint white;
-    u32 white_ID;
+	GLuint white;
+	u32 white_ID;
 
-    u32 batch_count;
- u32 current_shader;
- u32 current_batch;
+	u32 batch_count;
+	u32 current_shader;
+	u32 current_batch;
 
-    u32 *textures;
-    u32 tex_count;
+	u32 *textures;
+	u32 tex_count;
 
-    u32 max_quads;
-    u32 max_vertices;
-    u32 max_textures;
+	u32 max_quads;
+	u32 max_vertices;
+	u32 max_textures;
 } Renderer;
 
 typedef struct State
 {
-    u32 screen_width;
-    u32 screen_height;
-    float near_z;
-    float far_z;
-    u32 target_fps;
-    SDL_Event window_event;
-    SDL_Window *main_window;
-    SDL_GLContext main_context;
+	u32 screen_width;
+	u32 screen_height;
+	float near_z;
+	float far_z;
+	u32 target_fps;
+	SDL_Event window_event;
+	SDL_Window *main_window;
+	SDL_GLContext main_context;
 
-    Audio audio;
+	Audio audio;
 
-    Input input;
+	Input input;
 
-    Salad *salad;
+	Salad *salad;
 
-    Renderer renderer;
+	Renderer renderer;
 
-    const u8 *key_state;
-    u32 mouse_state;
-    Vector2 mouse_world;
-    Vector2 camera_pan_start;
-    Vector2 camera_pan_end;
-    Vector2 mouse_pos;
-    Vector2 mouse_delta;
-    int wheel;
-    bool deferred;
-    bool sdf_font;
-    void (*resize_callback)(int, int);
-    Bloom bloom;
-    Camera camera;
-    f64 frame_time;
-    f64 time;
-    u32 active_camera;
-    f32 gravity;
-    bool quit;
-    mat4 model, view, projection, ortho_projection;
-    u32 max_colliders;
-    u32 cur_colliders;
-    bool fullscreen;
+	const u8 *key_state;
+	u32 mouse_state;
+	Vector2 mouse_world;
+	Vector2 camera_pan_start;
+	Vector2 camera_pan_end;
+	Vector2 mouse_pos;
+	Vector2 mouse_delta;
+	int wheel;
+	bool deferred;
+	bool sdf_font;
+	void (*resize_callback)(int, int);
+	Bloom bloom;
+	Camera camera;
+	f64 frame_time;
+	f64 time;
+	u32 active_camera;
+	f32 gravity;
+	bool quit;
+	mat4 model, view, projection, ortho_projection;
+	u32 max_colliders;
+	u32 cur_colliders;
+	bool fullscreen;
 } State;
 
-static Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
-static float line_vertices[6];
+extern unsigned int text_characters_max;
 
-static float quad_vertices[] = {
-    -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 0.0f
-};
+extern Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
+extern float line_vertices[6];
 
-static float plane_vertices[] = {
-    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-     0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-};
+extern float quad_vertices[20];
 
-static float cube_vertices[] = {
+extern float plane_vertices[20];
+extern float cube_vertices[192];
+extern State *state;
 
-   -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-   -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+extern u64 last_frame;
+extern u64 current_frame;
 
-
-    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-
-
-    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-   -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-   -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-
-
-   -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-   -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-   -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-   -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-
-
-   -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-   -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-
-
-   -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-   -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-};
-static State *state;
-
-static int MAX_BLOOM_MIP = 10;
-static u64 last_frame;
-static u64 current_frame;
-
-static u32 quad_vbo, quad_vao;
-static u32 plane_vbo, plane_vao;
-static u32 text_vbo, text_vao;
-static u32 line_vbo, line_vao;
-static u32 cube_vbo, cube_vao;
+extern u32 quad_vbo, quad_vao;
+extern u32 plane_vbo, plane_vao;
+extern u32 text_vbo, text_vao;
+extern u32 line_vbo, line_vao;
+extern u32 cube_vbo, cube_vao;
 
 void ToggleFullscreen();
 
 int GetRandomValue(int min, int max);
-char* TextFormat(const char* format, ...);
+char *TextFormat(const char *format, ...);
+TextCharacter CalculateCharacterInfo(TextureAtlas atlas, char character);
 float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 char *ReadTextFile(char *path);
-
+// multiply vector2 by a value
 Vector2 Vector2Scale(Vector2 vector, float scalar);
-
+// add two vector2s
 Vector2 Vector2Add(Vector2 first, Vector2 second);
 Vector2 Vector2Zero(void);
 Vector3 Vector3Scale(Vector3 vector, float scalar);
@@ -547,9 +525,9 @@ Vector3 Vector3Zero(void);
 Vector3 Vector2ToVector3(Vector2 vec, float z);
 float Vector3Distance(Vector3 v1, Vector3 v2);
 Vector3 Vector3Normalize(Vector3 vector);
-
+// comparing too floats might be innacurate, avoid doing this
 bool Vector2Comp(Vector2 first, Vector2 second);
-
+// return the delta of your mouse between frames
 Vector2 GetMouseDelta(void);
 Vector2 GetMouseWorldDelta(void);
 Vector3 Vector3Transform(vec3 v, mat4 mat);
@@ -569,7 +547,7 @@ void CameraZoom(Camera *camera, float amount, float min, float max);
 void ZoomCamera(Camera *Camera);
 void LightingPass();
 
-
+// initiate engine, higher mip level = more bloom samples and 0 is no bloom at all
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level);
 void EngineUpdate();
 void EnginePresent(void);
@@ -581,12 +559,12 @@ void BloomInit(int mip_amount);
 void UpsampleBloom(float filter_radius);
 void DownSampleBloom(unsigned int src_texture, float threshold, float knee);
 void RenderBloom(unsigned int src_texture, float filter_radius, float threshold, float knee);
-# 3 "SpriteLight/engine_include/SpriteLight.h" 2
+
+#endif // SPRITELIGHT_H
 
 
-# 1 "SpriteLight/engine_include/resource_mgr.h" 1
-
-
+#ifndef SALAD_H
+#define SALAD_H
 
 void InitHashTable(size_t initial_capacity);
 void FreeResources();
@@ -597,9 +575,9 @@ Texture LoadTexture(const char *texture_name);
 Shader Load_Shader(const char *vertex_name, const char *fragment_name);
 unsigned int Hash(const char *str);
 void HandleError(const char *message, ...);
-# 6 "SpriteLight/engine_include/SpriteLight.h" 2
 
-# 1 "SpriteLight/engine_include/draw.h" 1
+#endif /* SALAD_H */
+
 void DrawQuad();
 void DrawRect(Rectangle rec, Vector4 color);
 void DrawUIRect(Rectangle rec, Vector4 color);
@@ -614,4 +592,4 @@ void DrawSubTextText(Text *text, Font *font, int count);
 void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture);
 void DrawGradientV(Vector4 start, Vector4 end, float offset);
 void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color);
-# 8 "SpriteLight/engine_include/SpriteLight.h" 2
+

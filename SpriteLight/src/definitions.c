@@ -1,3 +1,5 @@
+#include "engine.h"
+
 char *ReadTextFile(char *path)
 {
 	void *file;
@@ -232,8 +234,10 @@ Vector3 MeasureTextText(Text *text, Font *font)
 {
 	return MeasureText(text->text, font, text->scale);
 }
+
 Vector3 MeasureText(char *text, Font *font, float scale)
 {
+	/*
 	if (text == NULL || text[0] == '\0')
 	{
 		return (Vector3){0.0f, 0.0f, 0.0f}; // Empty text, return zeros.
@@ -296,7 +300,8 @@ Vector3 MeasureText(char *text, Font *font, float scale)
 
 		offset_x += (ch.advance >> 6) * scale;
 	}
-	return (Vector3){offset_x_max, (max_y - offset_y_min), offset_y_min + first_offset};
+	*/
+	return (Vector3){0, 0, 0};
 }
 
 Vector3 MeasureWorldText(char *text, Font *font, float scale)

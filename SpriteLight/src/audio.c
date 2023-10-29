@@ -1,3 +1,5 @@
+#include "engine.h"
+
 u32 LoadAudioStream(const char *file_name)
 {
     Mix_Music *music = NULL;
