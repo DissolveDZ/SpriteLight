@@ -505,32 +505,48 @@ extern u32 cube_vbo, cube_vao;
 
 void ToggleFullscreen();
 
-int GetRandomValue(int min, int max);
 char *TextFormat(const char *format, ...);
 TextCharacter CalculateCharacterInfo(TextureAtlas atlas, char character);
-float Lerp(float start, float end, float amount);
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 char *ReadTextFile(char *path);
-// multiply vector2 by a value
+
+// MATH
+
+// returns a random value between min and max
+int GetRandomValue(int min, int max);
+// interpolates between two floats
+float Lerp(float start, float end, float amount);
+// multiply Vector2 by a value
 Vector2 Vector2Scale(Vector2 vector, float scalar);
-// add two vector2s
+// add two Vector2s
 Vector2 Vector2Add(Vector2 first, Vector2 second);
+// returns an empty Vector2
 Vector2 Vector2Zero(void);
-Vector3 Vector3Scale(Vector3 vector, float scalar);
-Vector3 Vector3Add(Vector3 first, Vector3 second);
+// Subtract a Vector2 by a Vector2
 Vector2 Vector2Subtract(Vector2 first, Vector2 second);
+// "scale" a Vector, which is multiplying the vector by a given number
+Vector3 Vector3Scale(Vector3 vector, float scalar);
+// Add two Vector3s
+Vector3 Vector3Add(Vector3 first, Vector3 second);
+// Subtract a Vector3 by a Vector3
 Vector3 Vector3Subtract(Vector3 first, Vector3 second);
+// returns an empty Vector3
 Vector3 Vector3Zero(void);
+// easy Vector2 to Vector3 conversion 
 Vector3 Vector2ToVector3(Vector2 vec, float z);
+// distance between two 3D Vectors
 float Vector3Distance(Vector3 v1, Vector3 v2);
+// normalize a 3D Vector
 Vector3 Vector3Normalize(Vector3 vector);
-// comparing too floats might be innacurate, avoid doing this
+// comparing two floats might be innacurate, avoid doing this
 bool Vector2Comp(Vector2 first, Vector2 second);
+// depricated, use cglm function
+Vector3 Vector3Transform(vec3 v, mat4 mat);
+
 // return the delta of your mouse between frames
 Vector2 GetMouseDelta(void);
 Vector2 GetMouseWorldDelta(void);
-Vector3 Vector3Transform(vec3 v, mat4 mat);
 Vector2 GetScreenToWorld2D(Vector2 position, mat4 projection);
 Camera *CreateCamera2D(float fov, Vector3 position, CameraType type);
 void GBufferSetup(unsigned int *g_buffer, unsigned int *g_position, unsigned int *g_normal, unsigned int *g_albedo, unsigned int *depth, int screen_width, int screen_height);
@@ -578,18 +594,34 @@ void HandleError(const char *message, ...);
 
 #endif /* SALAD_H */
 
+// draws a quad with no matrices which will cover the whole screen
 void DrawQuad();
+// draws a rectangle in world-space with a given color
 void DrawRect(Rectangle rec, Vector4 color);
+// draws a screen-space rectangle, size in pixels
 void DrawUIRect(Rectangle rec, Vector4 color);
+// draws a textured rectangle
 void DrawTexRect(Rectangle rec, u32 tex_id, float rotation);
+// draws a textured rectangle with a tint
 void DrawTexRectTint(Rectangle rec, u32 tex_id, float rotation, Vector4 tint);
+// draws text in world-space
 void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
+// draws text using the text struct
 void DrawWorldTextText(Text text, Font *font);
+// draws a basic screen-space text
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
+// draws a basic screen-space text using the text struct
+// might make it return an array which can be used to offset individual characters
 void DrawTextText(Text text, Font *font);
+// draw only part of text, best used for animated text
 void DrawSubText(char *text, Font *font, int count, float x, float y, float scale, Vector4 color);
+// draws only part of text, best used for animated text using the text struct
 void DrawSubTextText(Text *text, Font *font, int count);
+// draws a textured cube in world-space
 void DrawCube(Vector3 position, Vector3 scale, Vector3 rotation, Texture texture);
+// draws a gradient which covers the whole screen
 void DrawGradientV(Vector4 start, Vector4 end, float offset);
+// draws a line
 void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color);
+
 

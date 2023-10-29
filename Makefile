@@ -1,7 +1,5 @@
 header:
 	./merge_headers.sh
-	# gcc -E -ISpriteLight/engine_include SpriteLight/engine_include/SpriteLight.h -o SpriteLight/include/engine.h
-	#cp SpriteLight/include/engine.h include
 
 dynamic: header
 	meson compile -C build sprite_light_shared
