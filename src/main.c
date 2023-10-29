@@ -93,26 +93,9 @@ int main(int argc, char *argv[])
 	{
 		EngineUpdate();
 		UpdateCamera();
+
 		glClearColor(1.0f, 0.5f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		/*
-		for (int y = 0; y < 50; y++)
-		{
-			for (int x = 0; x < 50; x++)
-			{
-				DrawTexRect((Rectangle){x, y, 1, 1}, (x + y) % 2 == 0 ? tex1.ID : tex2.ID, 0.f);
-			}
-		}
-		for (int y = 0; y < 50; y++)
-		{
-			for (int x = 0; x < 50; x++)
-			{
-				DrawTexRect((Rectangle){-x, -y, 1, 1}, (x + y) % 2 == 0 ? tex1.ID : tex2.ID, 0.f);
-			}
-		}
-		DrawTexRect((Rectangle){0, 0, 4, 1}, tex1.ID, -state->time * 200);
-		*/
-
 		DrawGradientV((Vector4){51, 76.5f, 153, 255}, (Vector4){178.5f, 229.5f, 255, 255}, state->camera.position.y / 100);
 		DrawRect((Rectangle){0, 0, 2, 1}, (Vector4){125, 125, 125, 255});
 		DrawRect((Rectangle){-3, 0, 2, 1}, (Vector4){255, 75, 75, 255});
