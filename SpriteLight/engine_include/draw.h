@@ -12,6 +12,10 @@ void DrawTexRectTint(Rectangle rec, u32 tex_id, float rotation, Vector4 tint);
 void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 // draws text using the text struct
 void DrawWorldTextText(Text text, Font *font);
+// draws a Text using signed-distance-fields and other tricks to look really crisp
+void DrawSDFText(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color);
+// draws a Text using signed-distance-fields and other tricks to look really crisp
+void DrawSDFTextWorld(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color);
 // draws a basic screen-space text
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 // draws a basic screen-space text using the text struct

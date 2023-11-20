@@ -3,7 +3,7 @@
 
 unsigned int text_characters_max = 100;
 
-Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
+Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader, sdf_text_shader;
 float line_vertices[6];
 
 float quad_vertices[20] = {

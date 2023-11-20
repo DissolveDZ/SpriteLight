@@ -6,6 +6,7 @@ source_files = files('SpriteLight/src/main.c', 'SpriteLight/src/glad.c', 'Sprite
 # Define dependencies
 cglm_dep = dependency('cglm')
 freetype_dep = dependency('freetype2')
+b_sanitize = ['address', 'undefined']
 
 # Define shared library
 shared_lib = shared_library('sprite_light_shared', source_files,
@@ -28,7 +29,7 @@ executable('engine_test_shared',
     'src/main.c',
     link_with : shared_lib,
     c_args : ['-ggdb', '-Wno-missing-braces'],
-    link_args : ['-lSDL3'],
+    link_args : ['-lSDL3', '-lmsdfl'],
     dependencies : [cglm_dep, freetype_dep],
     include_directories : include_directories('include')
 )
@@ -37,7 +38,7 @@ executable('engine_test_static',
     'src/main.c',
     link_with : static_lib,
     c_args : ['-ggdb', '-Wno-missing-braces'],
-    link_args : ['-lSDL3'],
+    link_args : ['-lSDL3', '-lmsdfgl'],
     dependencies : [cglm_dep, freetype_dep],
     include_directories : include_directories('include')
 )

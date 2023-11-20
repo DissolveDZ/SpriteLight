@@ -1,7 +1,4 @@
 #pragma once
-#ifndef SDL_MAIN_HANDLED 
-#define SDL_MAIN_HANDLED 
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -16,6 +13,7 @@
 #include <cglm/struct.h>
 #include <glad/glad.h>
 #include <flecs.h>
+#include <msdfgl.h>
 #include <ft2build.h>
 #include <stb_image.h>
 #include FT_FREETYPE_H
@@ -232,6 +230,7 @@ void FreeLights();
 #ifndef SPRITELIGHT_H
 #define SPRITELIGHT_H
 
+#include "msdfgl.h"
 #define MAX_BLOOM_MIP 10
 
 typedef uint8_t u8;
@@ -450,6 +449,9 @@ typedef struct State
 	SDL_Event window_event;
 	SDL_Window *main_window;
 	SDL_GLContext main_context;
+	msdfgl_context_t msdfgl_context;
+	msdfgl_atlas_t atlas;
+	GLfloat msdf_ortho[4][4];
 
 	Audio audio;
 
@@ -485,7 +487,7 @@ typedef struct State
 
 extern unsigned int text_characters_max;
 
-extern Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader;
+extern Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader, sdf_text_shader;
 extern float line_vertices[6];
 
 extern float quad_vertices[20];
@@ -513,6 +515,8 @@ char *ReadTextFile(char *path);
 
 // MATH
 
+// RGB to Hex
+i32 RGBToHex(Vector4I color);
 // returns a random value between min and max
 int GetRandomValue(int min, int max);
 // interpolates between two floats
@@ -608,6 +612,10 @@ void DrawTexRectTint(Rectangle rec, u32 tex_id, float rotation, Vector4 tint);
 void DrawWorldText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 // draws text using the text struct
 void DrawWorldTextText(Text text, Font *font);
+// draws a Text using signed-distance-fields and other tricks to look really crisp
+void DrawSDFText(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color);
+// draws a Text using signed-distance-fields and other tricks to look really crisp
+void DrawSDFTextWorld(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color);
 // draws a basic screen-space text
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color);
 // draws a basic screen-space text using the text struct

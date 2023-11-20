@@ -14,6 +14,17 @@ char *ReadTextFile(char *path)
 	return path;
 }
 
+i32 RGBToHex(Vector4I color) 
+{
+    // Ensure that the input values are within the valid range (0 to 255)
+    color.r = (color.r < 0) ? 0 : (color.r > 255) ? 255 : color.r;
+    color.g = (color.g < 0) ? 0 : (color.g > 255) ? 255 : color.g;
+    color.b = (color.b < 0) ? 0 : (color.b > 255) ? 255 : color.b;
+    color.a = (color.a < 0) ? 0 : (color.a > 255) ? 255 : color.a;
+
+    return (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
+}
+
 char *FormatShaderUniform(const char *uniform_name, int index)
 {
 	int buffer_size = snprintf(NULL, 0, "%s[%d].%s", uniform_name, index, uniform_name) + 1;
@@ -324,6 +335,9 @@ void EnginePresent(void)
 
 void EngineQuit(void)
 {
+	/* Cleanup */
+	// msdfgl_destroy_font(font);
+	msdfgl_destroy_context(state->msdfgl_context);
 	FreeResources();
 	SDL_GL_DeleteContext(state->main_context);
 	SDL_DestroyWindow(state->main_window);

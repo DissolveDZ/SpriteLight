@@ -1,4 +1,6 @@
 #include "engine.h"
+#include "msdfgl.h"
+#include <cglm/mat4.h>
 
 void DrawQuad()
 {
@@ -122,6 +124,23 @@ void DrawLine2DWorld(Vector2 start, Vector2 end, Vector4 color)
 void DrawText(char *text, Font *font, float x, float y, float scale, Vector4 color)
 {
 	DrawTextText((Text){text, x, y, scale, color}, font);
+	
+}
+
+void DrawSDFText(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color)
+{
+  msdfgl_printf(x-scale/16, y+scale, font, scale, RGBToHex((Vector4I){.r=(int)color.r, .g=(int)color.g, .b=(int)color.b, .a=(int)color.a}), (GLfloat *)state->ortho_projection,
+  MSDFGL_UTF8 | MSDFGL_KERNING, text);
+}
+
+void DrawSDFTextWorld(const char *text, msdfgl_font_t font, float x, float y, float scale, Vector4 color)
+{
+	mat4 model_view = GLM_MAT4_IDENTITY_INIT;
+	glm_mat4_mul(state->projection, state->view, model_view);
+	glm_scale(model_view, (vec3){1, -1, 1});
+
+  msdfgl_printf(x, y, font, scale*.025f, RGBToHex((Vector4I){.r=(int)color.r, .g=(int)color.g, .b=(int)color.b, .a=(int)color.a}), (GLfloat *)model_view,
+  MSDFGL_UTF8 | MSDFGL_KERNING, text);
 }
 
 TextCharacter CalculateCharacterInfo(TextureAtlas atlas, char character)
@@ -154,12 +173,6 @@ void DrawTextText(Text text, Font *font)
 	for (size_t i = 0; i < text_length; i++)
 	{
 		TextCharacter ch;
-		/*
-		if (font == NULL)
-			ch = default_chars[text.text[i]];
-		else
-			ch = font->loaded_chars[text.text[i]];
-		*/
 		ch = CalculateCharacterInfo(font->texture_atlas, text.text[i]);
 
 		float w = 500; // ch.size.x * text.scale; // Update: Use ch.size.x instead of ch.size[0]

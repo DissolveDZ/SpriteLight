@@ -1,6 +1,3 @@
-#ifndef SDL_MAIN_HANDLED 
-#define SDL_MAIN_HANDLED 
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -15,6 +12,7 @@
 #include <cglm/struct.h>
 #include <glad/glad.h>
 #include <flecs.h>
+#include <msdfgl.h>
 #include <ft2build.h>
 #include <stb_image.h>
 #include FT_FREETYPE_H

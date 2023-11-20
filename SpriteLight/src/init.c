@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "msdfgl.h"
 
 State *EngineInit(char *window_name, char *icon_path, int width, int height, int bloom_mip_level)
 {
@@ -24,23 +25,11 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 	}
 	state->target_fps = cur_mode->refresh_rate;
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	// glEnable(GL_CULL_FACE);
+	// glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
 	glEnable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	InitHashTable(16);
-	InitDefaultFont(256);
-
-	SetInputAction(KEY_F11, ToggleFullscreen, INPUT_PRESS, "Toggle Fullscreen", 0);
-	// SetInputAction(MOUSE_RIGHT, CameraPan, INPUT_PRESS, "Camera Pan", 0);
-
-	general_shader = LoadShader("engine/rec.vert", "engine/rec.frag");
-	ui_shader = LoadShader("ui/screen_space.vert", "engine/rec.frag");
-	text_shader = LoadShader("engine/text.vert", "engine/text.frag");
-	text_shader_world = LoadShader("engine/text_world.vert", "engine/text.frag");
-	gradient_shader = LoadShader("engine/quad.vert", "ui/gradient.frag");
 
 	SDL_Surface *icon = LoadSDLImage(icon_path);
 	SDL_SetWindowIcon(state->main_window, icon);
@@ -57,6 +46,20 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 	state->resize_callback = 0;
 	OnResize(width, height);
 
+	InitHashTable(16);
+	InitDefaultFont(256);
+	
+	general_shader = LoadShader("engine/rec.vert", "engine/rec.frag");
+	ui_shader = LoadShader("ui/screen_space.vert", "engine/rec.frag");
+	sdf_text_shader = LoadShader("engine/sdf_text.vert", "engine/sdf_text.frag");
+	text_shader = LoadShader("engine/text.vert", "engine/text.frag");
+	text_shader_world = LoadShader("engine/text_world.vert", "engine/text.frag");
+	gradient_shader = LoadShader("engine/quad.vert", "ui/gradient.frag");
+
+	SetInputAction(KEY_F11, ToggleFullscreen, INPUT_PRESS, "Toggle Fullscreen", 0);
+	// SetInputAction(MOUSE_RIGHT, CameraPan, INPUT_PRESS, "Camera Pan", 0);
+
+
 	BufferSetup(&quad_vao, &quad_vbo, quad_vertices, sizeof(quad_vertices), true, false);
 	BufferSetup(&text_vao, &text_vbo, quad_vertices, sizeof(quad_vertices), true, false);
 	BufferSetup(&plane_vao, &plane_vbo, plane_vertices, sizeof(plane_vertices), true, false);
@@ -70,8 +73,10 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 
 void InitDefaultFont(unsigned int resolution)
 {
-	// Font *default_font = LoadFont("arial.ttf", resolution);
-	// memcpy(default_chars, default_font->loaded_chars, 128 * sizeof(TextCharacter));
+	state->msdfgl_context = msdfgl_create_context("330 core");
+	state->atlas = msdfgl_create_atlas(state->msdfgl_context, 1024, 2);
+	/* Enable auto-generating undefined glyphs as they are encountered for the first time. */
+	msdfgl_set_missing_glyph_callback(state->msdfgl_context, msdfgl_generate_glyph, NULL);
 }
 
 #define NUM_GLYPHS 127
@@ -170,8 +175,6 @@ Font *LoadFont(const char *font_name, unsigned int resolution)
 				font->characters[i].bearing.x = pen_x;
 				font->characters[i].bearing.y = -pen_y;
 				font->characters[i].advance = face->glyph->advance.x >> 6;
-				// font->offsets[i].x = (face->glyph->advance.x >> 6) + face->glyph->bitmap_left;
-				// font->offsets[i].y = face->glyph->bitmap_top; 
 				pen_x += bmp->width + 1;
 			}
 
@@ -194,9 +197,6 @@ Font *LoadFont(const char *font_name, unsigned int resolution)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			font->texture_atlas.id = texture_atlas;
 			font->texture_atlas.num_columns = 1;
-			//font->texture_atlas.num_columns = tex_width / char_width;
-			//font->texture_atlas.character_width = char_width;
-			//font->texture_atlas.character_height = char_height;
 			font->texture_atlas.resolution = tex_width;
 
 			resource->data = font;
