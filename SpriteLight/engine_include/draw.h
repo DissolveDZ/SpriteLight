@@ -3,7 +3,7 @@ void DrawQuad();
 // draws a rectangle in world-space with a given color
 void DrawRect(Rectangle rec, Vector4 color);
 // draws a screen-space rectangle, size in pixels
-void DrawUIRect(Rectangle rec, Vector4 color);
+void DrawUIRect(Rectangle rec, Vector4 color, float rotation);
 // draws a textured rectangle
 void DrawTexRect(Rectangle rec, u32 tex_id, float rotation);
 // draws a textured rectangle with a tint

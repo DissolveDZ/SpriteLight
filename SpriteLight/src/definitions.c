@@ -1,5 +1,75 @@
 #include "engine.h"
 
+// exports
+unsigned int text_characters_max = 100;
+
+Shader downsample_shader, upsample_shader, general_shader, ui_shader, text_shader, gradient_shader, circle_shader, text_shader_world, text_shader, sdf_text_shader;
+float line_vertices[6];
+
+float quad_vertices[20] = {
+	-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, 0.0f, 1.0f, 0.0f};
+
+float plane_vertices[20] = {
+	-0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+	0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+	0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
+
+float cube_vertices[192] =
+{
+    // Front face
+    -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,  // 0
+     1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,  // 1
+    -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,  // 2
+     1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,  // 3
+
+    // Right face
+     1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f,  // 1
+     1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  1.0f,  0.0f, 0.0f,  // 5
+     1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  1.0f,  0.0f, 0.0f,  // 3
+     1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  1.0f,  0.0f, 0.0f,  // 7
+
+    // Back face
+     1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,  // 5
+    -1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,  // 4
+     1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,  // 7
+    -1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,  // 6
+
+    // Left face
+    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f,  // 4
+    -1.0f, -1.0f,  1.0f,  1.0f, 0.0f, -1.0f,  0.0f, 0.0f,  // 0
+    -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, -1.0f,  0.0f, 0.0f,  // 6
+    -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, -1.0f,  0.0f, 0.0f,  // 2
+
+    // Bottom face
+    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,  // 4
+     1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,  // 5
+    -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,  // 0
+     1.0f, -1.0f,  1.0f,  1.0f, 1.0f,  0.0f, -1.0f,  0.0f,  // 1
+
+    // Top face
+    -1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  0.0f,  1.0f,  0.0f,  // 2
+     1.0f,  1.0f,  1.0f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,  // 3
+    -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,  // 6
+     1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  0.0f,  1.0f,  0.0f   // 7
+};
+
+u64 last_frame;
+u64 current_frame;
+
+u32 quad_vbo, quad_vao;
+u32 plane_vbo, plane_vao;
+u32 text_vbo, text_vao;
+u32 line_vbo, line_vao;
+u32 cube_vbo, cube_vao;
+
+State *state;
+
+// main definitions
+
 char *ReadTextFile(char *path)
 {
 	void *file;
@@ -138,49 +208,49 @@ Vector3 Vector3Transform(vec3 v, mat4 mat)
 
 Vector2 GetScreenToWorld2D(Vector2 position, mat4 projection)
 {
-	Vector2 clipcoord = {2.0f * position.x / (float)state->screen_width - 1.0f, 1.0 - 2.0 * position.y / (float)state->screen_height};
+	Vector2 clipcoord = {{2.0f * position.x / (float)state->screen_width - 1.0f, 1.0 - 2.0 * position.y / (float)state->screen_height}};
 	mat4 inv_view;
 	glm_mat4_inv(projection, inv_view);
 	Vector3 transform;
 	transform = Vector3Transform((vec3){clipcoord.x, clipcoord.y, 1}, inv_view);
-	return (Vector2){transform.x * state->camera.position.z + state->camera.position.x, transform.y * state->camera.position.z + state->camera.position.y};
+	return (Vector2){{transform.x * state->camera.position.z + state->camera.position.x, transform.y * state->camera.position.z + state->camera.position.y}};
 }
 
 // Function to subtract two Vector2 vectors
 Vector2 Vector2Subtract(Vector2 first, Vector2 second)
 {
-	return (Vector2){first.x - second.x, first.y - second.y};
+	return (Vector2){{first.x - second.x, first.y - second.y}};
 }
 
 // Function to convert a Vector2 to Vector3
 Vector3 Vector2ToVector3(Vector2 vec, float z)
 {
-	return (Vector3){vec.x, vec.y, z};
+	return (Vector3){{vec.x, vec.y, z}};
 }
 
 Vector2 Vector2Scale(Vector2 vector, float scalar)
 {
-	return (Vector2){vector.x * scalar, vector.y * scalar};
+	return (Vector2){{vector.x * scalar, vector.y * scalar}};
 }
 
 Vector2 Vector2Add(Vector2 first, Vector2 second)
 {
-	return (Vector2){first.x + second.x, first.y + second.y};
+	return (Vector2){{first.x + second.x, first.y + second.y}};
 }
 
 Vector3 Vector3Scale(Vector3 vector, float scalar)
 {
-	return (Vector3){vector.x * scalar, vector.y * scalar, vector.z * scalar};
+	return (Vector3){{vector.x * scalar, vector.y * scalar, vector.z * scalar}};
 }
 
 Vector3 Vector3Add(Vector3 first, Vector3 second)
 {
-	return (Vector3){first.x + second.x, first.y + second.y, first.z + second.z};
+	return (Vector3){{first.x + second.x, first.y + second.y, first.z + second.z}};
 }
 
 Vector3 Vector3Subtract(Vector3 first, Vector3 second)
 {
-	return (Vector3){first.x - second.x, first.y - second.y, first.z - second.z};
+	return (Vector3){{first.x - second.x, first.y - second.y, first.z - second.z}};
 }
 
 Vector2 Vector2Zero()
@@ -197,9 +267,9 @@ Vector3 Vector3Normalize(Vector3 vector)
 {
 	float length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
 	if (length != 0.0f)
-		return (Vector3){vector.x / length, vector.y / length, vector.z / length};
+		return (Vector3){{vector.x / length, vector.y / length, vector.z / length}};
 	else
-		return (Vector3){0.0f, 0.0f, 0.0f};
+		return (Vector3){{0.0f, 0.0f, 0.0f}};
 }
 
 // return the distance between two vector3s
@@ -312,7 +382,7 @@ Vector3 MeasureText(char *text, Font *font, float scale)
 		offset_x += (ch.advance >> 6) * scale;
 	}
 	*/
-	return (Vector3){0, 0, 0};
+	return (Vector3){{0, 0, 0}};
 }
 
 Vector3 MeasureWorldText(char *text, Font *font, float scale)

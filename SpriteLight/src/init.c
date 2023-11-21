@@ -25,8 +25,8 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 	}
 	state->target_fps = cur_mode->refresh_rate;
 
-	// glEnable(GL_CULL_FACE);
-	// glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
 	glEnable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -73,7 +73,7 @@ State *EngineInit(char *window_name, char *icon_path, int width, int height, int
 
 void InitDefaultFont(unsigned int resolution)
 {
-	state->msdfgl_context = msdfgl_create_context("330 core");
+	state->msdfgl_context = msdfgl_create_context("460 core");
 	state->atlas = msdfgl_create_atlas(state->msdfgl_context, 1024, 2);
 	/* Enable auto-generating undefined glyphs as they are encountered for the first time. */
 	msdfgl_set_missing_glyph_callback(state->msdfgl_context, msdfgl_generate_glyph, NULL);

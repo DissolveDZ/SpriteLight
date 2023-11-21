@@ -1,4 +1,4 @@
-project('Engine', 'c', 'cpp', version: '0.1', default_options: ['default_library=static', 'cpp_std=c++23', 'c_std=c23', 'prefer_static=true'])
+project('Engine', 'c', 'cpp', version: '0.1', default_options: ['default_library=static', 'cpp_std=c++23', 'c_std=c2x', 'prefer_static=true'])
 
 # Specify source files
 source_files = files('SpriteLight/src/main.c', 'SpriteLight/src/glad.c', 'SpriteLight/src/resource_mgr.c', 'SpriteLight/src/definitions.c', 'SpriteLight/src/shader.c', 'SpriteLight/src/texture.c', 'SpriteLight/src/lights.c', 'SpriteLight/src/input.c', 'SpriteLight/src/buffers.c', 'SpriteLight/src/bloom.c', 'SpriteLight/src/init.c', 'SpriteLight/src/update.c', 'SpriteLight/src/draw.c')

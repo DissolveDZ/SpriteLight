@@ -64,15 +64,15 @@ void DrawTexRect(Rectangle rec, u32 tex_id, float rotation)
 	DrawTexRectTint(rec, tex_id, rotation, (Vector4){{255, 255, 255, 255}});
 }
 
-void DrawUIRect(Rectangle rec, Vector4 color)
+void DrawUIRect(Rectangle rec, Vector4 color, float rotation)
 {
 	UseShader(ui_shader);
 	glm_mat4_identity(state->model);
-	glm_translate(state->model, (vec3){rec.x, rec.y, 0.f});
-	glm_translate(state->model, (vec3){0.5f * rec.width, 0.5f * rec.height, 0.f});
-	glm_rotate(state->model, glm_rad(0), (vec3){0.0f, 0.0f, 1.f});
-	glm_translate(state->model, (vec3){-0.5f * rec.width, -0.5f * rec.height, 0.f});
-	glm_scale(state->model, (vec3){rec.width / 2, rec.height / 2, 0.5f});
+	glm_translate(state->model, (vec3){rec.x+(float)state->screen_width/2, rec.y+(float)state->screen_height/2, 0.f});
+	// glm_translate(state->model, (vec3){0.5f * rec.width, 0.5f * rec.height, 0.f});
+	glm_rotate(state->model, glm_rad(rotation), (vec3){0.0f, 0.0f, 1.f});
+	// glm_translate(state->model, (vec3){-0.5f * rec.width, -0.5f * rec.height, 0.f});
+	glm_scale(state->model, (vec3){rec.width / 2, rec.height / 2, 1.f});
 	SetShaderMat4(ui_shader.ID, "model", state->model);
 	SetShaderMat4(ui_shader.ID, "projection", state->ortho_projection);
 	SetShaderBool(ui_shader.ID, "use_color", true);
@@ -139,7 +139,7 @@ void DrawSDFTextWorld(const char *text, msdfgl_font_t font, float x, float y, fl
 	glm_mat4_mul(state->projection, state->view, model_view);
 	glm_scale(model_view, (vec3){1, -1, 1});
 
-  msdfgl_printf(x, y, font, scale*.025f, RGBToHex((Vector4I){.r=(int)color.r, .g=(int)color.g, .b=(int)color.b, .a=(int)color.a}), (GLfloat *)model_view,
+  msdfgl_printf(x, y, font, scale*.01f, RGBToHex((Vector4I){.r=(int)color.r, .g=(int)color.g, .b=(int)color.b, .a=(int)color.a}), (GLfloat *)model_view,
   MSDFGL_UTF8 | MSDFGL_KERNING, text);
 }
 
