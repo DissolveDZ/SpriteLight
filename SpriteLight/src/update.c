@@ -9,18 +9,18 @@ void ProcessCamera(Camera *camera)
 	case PANNING_CAMERA:
 		if (state->mouse_state & SDL_BUTTON_RMASK)
 		{
-			state->camera_pan_end = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+			state->camera_pan_end = GetScreenToWorld2D((Vector2){{state->mouse_pos.x, state->mouse_pos.y}}, state->projection);
 			camera->position.x += (state->camera_pan_start.x - state->camera_pan_end.x);
 			camera->position.y += (state->camera_pan_start.y - state->camera_pan_end.y);
-			state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+			state->camera_pan_start = GetScreenToWorld2D((Vector2){{state->mouse_pos.x, state->mouse_pos.y}}, state->projection);
 		}
 		if (state->wheel != 0)
 		{
 			camera->target.x = state->mouse_world.x;
 			camera->target.y = state->mouse_world.y;
-			Vector2 before = (Vector2){camera->target.x, camera->target.y};
-			CameraZoom(&state->camera, -2 * state->wheel, 1.f, 1000.f);
-			Vector2 after = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+			Vector2 before = (Vector2){{camera->target.x, camera->target.y}};
+			CameraZoom(&state->camera, -1.f * state->wheel, 1.f, 1000.f);
+			Vector2 after = GetScreenToWorld2D((Vector2){{state->mouse_pos.x, state->mouse_pos.y}}, state->projection);
 			camera->position.x += (before.x - after.x);
 			camera->position.y += (before.y - after.y);
 		}
@@ -31,7 +31,7 @@ void ProcessCamera(Camera *camera)
 void CameraPan()
 {
 	if (state->camera.type == PANNING_CAMERA)
-		state->camera_pan_start = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+		state->camera_pan_start = GetScreenToWorld2D((Vector2){{state->mouse_pos.x, state->mouse_pos.y}}, state->projection);
 }
 
 void UpdateCamera()
@@ -55,6 +55,6 @@ void EngineUpdate()
 	glm_mat4_identity(state->projection);
 	if (state->screen_height && state->screen_width)
 		glm_perspective(glm_rad((float)state->screen_height / state->camera.fov), (float)state->screen_width / (float)state->screen_height, state->near_z, state->far_z, state->projection);
-	state->mouse_world = GetScreenToWorld2D((Vector2){state->mouse_pos.x, state->mouse_pos.y}, state->projection);
+	state->mouse_world = GetScreenToWorld2D((Vector2){{state->mouse_pos.x, state->mouse_pos.y}}, state->projection);
 	ProcessCamera(&state->camera);
 }

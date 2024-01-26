@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	Texture tex1 = LoadTexture("cube.png");
 	Texture tex2 = LoadTexture("vedl.png");
 
-	glEnable(GL_DEBUG_OUTPUT);
+	// glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 	Camera *camera = CreateCamera2D(45.f, (Vector3){0, 0, 25}, PANNING_CAMERA);
 	Rectangle rec = (Rectangle){0, 2, 1, 1};

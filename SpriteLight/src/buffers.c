@@ -96,7 +96,7 @@ void BufferSetup(unsigned int *VAO, unsigned int *VBO, float vertices[], int siz
 
 void InitRenderer()
 {
-	DrawCommand draw_command;
+	DrawArraysCommand draw_command;
 
 	draw_command.count = 4;
 }
